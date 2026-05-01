@@ -45,8 +45,6 @@ long long independentChains(vector<int>& data) {
         x1 = x1 ^ (x1 >> 1);
         x1 = x1 * 3;
         x1 = x1 ^ (x1 >> 2);
-
-        std::atomic_thread_fence(std::memory_order_seq_cst);
         
         // Chain 2 - independent of chain 1
         x2 = x2 + data[i + 1];
@@ -54,23 +52,17 @@ long long independentChains(vector<int>& data) {
         x2 = x2 * 3;
         x2 = x2 ^ (x2 >> 2);
 
-        std::atomic_thread_fence(std::memory_order_seq_cst);
-        
         // Chain 3 - independent of chains 1,2
         x3 = x3 + data[i + 2];
         x3 = x3 ^ (x3 >> 1);
         x3 = x3 * 3;
         x3 = x3 ^ (x3 >> 2);
-
-        std::atomic_thread_fence(std::memory_order_seq_cst);
         
         // Chain 4 - independent of chains 1,2,3
         x4 = x4 + data[i + 3];
         x4 = x4 ^ (x4 >> 1);
         x4 = x4 * 3;
         x4 = x4 ^ (x4 >> 2);
-
-        std::atomic_thread_fence(std::memory_order_seq_cst);
     }
     
     return x1 + x2 + x3 + x4;
@@ -175,7 +167,6 @@ pair<long long, long long> benchmark(const string& name, Func func,
 }
 
 int main() {
-    cout << "=== CORRECT Pipeline Demonstration ===" << endl;
     cout << "Array size: " << ARRAY_SIZE << " elements\n" << endl;
     
     vector<int> data(ARRAY_SIZE);
