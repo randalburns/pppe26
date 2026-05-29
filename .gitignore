@@ -1,0 +1,36 @@
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Build artifacts
+*.o
+*.out
+*.a
+*.dylib
+*.so
+*.dSYM/
+
+# Compiled binaries (add specific names as needed)
+pipeline
+pipeline.cse
+pipeline.dce
+pipeline.tempvar
+pipeline_O0
+pipeline_O1
+pipeline_O2
+pipeline_O3
+pipeline_stall_elimination
+strength.reduction/strength.reduction
+strength.reduction/a.out
+
+# Logs and temp files
+*.log
+*.tmp

@@ -8,6 +8,7 @@ Prompt history for this is interesting.   Claude Opus 4.5 have lots of wrong ans
 
 In pipeline.tempvar.cpp
 
+
 Why does the code >>2?
 
 The >> 2 isn't special — it's there to   
@@ -104,3 +105,15 @@ The >> 2 isn't special — it's there to
   and print " µs" instead of " ms". That   
   will show the real SIMD speedup rather
   than 0.                                 
+
+
+pipeline.cse.cpp -- stall elimination
+
+
+pipeline.dce.cpp
+Dead Code elimination -- this is really more of a compiler thing.  And, use your brain, don't write code that doesn't do anything.
+
+ * Three patterns shown:
+ *   1. Dead store      — value written but overwritten before any read
+ *   2. Dead branch     — condition is compile-time constant; one arm is unreachable
+ *   3. Dead pure call  — return value of a side-effect-free function is discarded

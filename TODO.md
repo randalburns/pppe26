@@ -1,3 +1,46 @@
+## RB Thoughts
+
+There are really only 2 computations in all of CS.
+  * sorting
+  * matrix multiplication
+
+* start with speedup
+  * loop optimizations as examples of speedup.
+* then pipelining note that these are processor things
+    * and pipeline examples
+* then let's talk about compilers
+  * and do code generation
+  * even last year it was generate and read assembly
+  * now AI can tell you a lot about what's going on
+* then ILP/CPI note that these are processor ops
+  * out of order and speculative execution
+* now that we have a deep undertand of regular, serial code let's do sorting
+  * 
+
+
+# Structure
+
+* Intro (Currently Lec 0)
+  * what simple example to DO???
+
+* Amdahl's law and speedup (Lec 2)
+* Looping unrolling as first form of optimization
+  * think about the processor instructions, overhead, and branches 
+    * unrolling (1 whole lecture)
+    * loop fusion
+
+* Compiler and optimizations levels
+  * 02 -- auto vectorization, why we run all stuf at 01
+  * strength reduction as something compiler does
+
+* CPU stuff to realize ILP: CPI
+  * OOO and speculative execution
+
+* Pipelining -- 
+
+
+* Cache hierarchy
+  * loop interchange and tiling blocking. loop fission.
 
 ** Loop Optimizations **
 Loop unrolling
@@ -20,10 +63,10 @@ Dead code elimination
 
 Data prefetching
 Cache blocking
-Structure of Arrays (SoA) vs Array of Structures (AoS)
-Memory alignment
+Structure of Arrays (SoA) vs Array of Structures (AoS). TODO
+Memory alignment. TODO
 Avoiding false sharing
-Reducing pointer aliasing (restrict keyword)
+Reducing pointer aliasing (restrict keyword). TODO
 
 ** Branch Optimizations **
 Branch-free code (using arithmetic/bitwise ops)
@@ -33,7 +76,7 @@ Predicated execution
 Loop unswitching
 
 ** Instruction Scheduling **
-Instruction reordering
-Separating dependent instructions
-Interleaving independent operations
+Instruction reordering. (part of piplelining)
+Separating dependent instructions (in ILP)
+Interleaving independent operations (part of separating dependent instructions1)  -- this is redundant with loop fusion and other stuff.
 
