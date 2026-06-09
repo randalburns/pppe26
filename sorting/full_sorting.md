@@ -29,53 +29,86 @@ branches, no recursion, and fits entirely in four `int32x4_t` registers —
 
 ## Introsort (quicksort + bitonic_simd base case) vs std::sort
 
-`newintrosort_heapsortfallback.cpp` uses bitonic_simd as the leaf sorter for
-partitions of ≤ 16 elements, with heapsort fallback to guarantee O(n log n).
-This is the best general-purpose implementation that incorporates the SIMD
-base case.
+`newintrosort_heapsortfallback.cpp` uses `bitonic_sort_simd` as the leaf sorter
+for partitions ≤ 16, with heapsort fallback to guarantee O(n log n).
 
-| n | introsort | std::sort | speedup | region |
-|---|---|---|---|---|
-| 1 024 | 8 µs | 8 µs | **1.00×** | break-even |
-| 2 048 | 17 µs | 13 µs | 0.76× | std wins |
-| 4 096 | 33 µs | 25 µs | 0.76× | std wins |
-| 8 192 | 128 µs | 46 µs | 0.36× | std wins |
-| 16 384 | 350 µs | 115 µs | 0.33× | std wins |
-| 32 768 | 867 µs | 329 µs | 0.38× | std wins |
-| 65 536 | 1 ms | 716 µs | 0.72× | std wins |
-| 131 072 | 4 ms | 1 ms | 0.37× | std wins |
-| 262 144 | 9 ms | 3 ms | 0.37× | std wins |
-| 524 288 | 19 ms | 6 ms | 0.35× | std wins |
-| 1 048 576 | 41 ms | 14 ms | 0.35× | std wins |
+### n = 16: bitonic_sort_simd base case (quicksort never runs)
 
-Speedup = std::sort time ÷ introsort time; values < 1.0 mean std::sort is faster.
+At n = 16 the cutoff fires immediately — introsort *is* bitonic_sort_simd with
+two function calls of overhead:
 
-The SIMD base case yields a measurable advantage at the leaf level (3.18× at
-n = 16 in isolation), but Apple's libc++ `std::sort` dominates at all larger
-sizes. Its pdqsort-derived implementation uses pattern detection, block
-partitioning, and a heavily tuned insertion-sort fallback that collectively
-outperform a hand-rolled median-of-three introsort regardless of base-case
+| n | introsort | std::sort | speedup |
+|---|---|---|---|
+| 16 | **10 ns** | 24 ns | **2.40×** |
+
+This matches the standalone result (11 ns) within measurement noise. Quicksort
+does no partition work; the entire sort is the NEON bitonic network.
+
+### n > 16: quicksort with bitonic_sort_simd leaves
+
+| n | introsort | std::sort | speedup |
+|---|---|---|---|
+| 32 | 52 ns | 77 ns | **1.48×** |
+| 64 | 140 ns | 156 ns | **1.11×** |
+| 128 | 375 ns | 434 ns | **1.16×** |
+| 256 | 887 ns | 982 ns | **1.11×** |
+| 512 | 2.3 µs | 2.2 µs | ~1.0× |
+| 1 024 | 5.5 µs | 5.0 µs | 0.91× std wins |
+| 2 048 | 12.2 µs | 10.7 µs | 0.88× std wins |
+| 4 096 | 27.3 µs | 22.9 µs | 0.84× std wins |
+| 8 192 | 101 µs | 49.8 µs | 0.49× std wins |
+| 16 384 | 342 µs | 110 µs | 0.32× std wins |
+
+Speedup = std::sort ÷ introsort; values < 1.0 mean std::sort is faster.
+
+introsort beats std::sort at n = 32–256 because bitonic leaves account for a
+large fraction of total work in that range. Above n ≈ 512 the upper-level Hoare
+partition dominates and Apple's pdqsort pulls ahead — its pattern detection and
+block partitioning outperform median-of-three Hoare regardless of base-case
 quality.
 
 ---
 
-## Where bitonic_simd Wins
+## Large n: vqs_highway vs std::sort
 
-The bitonic NEON sorter is the right choice when n = 16 is a fixed, repeated
-inner-loop operation — for example, as the base case of a merge sort called
-millions of times per second, or sorting fixed-size register tiles in a SIMD
-pipeline. In that context the 3.18× advantage over std::sort accumulates
-directly into end-to-end throughput.
+`vqs_highway.cpp` (Algorithm 4, Bramas 2017) replaces the in-place Hoare
+partition with a `CompressStore`-based scatter into scratch buffers. All reads
+and writes are sequential, eliminating the random dirty-cache-line writes that
+Hoare partition produces on every swap. The cost is 2× memory bandwidth plus two
+`memcpy` calls per partition level.
 
-For general sorting of variable-length arrays, `std::sort` is the correct
-choice at all sizes benchmarked here.
+The trade-off pays off past the L2/L3 boundary:
+
+| n | vqs_highway | std::sort | speedup |
+|---|---|---|---|
+| 16 | **10 ns** | 24 ns | **2.40×** (bitonic, no allocation) |
+| 1 024 | 5 889 ns | 5 923 ns | 1.01× |
+| 4 096 | 25 236 ns | 23 888 ns | 0.95× std wins |
+| 8 192 | 49 954 ns | 52 517 ns | 1.05× |
+| 32 768 | 243 486 ns | 336 652 ns | **1.38×** |
+| 65 536 | 619 500 ns | 699 750 ns | **1.13×** |
+| 131 072 | 1 406 500 ns | 1 613 583 ns | **1.15×** |
+| 262 144 | 2 870 834 ns | 3 366 375 ns | **1.17×** |
+| 524 288 | 6 050 708 ns | 6 985 500 ns | **1.15×** |
+| 1 048 576 | 12 468 458 ns | 14 512 333 ns | **1.16×** |
+
+The transition is noisy between n = 8192 and n = 32768 (the L2/L3 cliff); the
+advantage stabilises at **~1.15×** from n = 65536 onward.
+
+**Why introsort does not get this benefit:** both introsort and std::sort use
+in-place Hoare partitioning. The random swap-writes are the bottleneck at large
+n, not the base case. A faster leaf sorter (bitonic vs insertion sort) helps only
+at the leaf level; the upper partition levels dominate large-n cost.
 
 ---
 
-## Summary
+## Where Each Method Wins
 
-| Scenario | Best method | vs std::sort |
+| n | Best method | vs std::sort |
 |---|---|---|
-| n = 16, fixed, called in a tight loop | `bitonic_simd` (NEON) | **3.18× faster** |
-| n = 16, portable SIMD needed | `bitonic_highway` | 2.50× faster |
-| n > 16, general use | `std::sort` | reference |
+| 16 (standalone or base case) | `bitonic_sort_simd` (NEON) | **2.40–3.18×** |
+| 16 (portable) | `bitonic_highway` | 2.50× |
+| 32–256 | introsort (quicksort + bitonic_simd leaves) | **1.11–1.48×** |
+| 512–4 096 | `std::sort` | reference |
+| 8 192–32 768 | vqs_highway or std::sort | within noise |
+| ≥ 65 536 | `vqs_highway` | **~1.15–1.21×** |
