@@ -9,12 +9,16 @@
 ## Headline: bitonic_simd at n = 16
 
 At n = 16 in isolation, the NEON bitonic sorting network (`bitonic_sort_simd.cpp`)
-is **2.95× faster** than `std::sort`.
+is **3.18× faster** than `std::sort`.
 
 | Algorithm | Time | ns/elem | vs std::sort |
 |---|---|---|---|
-| `bitonic_simd` (NEON) | **19 ns** | 1.2 | **2.95× faster** |
-| `std::sort` | 56 ns | 3.5 | 1.00× (reference) |
+| `bitonic_simd` (NEON) | **11 ns** | 0.7 | **3.18× faster** |
+| `bitonic_highway` (portable) | 14 ns | 0.9 | 2.50× faster |
+| `bitonic_scalar` | 24 ns | 1.5 | 1.46× faster |
+| insertion sort | 29 ns | 1.8 | 1.21× faster |
+| `std::sort` | 35 ns | 2.2 | 1.00× (reference) |
+| quicksort (median-of-3) | 38 ns | 2.4 | 0.92× (slower) |
 
 `std::sort` fires its insertion-sort base case immediately at n = 16 but still
 pays for function-call and dispatch overhead. The NEON bitonic network has no
@@ -46,7 +50,7 @@ base case.
 
 Speedup = std::sort time ÷ introsort time; values < 1.0 mean std::sort is faster.
 
-The SIMD base case yields a measurable advantage at the leaf level (2.95× at
+The SIMD base case yields a measurable advantage at the leaf level (3.18× at
 n = 16 in isolation), but Apple's libc++ `std::sort` dominates at all larger
 sizes. Its pdqsort-derived implementation uses pattern detection, block
 partitioning, and a heavily tuned insertion-sort fallback that collectively
@@ -60,7 +64,7 @@ quality.
 The bitonic NEON sorter is the right choice when n = 16 is a fixed, repeated
 inner-loop operation — for example, as the base case of a merge sort called
 millions of times per second, or sorting fixed-size register tiles in a SIMD
-pipeline. In that context the 2.95× advantage over std::sort accumulates
+pipeline. In that context the 3.18× advantage over std::sort accumulates
 directly into end-to-end throughput.
 
 For general sorting of variable-length arrays, `std::sort` is the correct
@@ -72,6 +76,6 @@ choice at all sizes benchmarked here.
 
 | Scenario | Best method | vs std::sort |
 |---|---|---|
-| n = 16, fixed, called in a tight loop | `bitonic_simd` (NEON) | **2.95× faster** |
-| n = 16, portable SIMD needed | `bitonic_highway` | 2.33× faster |
+| n = 16, fixed, called in a tight loop | `bitonic_simd` (NEON) | **3.18× faster** |
+| n = 16, portable SIMD needed | `bitonic_highway` | 2.50× faster |
 | n > 16, general use | `std::sort` | reference |
