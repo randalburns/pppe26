@@ -33,6 +33,9 @@ There are really only 2 computations in all of CS.
   * 02 -- auto vectorization, why we run all stuf at 01
   * strength reduction as something compiler does
 
+* Branches
+   * TODO something demonstrating how branch predication works.
+
 * CPU stuff to realize ILP: CPI
   * OOO and speculative execution
 
@@ -41,6 +44,13 @@ There are really only 2 computations in all of CS.
 
 * Cache hierarchy
   * loop interchange and tiling blocking. loop fission.
+  * false sharing.
+
+* Roofline -- before we do parallelism -- understand using the processor well.
+
+* Joblib -- concept of parallelism
+  * hazard of choosing to parallelize bad imnplementataions
+  * roofline is our guide.
 
 ** Loop Optimizations **
 Loop unrolling
