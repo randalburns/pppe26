@@ -14,14 +14,14 @@ This document covers six implementations benchmarked at n=16 on an Apple M4
 
 ## Results
 
-| Algorithm | Time | ns/elem | vs quicksort |
+| Algorithm | Time | ns/elem | vs std::sort |
 |---|---|---|---|
-| std::sort (introsort) | 25 ns | 1.6 | 1.72× faster |
-| quicksort (median-of-3) | 43 ns | 2.7 | 1.00× (baseline) |
-| insertion sort | 37 ns | 2.3 | 1.16× faster |
-| bitonic scalar (80 CAS) | 56 ns | 3.5 | 1.30× **slower** |
-| bitonic NEON | 13 ns | 0.8 | 3.31× faster |
-| bitonic Highway (portable) | 17 ns | 1.1 | 2.53× faster |
+| **bitonic NEON** | **19 ns** | **1.2** | **2.95× faster** |
+| bitonic Highway (portable) | 24 ns | 1.5 | 2.33× faster |
+| bitonic scalar (80 CAS) | 23 ns | 1.4 | 2.43× faster |
+| insertion sort | 49 ns | 3.1 | 1.14× faster |
+| std::sort (introsort) | 56 ns | 3.5 | 1.00× (reference) |
+| quicksort (median-of-3) | 75 ns | 4.7 | 1.34× **slower** |
 
 ## Algorithm Analysis
 
