@@ -164,7 +164,17 @@ void bitonic_sort_simd(int* a) {
     vst1q_s32(a + 12, v3);
 }
 
-void bitonic_sort_simd(vector<int>& v) { bitonic_sort_simd(v.data()); }
+// Public API: handles n ≤ 16 by padding to exactly 16 with INT_MAX.
+// INT_MAX sinks to the tail of the sorted result and is ignored on copy-back.
+void bitonic_sort_simd(vector<int>& v) {
+    int n = (int)v.size();
+    if (n == 16) { bitonic_sort_simd(v.data()); return; }
+    alignas(16) int buf[16];
+    for (int i = 0; i < n;  i++) buf[i] = v[i];
+    for (int i = n; i < 16; i++) buf[i] = INT_MAX;
+    bitonic_sort_simd(buf);
+    for (int i = 0; i < n; i++) v[i] = buf[i];
+}
 
 // ================================================================
 // Scalar bitonic sort (from bitonic_sort.cpp) for comparison
