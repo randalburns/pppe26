@@ -1,76 +1,75 @@
 #!/usr/bin/env python3
 """
 Roofline model plotter.
-Usage: python3 roofline.py <peak_bw_GBs> <peak_simd_gflops> [peak_scalar_gflops]
+Usage: python3 roofline.py <peak_bw_GBs> <simd_fma> [simd_nofma] [scalar_fma] [scalar_nofma]
 
 Example (Apple M4 single-thread, measured values):
-    python3 roofline.py 113.1 62.9 15.7
+    python3 roofline.py 113.1 73.0 47.5 18.2 9.1
 """
 
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
+# (color, linestyle, linewidth)
+_STYLES = {
+    "simd_fma":    ("#1f77b4", "-",  2.5),   # blue  solid
+    "simd_nofma":  ("#9467bd", "--", 1.8),   # purple dashed
+    "scalar_fma":  ("#ff7f0e", "--", 1.8),   # orange dashed
+    "scalar_nofma":("#2ca02c", ":",  1.8),   # green  dotted
+}
 
-def plot_roofline(peak_bw: float, peak_simd: float,
-                  peak_scalar: float | None = None, title: str = "") -> None:
+
+def _draw_ceiling(ax, ai, bw, peak, key, label):
+    color, ls, lw = _STYLES[key]
+    perf  = np.minimum(bw * ai, peak)
+    ridge = peak / bw
+    ax.loglog(ai, perf, color=color, lw=lw, ls=ls, zorder=3, label=label)
+    ax.scatter([ridge], [peak], color=color, zorder=5, s=50)
+    return ridge, color
+
+
+def plot_roofline(peak_bw: float,
+                  simd_fma:    float,
+                  simd_nofma:  float | None = None,
+                  scalar_fma:  float | None = None,
+                  scalar_nofma:float | None = None,
+                  title: str = "") -> None:
 
     ai = np.logspace(-2, 4, 2000)
+    fig, ax = plt.subplots(figsize=(11, 6))
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # Draw bottom-to-top so higher lines sit on top visually
+    ceilings = [
+        ("scalar_nofma", scalar_nofma, f"Scalar mul-only  ({scalar_nofma:.1f} GFLOPS/s)" if scalar_nofma else None),
+        ("scalar_fma",   scalar_fma,   f"Scalar FMA       ({scalar_fma:.1f} GFLOPS/s)"   if scalar_fma   else None),
+        ("simd_nofma",   simd_nofma,   f"SIMD mul-only    ({simd_nofma:.1f} GFLOPS/s)"   if simd_nofma   else None),
+        ("simd_fma",     simd_fma,     f"SIMD FMA         ({simd_fma:.1f} GFLOPS/s)"),
+    ]
 
-    # --- memory bandwidth slope (shared by both ceilings) ---
-    slope_mid_x = 10 ** (np.log10(ai[0]) / 2 + np.log10(peak_simd / peak_bw) / 2)
-    slope_mid_y = peak_bw * slope_mid_x
-    ax.text(slope_mid_x * 0.7, slope_mid_y * 4,
-            f"Peak BW\n{peak_bw:.1f} GB/s",
-            fontsize=9, ha="right", va="bottom", color="#555")
+    ridge_annotations = []   # (x, y, label, color)
+    for key, peak, label in ceilings:
+        if peak is None:
+            continue
+        ridge, color = _draw_ceiling(ax, ai, peak_bw, peak, key, label)
+        ridge_annotations.append((ridge, peak, color))
 
-    # --- scalar roofline (draw first so SIMD sits on top) ---
-    if peak_scalar is not None:
-        ridge_s   = peak_scalar / peak_bw
-        perf_s    = np.minimum(peak_bw * ai, peak_scalar)
-        ax.loglog(ai, perf_s, color="#ff7f0e", lw=2.0, ls="--", zorder=3,
-                  label=f"Scalar FP32  ({peak_scalar:.1f} GFLOPS/s)")
-
-        ax.scatter([ridge_s], [peak_scalar], color="#ff7f0e", zorder=5, s=60)
+    # Ridge annotations — offset alternately above/below to reduce overlap
+    for i, (r, peak, color) in enumerate(ridge_annotations):
+        yfactor = 0.42 if i % 2 == 0 else 0.58
         ax.annotate(
-            f"Ridge: {ridge_s:.2f} FLOP/B",
-            xy=(ridge_s, peak_scalar),
-            xytext=(ridge_s * 1.6, peak_scalar * 0.45),
-            fontsize=8, color="#ff7f0e",
-            arrowprops=dict(arrowstyle="->", color="#ff7f0e", lw=0.9),
+            f"{r:.2f}",
+            xy=(r, peak),
+            xytext=(r * 2.0, peak * yfactor),
+            fontsize=7.5, color=color,
+            arrowprops=dict(arrowstyle="->", color=color, lw=0.8),
         )
 
-    # --- SIMD roofline ---
-    ridge_v  = peak_simd / peak_bw
-    perf_v   = np.minimum(peak_bw * ai, peak_simd)
-    ax.loglog(ai, perf_v, color="#1f77b4", lw=2.5, zorder=4,
-              label=f"SIMD FP32x4  ({peak_simd:.1f} GFLOPS/s)")
-
-    ax.scatter([ridge_v], [peak_simd], color="red", zorder=6, s=60)
-    ax.annotate(
-        f"Ridge: {ridge_v:.2f} FLOP/B",
-        xy=(ridge_v, peak_simd),
-        xytext=(ridge_v * 1.6, peak_simd * 0.55),
-        fontsize=8, color="red",
-        arrowprops=dict(arrowstyle="->", color="red", lw=0.9),
-    )
-
-    # --- SIMD speedup callout ---
-    if peak_scalar is not None:
-        speedup = peak_simd / peak_scalar
-        ax.text(ridge_v * 80, peak_simd * 0.6,
-                f"SIMD peak\n{peak_simd:.1f} GFLOPS/s\n({speedup:.1f}× scalar)",
-                fontsize=9, ha="left", va="center", color="#1f77b4")
-        # mark the "SIMD gains nothing" zone between scalar ridge and SIMD ridge
-        ax.axvspan(peak_scalar / peak_bw, ridge_v,
-                   alpha=0.05, color="green",
-                   label="Scalar compute-bound,\nSIMD memory-bound")
-    else:
-        ax.text(ridge_v * 80, peak_simd * 0.55,
-                f"Peak compute\n{peak_simd:.1f} GFLOPS/s",
-                fontsize=9, ha="left", va="center", color="#1f77b4")
+    # Memory bandwidth label on the slope
+    slope_x = 10 ** (np.log10(ai[0]) / 2 + np.log10(simd_fma / peak_bw) / 2)
+    ax.text(slope_x * 0.7, peak_bw * slope_x * 4,
+            f"Peak BW\n{peak_bw:.1f} GB/s",
+            fontsize=9, ha="right", va="bottom", color="#555")
 
     ax.set_xlabel("Arithmetic Intensity  (FLOP / byte)", fontsize=12)
     ax.set_ylabel("Performance  (GFLOPS/s)", fontsize=12)
@@ -91,6 +90,8 @@ if __name__ == "__main__":
     if len(sys.argv) < 3:
         print(__doc__)
         sys.exit(1)
-    scalar = float(sys.argv[3]) if len(sys.argv) > 3 else None
-    title  = sys.argv[4] if len(sys.argv) > 4 else ""
-    plot_roofline(float(sys.argv[1]), float(sys.argv[2]), scalar, title)
+    args = [float(a) for a in sys.argv[1:6]]
+    while len(args) < 5:
+        args.append(None)
+    title = sys.argv[6] if len(sys.argv) > 6 else ""
+    plot_roofline(*args, title=title)
