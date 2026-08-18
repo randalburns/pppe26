@@ -30,7 +30,7 @@ long long bench(Func f, int runs = 5) {
         auto v  = f();
         sink(v);
         auto t1 = high_resolution_clock::now();
-        best = min(best, duration_cast<milliseconds>(t1 - t0).count());
+        best = min(best, (long long)duration_cast<milliseconds>(t1 - t0).count());
     }
     return best;
 }
