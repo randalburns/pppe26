@@ -8,7 +8,7 @@ differences between them are modest.  At n=16 the landscape inverts: recursion
 overhead, branch mispredictions, and loop setup costs often exceed the actual
 comparison work, and the choice of algorithm can change the result by 5×.
 
-This document covers six implementations benchmarked at n=16 on an Apple M4
+This document covers six implementations benchmarked at n=16 on an Apple M5
 (ARM NEON, 4.0 GHz).  All times are the best of 7 trials on the same random
 `int32` array.
 

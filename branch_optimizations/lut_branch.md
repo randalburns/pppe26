@@ -60,7 +60,7 @@ is already branchless and narrows the gap considerably.
 
 ---
 
-## Results (Apple M4, N=32M bytes)
+## Results (Apple M5, N=32M bytes)
 
 | version | time | cycles/byte | speedup |
 |---------|------|-------------|---------|

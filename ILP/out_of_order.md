@@ -72,7 +72,7 @@ K_min = FADD_latency / issue_throughput = 3 / 1 = 3
 ```
 
 At `K = 4 >= K_min`, the single FP unit is fully pipelined.  Adding more
-accumulators beyond this saturates additional FP units (Apple M4 has 4), until
+accumulators beyond this saturates additional FP units (Apple M5 has 4), until
 memory bandwidth becomes the floor:
 
 ```
@@ -92,7 +92,7 @@ which is a different optimization that masks the scalar ILP effect.
 
 ---
 
-## Results (Apple M4, N=64M doubles, 512 MB)
+## Results (Apple M5, N=64M doubles, 512 MB)
 
 | version | time | speedup |
 |---------|------|---------|
@@ -112,7 +112,7 @@ confirming the bottleneck is the serial dependency and not memory bandwidth.
 **2 → 4 accumulators: 2.12x additional**
 Four chains fully hide the 3-cycle FADD latency on a single FP unit.
 The speedup from 1 to 4 is 4.75x — close to the theoretical ceiling of
-`FADD_latency = 3x` for one unit, and somewhat above it because the M4
+`FADD_latency = 3x` for one unit, and somewhat above it because the M5
 has multiple FP units that begin to share the load.
 
 **4 → 8 accumulators: 1.14x additional**
@@ -121,7 +121,7 @@ The modest further gain from K=8 suggests a second FP unit is engaged,
 but memory bandwidth (~5 ms floor) is the new constraint.
 
 **Why K=8 doesn't double K=4:**
-The M4 can sustain ~100 GB/s on sequential reads.  At 8 ms (K=8), the
+The M5 can sustain ~100 GB/s on sequential reads.  At 8 ms (K=8), the
 computation is close to the memory bandwidth limit.  More accumulators cannot
 reduce time below the time required to stream 512 MB from memory.
 

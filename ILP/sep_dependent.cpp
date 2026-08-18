@@ -68,8 +68,8 @@ static const int RUNS = 5;
 // x86-64 (Skylake): ADDSS latency = 4 cycles.
 static const int FADD_LATENCY = 3;
 
-// CPU frequency (Apple M4 performance core).
-// Adjust: M1/M2 ≈ 3.2 GHz, M3 ≈ 3.7 GHz, M4 ≈ 4.0 GHz.
+// CPU frequency (Apple M5 performance core).
+// Adjust: M1/M2 ≈ 3.2 GHz, M3 ≈ 3.7 GHz, M5 ≈ 4.0 GHz.
 static const double CPU_GHZ = 4.0;
 
 // Instructions per element (approximate, from -O1 ARM64 assembly):

@@ -119,7 +119,7 @@ is required to observe the full branchy penalty.
 
 ---
 
-## Results (Apple M4, N=32M bytes)
+## Results (Apple M5, N=32M bytes)
 
 | version | random | sorted | random speedup |
 |---------|--------|--------|----------------|

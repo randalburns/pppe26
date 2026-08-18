@@ -69,7 +69,7 @@ explicit in source.
 
 ---
 
-## Results (Apple M4, N=32M floats)
+## Results (Apple M5, N=32M floats)
 
 | mode | switched | unswitched | speedup |
 |------|----------|------------|---------|
