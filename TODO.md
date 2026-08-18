@@ -41,7 +41,6 @@ There are really only 2 computations in all of CS.
 
 * Pipelining -- 
 
-
 * Cache hierarchy
   * loop interchange and tiling blocking. loop fission.
   * false sharing.
@@ -51,6 +50,21 @@ There are really only 2 computations in all of CS.
 * Joblib -- concept of parallelism
   * hazard of choosing to parallelize bad imnplementataions
   * roofline is our guide.
+
+### Multicore Parallelism
+
+OpenMP block parallelism -- prefix sum
+
+Cilk and work stealing -- sparse_col_sum
+  * parallel for
+  * work stealing
+  * dynamic OpenMP scheduling
+
+Compare and contrast of OpenMP and Cilk.
+
+
+
+### Stuff to cover from Claude
 
 ** Loop Optimizations **
 Loop unrolling

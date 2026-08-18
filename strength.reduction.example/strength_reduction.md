@@ -1,6 +1,6 @@
 # Strength Reduction Benchmarks
 
-Measured on Apple M4, clang 17, 100 million iterations, best of 5 runs.
+Measured on Apple M5, clang 17, 100 million iterations, best of 5 runs.
 
 ---
 
@@ -48,11 +48,11 @@ operations rather than swapping one instruction for another:
 - **Test 5**: Three integer divides collapsed into one.  Divide cost is proportional to
   count, so 3× → 1× is a direct 3× saving.
 
-**Tests 1, 2, 4, 6, 7, 8 show little or no benefit on Apple M4.**  The conventional
+**Tests 1, 2, 4, 6, 7, 8 show little or no benefit on Apple M5.**  The conventional
 wisdom behind these transformations comes from x86, where IDIV costs 20–30 cycles and
-IMUL costs 3–4 cycles.  On M4 the picture is different:
+IMUL costs 3–4 cycles.  On M5 the picture is different:
 
-| Operation | x86 approx. | Apple M4 approx. |
+| Operation | x86 approx. | Apple M5 approx. |
 |-----------|-------------|------------------|
 | SHL / SHR | 1 cycle | 1 cycle |
 | ADD / SUB | 1 cycle | 1 cycle |
@@ -61,7 +61,7 @@ IMUL costs 3–4 cycles.  On M4 the picture is different:
 | UDIV      | **20–30 cycles** | **~4 cycles** |
 | FDIV      | 10–15 cycles | 6–10 cycles |
 
-IMUL and UDIV both have 1-cycle throughput on M4 in a simple loop, because out-of-order
+IMUL and UDIV both have 1-cycle throughput on M5 in a simple loop, because out-of-order
 execution hides the latency.  Substituting a shift or AND for those operations saves
 latency on the critical path but not throughput — so the loop runs at the same speed.
 
@@ -74,16 +74,16 @@ compiler is free to keep `r` in a register.
 
 ## Summary
 
-| Rule | Reliable on M4? | Why |
+| Rule | Reliable on M5? | Why |
 |------|-----------------|-----|
 | `pow(x,n)` → `x*x*...` | Yes | Eliminates library call overhead |
 | `/d/d/d` → `/d³` | Yes | Reduces divide count |
-| `x/2^n` → `x>>n` | No | M4 UDIV throughput ≈ SHR throughput |
+| `x/2^n` → `x>>n` | No | M5 UDIV throughput ≈ SHR throughput |
 | `x%2^n` → `x&(2^n-1)` | No | Same reason |
-| `x*2^n` → `x<<n` | No | M4 IMUL throughput ≈ SHL throughput |
+| `x*2^n` → `x<<n` | No | M5 IMUL throughput ≈ SHL throughput |
 | `i*k` → accumulate `+=k` | No | Same reason |
 | `i/d` → `i*(1/d)` | No | Register spill with optnone erases gain |
 
 On a classic Intel/AMD CPU the shift, AND, and accumulate rules would each show 3–10×
-speedups because IDIV and IMUL are genuinely slow.  On M4, the wins come from reducing
+speedups because IDIV and IMUL are genuinely slow.  On M5, the wins come from reducing
 operation count, not from instruction substitution.

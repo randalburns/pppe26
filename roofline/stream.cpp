@@ -1,6 +1,6 @@
 // Build: clang++ -std=c++17 -O3 -o stream stream.cpp
 // Measures peak DRAM bandwidth via four STREAM kernels.
-// Arrays are sized to 8x the M4 SLC (~12 MB) so data comes from DRAM.
+// Arrays are sized to 8x the M5 SLC (~12 MB) so data comes from DRAM.
 
 #include <algorithm>
 #include <chrono>

@@ -19,7 +19,7 @@ speculative execution.
 - **Correct prediction:** the speculative work commits; the pipeline runs at
   full utilization as if the branch did not exist.
 - **Wrong prediction:** the pipeline is flushed back to the branch point; all
-  instructions issued along the wrong path are discarded.  On Apple M4 this
+  instructions issued along the wrong path are discarded.  On Apple M5 this
   flush costs approximately **15 cycles**.
 
 The branch predictor learns patterns from recent branch history.  Branches that
@@ -114,7 +114,7 @@ sorted, shuffled, and branchless — so speedup equals the CPI ratio directly.
 
 ---
 
-## Results (Apple M4, N=32M ints, 128 MB, threshold=128)
+## Results (Apple M5, N=32M ints, 128 MB, threshold=128)
 
 | version | time | cycles/elem | CPI | speedup |
 |---------|------|-------------|-----|---------|
@@ -137,7 +137,7 @@ proportional to CPI, and speedup equals the CPI ratio exactly:
 speedup = CPI_shuffled / CPI_sorted = 1.45 / 0.14 = 10.6x  [measured: 10.6x]
 ```
 
-The 0.14 CPI of the sorted version (< 1) reflects the M4's 10-wide
+The 0.14 CPI of the sorted version (< 1) reflects the M5's 10-wide
 superscalar OOO engine issuing ~7 instructions per cycle across multiple
 in-flight iterations when no branch stalls occur.
 

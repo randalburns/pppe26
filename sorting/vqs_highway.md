@@ -2,7 +2,7 @@
 
 **File:** `vqs_highway.cpp`  
 **Paper:** Bramas, "A Novel Hybrid Quicksort Algorithm Vectorized using AVX-512 on Intel Skylake," arxiv:1704.08579  
-**Platform:** Apple M4, ARM NEON (4-lane int32); portable via Google Highway  
+**Platform:** Apple M5, ARM NEON (4-lane int32); portable via Google Highway  
 **Build:**
 ```
 clang++ -O2 -std=c++17 -I/opt/homebrew/include -L/opt/homebrew/lib -lhwy \
@@ -170,7 +170,7 @@ giving the same 10 ns bitonic result as introsort at n = 16.
 
 ---
 
-## Performance (Apple M4, random int32, best of 7 runs)
+## Performance (Apple M5, random int32, best of 7 runs)
 
 | n | vqs_highway | std::sort | speedup | ns/(n log₂ n) |
 |---|---|---|---|---|
@@ -188,5 +188,5 @@ as its Hoare partition accumulates random cache-line evictions; vqs holds
 ~0.60 due to the sequential partition access pattern.
 
 The crossover where vqs_highway beats std::sort is around **n = 8192** — the
-point where the working set overflows L2/L3 on the M4 and random dirty writes
+point where the working set overflows L2/L3 on the M5 and random dirty writes
 become expensive.

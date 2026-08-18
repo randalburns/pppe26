@@ -62,8 +62,8 @@ static const int RUNS = 5;
 // x86-64 (Skylake+): ADDSD latency = 4 cycles, 2 FP execution units.
 static const int FADD_LATENCY = 3;
 
-// CPU frequency for CPI calculation (Apple M4 performance core).
-// Adjust: M1/M2 ≈ 3.2 GHz, M3 ≈ 3.7 GHz, M4 ≈ 4.0 GHz.
+// CPU frequency for CPI calculation (Apple M5 performance core).
+// Adjust: M1/M2 ≈ 3.2 GHz, M3 ≈ 3.7 GHz, M5 ≈ 4.0 GHz.
 static const double CPU_GHZ = 4.0;
 
 // Instructions per element in each inner loop (from -O1 assembly):

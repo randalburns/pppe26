@@ -119,7 +119,7 @@ which achieves the same effect automatically and masks the scalar ILP behavior.
 
 ---
 
-## Results (Apple M4, N=64M floats, 256 MB)
+## Results (Apple M5, N=64M floats, 256 MB)
 
 | version | time | speedup |
 |---------|------|---------|
@@ -143,7 +143,7 @@ floor of FADD_latency = 3 cycles.
 A second accumulator per chain doubles the independent instructions between
 consecutive updates to each variable.  At 4 independent instructions per
 latency gap (≥ FADD_latency = 3), all stalls are eliminated.  Cycles/elem
-falls to 1.67, approaching the throughput limit of the M4's four FP units.
+falls to 1.67, approaching the throughput limit of the M5's four FP units.
 
 **Why two_passes is slow:**
 

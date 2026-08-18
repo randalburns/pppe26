@@ -1,6 +1,6 @@
-# Sorting on Apple M4: Best Method vs std::sort
+# Sorting on Apple M5: Best Method vs std::sort
 
-**Platform:** Apple M4, ARM NEON (128-bit / 4-lane int32), clang++ -O2  
+**Platform:** Apple M5, ARM NEON (128-bit / 4-lane int32), clang++ -O2  
 **Data:** random int32, best of 7 runs  
 **Reference:** `std::sort` (libc++ pdqsort-derived introsort)
 

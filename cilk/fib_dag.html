@@ -1,0 +1,226 @@
+<title>fib(4) Spawn–Join Graph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+  :root{
+    --bg:#f4f6f6; --surface:#ffffff; --surface2:#eef2f2;
+    --ink:#16202a; --muted:#5f6b73; --line:#d7dfdf;
+    --spawn:#0b8f9e; --spawn-soft:rgba(11,143,158,.10);
+    --shadow:0 1px 2px rgba(20,32,40,.06),0 8px 24px rgba(20,32,40,.06);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1417; --surface:#151d22; --surface2:#1b242a;
+      --ink:#e6edef; --muted:#94a2a8; --line:#28343c;
+      --spawn:#37c7db; --spawn-soft:rgba(55,199,219,.13);
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1417; --surface:#151d22; --surface2:#1b242a;
+    --ink:#e6edef; --muted:#94a2a8; --line:#28343c;
+    --spawn:#37c7db; --spawn-soft:rgba(55,199,219,.13);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:56px 28px 80px}
+
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:500;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--spawn);
+    margin:0 0 14px;
+  }
+  h1{
+    font-size:clamp(30px,5vw,44px); font-weight:700; line-height:1.05;
+    letter-spacing:-.02em; text-wrap:balance; margin:0 0 14px;
+  }
+  h1 .mono{font-family:"IBM Plex Mono",monospace; font-weight:600}
+  .lede{font-size:18px; color:var(--muted); max-width:60ch; margin:0 0 30px}
+
+  .code{
+    font-family:"IBM Plex Mono",monospace; font-size:13.5px; line-height:1.7;
+    background:var(--surface2); border:1px solid var(--line); border-radius:12px;
+    padding:16px 18px; margin:0 0 38px; overflow-x:auto; white-space:pre;
+  }
+  .code .kw{color:var(--spawn); font-weight:600}
+  .code .cm{color:var(--muted)}
+
+  figure{
+    margin:0 0 34px; background:var(--surface); border:1px solid var(--line);
+    border-radius:16px; padding:26px 22px 20px; box-shadow:var(--shadow);
+  }
+  figure svg{width:100%; height:auto; display:block}
+  figcaption{
+    font-size:13.5px; color:var(--muted); margin-top:14px; padding-top:14px;
+    border-top:1px solid var(--line); text-wrap:pretty;
+  }
+
+  /* SVG semantic strokes via classes */
+  .rect-node{fill:var(--surface); stroke:var(--ink); stroke-width:1.6}
+  .rect-leaf{fill:var(--surface2); stroke:var(--muted); stroke-width:1.4; stroke-dasharray:4 3}
+  .nlabel{font-family:"IBM Plex Mono",monospace; font-size:15px; font-weight:500; fill:var(--ink)}
+  .nleaf-label{fill:var(--muted)}
+  .edge-spawn{stroke:var(--spawn); stroke-width:2.4; fill:none}
+  .edge-cont{stroke:var(--ink); stroke-width:1.9; fill:none; opacity:.85}
+  .edge-ret{stroke:var(--muted); stroke-width:1.3; fill:none; stroke-dasharray:5 4; opacity:.8}
+  .elabel{font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:500}
+  .elabel.sp{fill:var(--spawn)}
+  .elabel.co{fill:var(--muted)}
+  .sync-tag{font-family:"IBM Plex Mono",monospace; font-size:11.5px; fill:var(--muted)}
+
+  .legend{display:flex; flex-wrap:wrap; gap:18px 26px; margin:0 0 40px}
+  .legend div{display:flex; align-items:center; gap:10px; font-size:13.5px; color:var(--ink)}
+  .legend svg{flex:none}
+  .legend .lg-mut{color:var(--muted)}
+
+  h2{font-size:14px; font-family:"IBM Plex Mono",monospace; font-weight:600;
+     letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+     margin:0 0 16px}
+  .read{list-style:none; padding:0; margin:0 0 44px; display:grid; gap:14px}
+  .read li{display:grid; grid-template-columns:26px 1fr; gap:12px; align-items:start; font-size:15.5px}
+  .read b{font-weight:600}
+  .read .mono{font-family:"IBM Plex Mono",monospace; font-size:.92em}
+  .mk{font-family:"IBM Plex Mono",monospace; font-weight:600; color:var(--spawn); line-height:1.5}
+
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:0 0 12px}
+  @media (max-width:560px){.stats{grid-template-columns:1fr}}
+  .stat{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px 18px}
+  .stat .k{font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.06em;
+           text-transform:uppercase; color:var(--muted); margin:0 0 8px}
+  .stat .v{font-family:"IBM Plex Mono",monospace; font-size:26px; font-weight:600; margin:0 0 6px}
+  .stat .v .u{font-size:14px; color:var(--muted); font-weight:400}
+  .stat .d{font-size:13px; color:var(--muted); margin:0}
+  .note{font-size:13.5px; color:var(--muted); margin:16px 0 0}
+  .note .mono{font-family:"IBM Plex Mono",monospace}
+  a{color:var(--spawn)}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">OpenCilk · dependency graph</p>
+  <h1>The <span class="mono">fib(4)</span> spawn–join graph</h1>
+  <p class="lede">Every <span class="mono">cilk_spawn</span> forks a branch that may run in
+     parallel; every <span class="mono">cilk_sync</span> is a join that waits for both branches
+     before it can add them. Four levels of the recursion, drawn as the DAG the scheduler sees.</p>
+
+  <div class="code"><span class="kw">long</span> fib(<span class="kw">int</span> n){
+  <span class="kw">if</span> (n &lt; 2) <span class="kw">return</span> n;              <span class="cm">// base case — a leaf</span>
+  a = <span class="kw">cilk_spawn</span> fib(n-1);       <span class="cm">// fork: may run in parallel</span>
+  b =            fib(n-2);       <span class="cm">// continuation: runs in the caller</span>
+  <span class="kw">cilk_sync</span>;                     <span class="cm">// join: wait for both branches</span>
+  <span class="kw">return</span> a + b;                  <span class="cm">// combine — happens after the join</span>
+}</div>
+
+  <figure>
+    <svg viewBox="0 0 810 520" role="img"
+         aria-label="Spawn–join dependency graph for fib(4). fib(4) forks fib(3) as a parallel spawn and continues into fib(2); each internal call forks two children and joins at a cilk_sync before returning their sum. fib(1) and fib(0) are base-case leaves that return immediately.">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="context-stroke"/>
+        </marker>
+      </defs>
+
+      <!-- ============ FORK EDGES (solid) ============ -->
+      <!-- fib4 -> fib3 (spawn) / fib4 -> fib2'' (continue) -->
+      <line class="edge-spawn" x1="452" y1="87" x2="255" y2="183" marker-end="url(#ah)"/>
+      <line class="edge-cont"  x1="452" y1="87" x2="650" y2="183" marker-end="url(#ah)"/>
+      <!-- fib3 -> fib2' (spawn) / fib3 -> fib1 (continue) -->
+      <line class="edge-spawn" x1="255" y1="217" x2="160" y2="313" marker-end="url(#ah)"/>
+      <line class="edge-cont"  x1="255" y1="217" x2="350" y2="313" marker-end="url(#ah)"/>
+      <!-- fib2'' -> fib1 (spawn) / fib2'' -> fib0 (continue) -->
+      <line class="edge-spawn" x1="650" y1="217" x2="590" y2="313" marker-end="url(#ah)"/>
+      <line class="edge-cont"  x1="650" y1="217" x2="710" y2="313" marker-end="url(#ah)"/>
+      <!-- fib2' -> fib1 (spawn) / fib2' -> fib0 (continue) -->
+      <line class="edge-spawn" x1="160" y1="347" x2="100" y2="443" marker-end="url(#ah)"/>
+      <line class="edge-cont"  x1="160" y1="347" x2="220" y2="443" marker-end="url(#ah)"/>
+
+      <!-- ============ RETURN EDGES (dashed, up into the sync) ============ -->
+      <line class="edge-ret" x1="264" y1="183" x2="461" y2="87"  marker-end="url(#ah)"/>
+      <line class="edge-ret" x1="659" y1="183" x2="461" y2="87"  marker-end="url(#ah)"/>
+      <line class="edge-ret" x1="169" y1="313" x2="264" y2="217" marker-end="url(#ah)"/>
+      <line class="edge-ret" x1="359" y1="313" x2="264" y2="217" marker-end="url(#ah)"/>
+      <line class="edge-ret" x1="599" y1="313" x2="659" y2="217" marker-end="url(#ah)"/>
+      <line class="edge-ret" x1="719" y1="313" x2="659" y2="217" marker-end="url(#ah)"/>
+      <line class="edge-ret" x1="109" y1="443" x2="169" y2="347" marker-end="url(#ah)"/>
+      <line class="edge-ret" x1="229" y1="443" x2="169" y2="347" marker-end="url(#ah)"/>
+
+      <!-- inline edge labels (fib4's fork, shown once) -->
+      <text class="elabel sp" x="330" y="128" text-anchor="end">cilk_spawn</text>
+      <text class="elabel co" x="576" y="128" text-anchor="start">continue</text>
+      <text class="sync-tag" x="452" y="46" text-anchor="middle">⟂ cilk_sync → a+b</text>
+
+      <!-- ============ NODES ============ -->
+      <!-- internal -->
+      <g><rect class="rect-node" x="419" y="53" width="66" height="34" rx="8"/>
+         <text class="nlabel" x="452" y="75" text-anchor="middle">fib(4)</text></g>
+      <g><rect class="rect-node" x="222" y="183" width="66" height="34" rx="8"/>
+         <text class="nlabel" x="255" y="205" text-anchor="middle">fib(3)</text></g>
+      <g><rect class="rect-node" x="617" y="183" width="66" height="34" rx="8"/>
+         <text class="nlabel" x="650" y="205" text-anchor="middle">fib(2)</text></g>
+      <g><rect class="rect-node" x="127" y="313" width="66" height="34" rx="8"/>
+         <text class="nlabel" x="160" y="335" text-anchor="middle">fib(2)</text></g>
+      <!-- leaves -->
+      <g><rect class="rect-leaf" x="317" y="313" width="66" height="34" rx="8"/>
+         <text class="nlabel nleaf-label" x="350" y="335" text-anchor="middle">fib(1)</text></g>
+      <g><rect class="rect-leaf" x="557" y="313" width="66" height="34" rx="8"/>
+         <text class="nlabel nleaf-label" x="590" y="335" text-anchor="middle">fib(1)</text></g>
+      <g><rect class="rect-leaf" x="677" y="313" width="66" height="34" rx="8"/>
+         <text class="nlabel nleaf-label" x="710" y="335" text-anchor="middle">fib(0)</text></g>
+      <g><rect class="rect-leaf" x="67"  y="443" width="66" height="34" rx="8"/>
+         <text class="nlabel nleaf-label" x="100" y="465" text-anchor="middle">fib(1)</text></g>
+      <g><rect class="rect-leaf" x="187" y="443" width="66" height="34" rx="8"/>
+         <text class="nlabel nleaf-label" x="220" y="465" text-anchor="middle">fib(0)</text></g>
+    </svg>
+    <figcaption>Solid edges fork downward at a spawn point; the teal branch is the
+      <span style="color:var(--spawn)">spawned</span> child (eligible to run in parallel),
+      the dark branch is the continuation the caller runs itself. Dashed edges are returns
+      flowing back up — each internal node cannot pass its <span class="mono" style="font-family:'IBM Plex Mono',monospace">cilk_sync</span>
+      until <em>both</em> returns arrive, then it computes <span class="mono" style="font-family:'IBM Plex Mono',monospace">a+b</span>.
+      Dashed-outline nodes are base cases that return immediately.</figcaption>
+  </figure>
+
+  <div class="legend">
+    <div><svg width="34" height="12"><line x1="1" y1="6" x2="27" y2="6" stroke="var(--spawn)" stroke-width="2.4"/><path d="M27 2 L33 6 L27 10 z" fill="var(--spawn)"/></svg><span><b>spawn</b> — parallel branch</span></div>
+    <div><svg width="34" height="12"><line x1="1" y1="6" x2="27" y2="6" stroke="var(--ink)" stroke-width="1.9"/><path d="M27 2 L33 6 L27 10 z" fill="var(--ink)"/></svg><span><b>continuation</b> — runs in caller</span></div>
+    <div class="lg-mut"><svg width="34" height="12"><line x1="1" y1="6" x2="27" y2="6" stroke="var(--muted)" stroke-width="1.3" stroke-dasharray="5 4"/><path d="M27 2 L33 6 L27 10 z" fill="var(--muted)"/></svg><span><b>return</b> → arrives at a sync</span></div>
+    <div class="lg-mut"><svg width="20" height="16"><rect x="1" y="2" width="18" height="12" rx="3" fill="var(--surface2)" stroke="var(--muted)" stroke-width="1.3" stroke-dasharray="4 3"/></svg><span><b>base case</b> — a leaf</span></div>
+  </div>
+
+  <h2>How to read it</h2>
+  <ul class="read">
+    <li><span class="mk">↘</span><span>A node <b>forks into two edges</b>. The teal <span class="mono">cilk_spawn</span> edge makes <span class="mono">fib(n-1)</span> available to any idle worker to steal; the dark edge is the <b>continuation</b>, which the same worker keeps running as <span class="mono">fib(n-2)</span>.</span></li>
+    <li><span class="mk">‖</span><span>The two children of any node have <b>no edge between them</b> — that independence is the parallelism. On <span class="mono">P</span> workers they can execute at the same time.</span></li>
+    <li><span class="mk">↗</span><span>The dashed <b>returns converge on the node's <span class="mono">cilk_sync</span></b>. That join is a barrier for just this frame: <span class="mono">a+b</span> cannot be computed until both branches have returned.</span></li>
+    <li><span class="mk">■</span><span><span class="mono">fib(1)</span> and <span class="mono">fib(0)</span> hit the <span class="mono">n&lt;2</span> base case and return immediately — they are the leaves where the DAG stops growing.</span></li>
+  </ul>
+
+  <h2>Work vs. span</h2>
+  <div class="stats">
+    <div class="stat">
+      <p class="k">Work · T₁</p>
+      <p class="v">9 <span class="u">nodes</span></p>
+      <p class="d">Every call in the tree. Grows as Θ(φⁿ) — the serial running time.</p>
+    </div>
+    <div class="stat">
+      <p class="k">Span · T∞</p>
+      <p class="v">7 <span class="u">nodes</span></p>
+      <p class="d">Longest fork→sync path (down the left spine and back). Grows as Θ(n).</p>
+    </div>
+    <div class="stat">
+      <p class="k">Parallelism</p>
+      <p class="v">≈ 1.3<span class="u">×</span></p>
+      <p class="d">T₁ ⁄ T∞. Tiny at n=4; for large n it explodes as Θ(φⁿ⁄n).</p>
+    </div>
+  </div>
+  <p class="note">The graph is shallow but wide — that gap is the whole point of divide-and-conquer
+     parallelism. Span stays linear in <span class="mono">n</span> while work grows exponentially, so
+     <span class="mono">fib</span> has enormous parallelism to hand the work-stealing scheduler. Source:
+     <span class="mono">cilk/fib.c</span>.</p>
+</div>
