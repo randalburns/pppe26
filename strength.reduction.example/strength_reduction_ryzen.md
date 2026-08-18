@@ -2,16 +2,16 @@
 
 Measured on AMD Ryzen AI 9 HX 370 (Zen 5, "Strix Point" mobile, 12C/24T), Ubuntu clang 18.1.3,
 libc++, 100 million iterations, best of 5 runs. See [strength_reduction.md](strength_reduction.md)
-for the Apple M4 baseline this compares against.
+for the Apple M5 baseline this compares against.
 
 ---
 
 ## Design
 
-Same source as the M4 run (`strength_reduction.cpp`), built with clang instead of GCC so that
+Same source as the M5 run (`strength_reduction.cpp`), built with clang instead of GCC so that
 `__attribute__((optnone))` is honored — GCC silently ignores this attribute, which would let the
 optimizer erase the BEFORE/AFTER distinction at `-O1` and above. The build also links libc++
-(`-stdlib=libc++`) rather than the system default libstdc++, both to match the M4 clang/libc++
+(`-stdlib=libc++`) rather than the system default libstdc++, both to match the M5 clang/libc++
 toolchain and to avoid a GCC/clang header-version mismatch on this system.
 
 ```
@@ -35,23 +35,23 @@ CXXFLAGS := -std=c++14 -stdlib=libc++
 
 ---
 
-## Comparison to Apple M4
+## Comparison to Apple M5
 
-| # | Transformation | M4 speedup | Ryzen speedup | Verdict |
+| # | Transformation | M5 speedup | Ryzen speedup | Verdict |
 |---|---|---:|---:|---|
-| 1 | div by 2ⁿ → shift | 1.00x | **1.29x** | x86 shows a real win M4 doesn't |
+| 1 | div by 2ⁿ → shift | 1.00x | **1.29x** | x86 shows a real win M5 doesn't |
 | 2 | mod 2ⁿ → AND | 0.88x (slower) | 1.00x (flat) | Neither machine benefits |
 | 3 | `pow(x,n)` → mults | 9x | **12.3x** | Big win on both, x86 bigger |
-| 4 | FP div → reciprocal | 0.69x (slower) | 1.00x (flat) | Ryzen doesn't regress like M4 |
+| 4 | FP div → reciprocal | 0.69x (slower) | 1.00x (flat) | Ryzen doesn't regress like M5 |
 | 5 | 3×div → 1×div | 3x | 3.03x | Matches almost exactly |
 | 6 | induction mul → accumulate | 1.00x | 0.98x | No benefit on either |
 | 7 | near-2ⁿ mul → shift+add | 1.05x | 0.95x | Wash on both |
 | 8 | exact-2ⁿ mul → shift | 1.00x | 1.08x | Mild win on both |
 
-**Test 1 is the standout divergence.** On M4, IDIV/UDIV throughput (~4 cycles) is fast enough that
+**Test 1 is the standout divergence.** On M5, IDIV/UDIV throughput (~4 cycles) is fast enough that
 shifting doesn't help. On Zen 5, integer divide is still expensive enough relative to a shift that
 swapping in `>>` gives a genuine 1.29x — the one case where the "classic x86 folklore" cited in the
-M4 doc actually holds up on real x86 hardware.
+M5 doc actually holds up on real x86 hardware.
 
 **Test 2 does not follow test 1, which is a surprise.** Same IDIV→cheap-op substitution, same CPU,
 yet modulo-by-larger-constants (16/64/256) shows no win at all, while division-by-smaller-constants
@@ -59,15 +59,15 @@ yet modulo-by-larger-constants (16/64/256) shows no win at all, while division-b
 divisors, or out-of-order scheduling hides the cost differently depending on surrounding
 instruction mix. Worth investigating further if this pattern matters for real code.
 
-**Test 4 is the other interesting flip.** On M4, the "optimized" version got *slower* because the
+**Test 4 is the other interesting flip.** On M5, the "optimized" version got *slower* because the
 compiler spilled the precomputed reciprocal to the stack under `optnone`, and the reload latency
 outweighed the FDIV savings. On Ryzen the same spill occurs, but the loss is a wash rather than a
 regression — FDIV here isn't as disproportionately expensive relative to a spilled load as it is on
-M4.
+M5.
 
 **Tests 3 and 5 are the only transformations robust across both architectures**, and by a wide
 margin. Both eliminate operation *count* (a library call, or a divide count) rather than substitute
-one instruction for a nominally cheaper one. This reinforces the M4 doc's core thesis: on modern
+one instruction for a nominally cheaper one. This reinforces the M5 doc's core thesis: on modern
 out-of-order cores — ARM or x86 alike — single-cycle-throughput IMUL/AND/shift make most
 latency-only substitutions pointless, because the CPU already hides the latency behind independent
 work in the loop. The wins that survive are the ones that remove real work, not the ones that just
@@ -80,7 +80,7 @@ bottleneck on either CPU.
 
 ## Summary
 
-| Rule | Reliable on Ryzen (Zen 5)? | Reliable on M4? |
+| Rule | Reliable on Ryzen (Zen 5)? | Reliable on M5? |
 |------|:---:|:---:|
 | `pow(x,n)` → `x*x*...` | Yes | Yes |
 | `/d/d/d` → `/d³` | Yes | Yes |

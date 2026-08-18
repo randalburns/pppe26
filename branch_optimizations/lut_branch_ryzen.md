@@ -1,7 +1,7 @@
 # Lookup Table vs. Branch Benchmarks — AMD Ryzen AI 9 HX 370
 
 Measured on AMD Ryzen AI 9 HX 370 (Zen 5, "Strix Point" mobile, 12C/24T), Ubuntu, GCC 13.3.0,
-N=32M bytes, best of 5 runs. See [lut_branch.md](lut_branch.md) for the Apple M4 baseline this
+N=32M bytes, best of 5 runs. See [lut_branch.md](lut_branch.md) for the Apple M5 baseline this
 compares against.
 
 ---
@@ -28,16 +28,16 @@ Required the same `(long long)` cast fix to `duration_cast<milliseconds>(...).co
 
 ---
 
-## Comparison to Apple M4
+## Comparison to Apple M5
 
-| version | M4 | Ryzen |
+| version | M5 | Ryzen |
 |---|---:|---:|
 | branchy | 125 ms | 152 ms |
 | lut | 12 ms | 12 ms |
 | speedup | 10.42x | **12.7x** |
 
 **The LUT result is the tightest cross-machine match in this whole benchmark set.** The `lut`
-version lands at exactly 12 ms on both an Apple M4 and a Zen 5 laptop chip — unsurprising, since a
+version lands at exactly 12 ms on both an Apple M5 and a Zen 5 laptop chip — unsurprising, since a
 16-byte table pinned in L1 makes the lookup latency (1–4 cycles either way) essentially
 microarchitecture-independent at this scale, and the loop is otherwise just a load + store.
 
@@ -47,7 +47,7 @@ made the *branchless* path slower rather than the branchy path. Here the mechani
 `lut_branch`'s branchy path is a ternary-style conditional (`nibble < 10 ? ... : ...`) forced back
 into a real branch by the same flag, and GCC's branchy codegen for this pattern is apparently less
 efficient on this run than Apple Clang's — 18.1 cycles/byte here vs an implied ~14.9 cycles/byte
-on M4 (matching the M4 doc's own reported cpe of 14.9), even before considering misprediction cost.
+on M5 (matching the M5 doc's own reported cpe of 14.9), even before considering misprediction cost.
 
 **Both machines confirm the core thesis**: when the branch outcome is genuinely unpredictable
 (hex digit vs. letter, ~37.5% either way) and the table is small enough to live in L1, trading the
@@ -92,11 +92,11 @@ it's allowed to.
 
 ## Key takeaways (Ryzen-specific)
 
-1. **L1-resident LUTs are as fast on Zen 5 as on Apple M4** — 12 ms on both machines for this
+1. **L1-resident LUTs are as fast on Zen 5 as on Apple M5** — 12 ms on both machines for this
    workload. A cache-resident table lookup is about as portable a win as branch elimination gets.
 
 2. **The branchy baseline is compiler-codegen-sensitive, not just hardware-sensitive** — GCC under
    `-fno-if-conversion` produces a slower branchy loop on this x86 build than Apple Clang does on
-   M4, inflating the measured speedup (12.7x vs 10.42x) beyond what a pure hardware comparison
+   M5, inflating the measured speedup (12.7x vs 10.42x) beyond what a pure hardware comparison
    would show. As with [branch_free_ryzen.md](branch_free_ryzen.md), treat cross-toolchain speedup
    ratios as directional, not a precise ISA comparison.

@@ -1,7 +1,7 @@
 # Branch-Free Code Benchmarks — AMD Ryzen AI 9 HX 370
 
 Measured on AMD Ryzen AI 9 HX 370 (Zen 5, "Strix Point" mobile, 12C/24T), Ubuntu, GCC 13.3.0,
-N=32M bytes, best of 5 runs. See [branch_free.md](branch_free.md) for the Apple M4 baseline this
+N=32M bytes, best of 5 runs. See [branch_free.md](branch_free.md) for the Apple M5 baseline this
 compares against.
 
 ---
@@ -42,13 +42,13 @@ best = min(best, (long long)duration_cast<milliseconds>(t1 - t0).count());
 | arith (bitmask) | 28 ms | 28 ms | **5.3x** | 0.39x (slower) |
 
 Measured misprediction overhead (branchy − arith, random): ~120 ms.
-Expected overhead (32M × 1.0 × 15 / 4GHz): 126 ms — close agreement, same as M4.
+Expected overhead (32M × 1.0 × 15 / 4GHz): 126 ms — close agreement, same as M5.
 
 ---
 
-## Comparison to Apple M4
+## Comparison to Apple M5
 
-| version | M4 random | Ryzen random | M4 sorted | Ryzen sorted |
+| version | M5 random | Ryzen random | M5 sorted | Ryzen sorted |
 |---|---:|---:|---:|---:|
 | branchy | 123 ms | 148 ms | 13 ms | 12 ms |
 | ternary | 14 ms | 24 ms | 14 ms | 24 ms |
@@ -65,14 +65,14 @@ the win from going branchless is smaller here (6.2x vs 8.79x).
 doesn't just leave the `if`-statements alone, it also makes GCC's codegen for the *branchless*
 `ternary`/`arith` paths less aggressive than what Apple Clang produces at `-O1` (which converts to
 CSEL unconditionally, flag or no flag). GCC at `-O1` under this flag emits comparably naive scalar
-code throughout, so the 1.7–2x gap between M4 and Ryzen branchless numbers is a
+code throughout, so the 1.7–2x gap between M5 and Ryzen branchless numbers is a
 GCC-vs-Clang-codegen difference layered on top of the ARM-vs-x86 difference, not purely a hardware
 one. `cpe` (cycles/element, using each doc's own 4 GHz reference) confirms this: ternary computes
-to 2.86 cycles/byte on Ryzen vs an implied ~1.67 cycles/byte on M4 (from its 14 ms figure); arith
-computes to 3.34 here vs an implied ~1.91 on M4.
+to 2.86 cycles/byte on Ryzen vs an implied ~1.67 cycles/byte on M5 (from its 14 ms figure); arith
+computes to 3.34 here vs an implied ~1.91 on M5.
 
 **The misprediction penalty itself matches almost exactly.** 126 ms expected vs ~120 ms measured on
-Ryzen is the same close fit the M4 doc reports (126 ms expected, 110 ms measured: 123−16≈107, close
+Ryzen is the same close fit the M5 doc reports (126 ms expected, 110 ms measured: 123−16≈107, close
 enough). This confirms the ≈15-cycle misprediction penalty assumption used in the source (calibrated
 for Apple M-series) is *also* a reasonable estimate for Zen 5 at a 4 GHz reference clock — x86
 misprediction penalties (commonly cited as 15–20 cycles) land in the same ballpark as Apple's
