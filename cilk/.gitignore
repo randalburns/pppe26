@@ -1,0 +1,6 @@
+# compiled binaries (build with `make`)
+fib
+vector_add
+sum_reducer
+qsort_steal
+mergesort_balanced

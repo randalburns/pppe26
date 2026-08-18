@@ -1,0 +1,237 @@
+<title>Work-Stealing Deques</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+  :root{
+    --bg:#f4f6f6; --surface:#ffffff; --surface2:#eef2f2;
+    --ink:#16202a; --muted:#5f6b73; --line:#d7dfdf;
+    --spawn:#0b8f9e; --spawn-soft:rgba(11,143,158,.10);
+    --shadow:0 1px 2px rgba(20,32,40,.06),0 8px 24px rgba(20,32,40,.06);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1417; --surface:#151d22; --surface2:#1b242a;
+      --ink:#e6edef; --muted:#94a2a8; --line:#28343c;
+      --spawn:#37c7db; --spawn-soft:rgba(55,199,219,.13);
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1417; --surface:#151d22; --surface2:#1b242a;
+    --ink:#e6edef; --muted:#94a2a8; --line:#28343c;
+    --spawn:#37c7db; --spawn-soft:rgba(55,199,219,.13);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:56px 28px 80px}
+
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:500;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--spawn);
+    margin:0 0 14px;
+  }
+  h1{
+    font-size:clamp(30px,5vw,44px); font-weight:700; line-height:1.05;
+    letter-spacing:-.02em; text-wrap:balance; margin:0 0 14px;
+  }
+  h1 .mono{font-family:"IBM Plex Mono",monospace; font-weight:600}
+  .lede{font-size:18px; color:var(--muted); max-width:60ch; margin:0 0 30px}
+
+  .code{
+    font-family:"IBM Plex Mono",monospace; font-size:13.5px; line-height:1.7;
+    background:var(--surface2); border:1px solid var(--line); border-radius:12px;
+    padding:16px 18px; margin:0 0 38px; overflow-x:auto; white-space:pre;
+  }
+  .code .kw{color:var(--spawn); font-weight:600}
+  .code .cm{color:var(--muted)}
+
+  figure{
+    margin:0 0 34px; background:var(--surface); border:1px solid var(--line);
+    border-radius:16px; padding:26px 22px 20px; box-shadow:var(--shadow);
+  }
+  figure svg{width:100%; height:auto; display:block}
+  figcaption{
+    font-size:13.5px; color:var(--muted); margin-top:14px; padding-top:14px;
+    border-top:1px solid var(--line); text-wrap:pretty;
+  }
+
+  /* SVG semantic pieces */
+  .deque{fill:var(--surface2); stroke:var(--line); stroke-width:1.5}
+  .deque-idle{fill:none; stroke:var(--muted); stroke-width:1.5; stroke-dasharray:5 4}
+  .task{fill:var(--surface); stroke:var(--ink); stroke-width:1.5}
+  .task-hot{fill:var(--spawn-soft); stroke:var(--spawn); stroke-width:2.2}
+  .wname{font-family:"IBM Plex Mono",monospace; font-size:14px; font-weight:600; fill:var(--ink)}
+  .empty{font-family:"IBM Plex Mono",monospace; font-size:12px; fill:var(--muted)}
+  .edge-steal{stroke:var(--spawn); stroke-width:2.6; fill:none}
+  .steal-label{font-family:"IBM Plex Mono",monospace; font-size:12.5px; font-weight:600; fill:var(--spawn)}
+  .leader{stroke:var(--muted); stroke-width:1; fill:none}
+  .tag-top{font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:600; fill:var(--spawn)}
+  .tag-bot{font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:600; fill:var(--muted)}
+  .tag-sub{font-family:"IBM Plex Mono",monospace; font-size:11px; fill:var(--muted)}
+  .pp{stroke:var(--muted); stroke-width:1.7; fill:none}
+  .pp-label{font-family:"IBM Plex Mono",monospace; font-size:11px; fill:var(--muted)}
+  .pill{stroke-width:1.4}
+  .pill-run{fill:var(--surface2); stroke:var(--line)}
+  .pill-steal{fill:var(--spawn-soft); stroke:var(--spawn)}
+  .pill-run-t{fill:var(--muted)}
+  .pill-steal-t{fill:var(--spawn); font-weight:600}
+  .pilltext{font-family:"IBM Plex Mono",monospace; font-size:11.5px}
+
+  .legend{display:flex; flex-wrap:wrap; gap:18px 26px; margin:0 0 40px}
+  .legend div{display:flex; align-items:center; gap:10px; font-size:13.5px; color:var(--ink)}
+  .legend svg{flex:none}
+  .legend .lg-mut{color:var(--muted)}
+
+  h2{font-size:14px; font-family:"IBM Plex Mono",monospace; font-weight:600;
+     letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+     margin:0 0 16px}
+  .read{list-style:none; padding:0; margin:0 0 44px; display:grid; gap:14px}
+  .read li{display:grid; grid-template-columns:26px 1fr; gap:12px; align-items:start; font-size:15.5px}
+  .read b{font-weight:600}
+  .read .mono{font-family:"IBM Plex Mono",monospace; font-size:.92em}
+  .mk{font-family:"IBM Plex Mono",monospace; font-weight:600; color:var(--spawn); line-height:1.5}
+
+  .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:0 0 12px}
+  @media (max-width:620px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px}
+  .card .k{font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.05em;
+           text-transform:uppercase; color:var(--spawn); margin:0 0 8px}
+  .card .t{font-family:"IBM Plex Mono",monospace; font-size:17px; font-weight:600; margin:0 0 8px}
+  .card .d{font-size:13.5px; color:var(--muted); margin:0}
+  .note{font-size:14px; color:var(--muted); margin:18px 0 0}
+  .note .mono{font-family:"IBM Plex Mono",monospace}
+  a{color:var(--spawn)}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">OpenCilk · scheduler</p>
+  <h1>Work-stealing: how idle workers find work</h1>
+  <p class="lede">Every <span class="mono">cilk_spawn</span> pushes a task onto the worker's own
+     <b>deque</b>. A worker runs its deque from the bottom; when it runs dry it turns thief and
+     <b>steals the oldest task off the top of a random busy worker</b>. No central queue, no planner —
+     balance is what emerges.</p>
+
+  <div class="code"><span class="cm"># what each of the P workers runs</span>
+<span class="kw">while</span> not done:
+    <span class="kw">while</span> my_deque not empty:
+        t = my_deque.<span class="kw">pop_bottom</span>()   <span class="cm"># my newest task — LIFO, cache-warm</span>
+        run(t)                        <span class="cm"># running it may spawn &amp; push more</span>
+    v = <span class="kw">random</span>(other workers)      <span class="cm"># pick a victim at random</span>
+    t = v.deque.<span class="kw">steal_top</span>()         <span class="cm"># take its oldest task — FIFO</span></div>
+
+  <figure>
+    <svg viewBox="0 0 800 360" role="img"
+         aria-label="Four workers, each owning a deque of tasks drawn as a vertical stack. Worker W2 is the busiest with four tasks; worker W3's deque is empty, so W3 is idle and reaches an arrow to the top task of W2 to steal it. A worker pushes and pops its own tasks at the bottom of its deque (LIFO); thieves steal from the top (the oldest task).">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="context-stroke"/>
+        </marker>
+      </defs>
+
+      <!-- worker names -->
+      <text class="wname" x="96"  y="46" text-anchor="middle">W0</text>
+      <text class="wname" x="288" y="46" text-anchor="middle">W1</text>
+      <text class="wname" x="480" y="46" text-anchor="middle">W2</text>
+      <text class="wname" x="672" y="46" text-anchor="middle">W3</text>
+
+      <!-- deque containers -->
+      <rect class="deque"      x="32"  y="64" width="128" height="196" rx="12"/>
+      <rect class="deque"      x="224" y="64" width="128" height="196" rx="12"/>
+      <rect class="deque"      x="416" y="64" width="128" height="196" rx="12"/>
+      <rect class="deque-idle" x="608" y="64" width="128" height="196" rx="12"/>
+
+      <!-- W0: 3 tasks -->
+      <rect class="task" x="44"  y="74"  width="104" height="36" rx="7"/>
+      <rect class="task" x="44"  y="118" width="104" height="36" rx="7"/>
+      <rect class="task" x="44"  y="162" width="104" height="36" rx="7"/>
+      <!-- W1: 2 tasks -->
+      <rect class="task" x="236" y="74"  width="104" height="36" rx="7"/>
+      <rect class="task" x="236" y="118" width="104" height="36" rx="7"/>
+      <!-- W2 (victim): 4 tasks, top one hot -->
+      <rect class="task-hot" x="428" y="74"  width="104" height="36" rx="7"/>
+      <rect class="task" x="428" y="118" width="104" height="36" rx="7"/>
+      <rect class="task" x="428" y="162" width="104" height="36" rx="7"/>
+      <rect class="task" x="428" y="206" width="104" height="36" rx="7"/>
+      <!-- W3: empty -->
+      <text class="empty" x="672" y="167" text-anchor="middle">empty</text>
+
+      <!-- steal arrow: W3 reaches into W2's top task -->
+      <line class="edge-steal" x1="604" y1="92" x2="536" y2="92" marker-end="url(#ah)"/>
+      <text class="steal-label" x="570" y="80" text-anchor="middle">steal</text>
+
+      <!-- top-end callout on W2 -->
+      <line class="leader" x1="416" y1="92" x2="404" y2="92"/>
+      <text class="tag-top" x="400" y="88"  text-anchor="end">TOP ▲</text>
+      <text class="tag-sub" x="400" y="102" text-anchor="end">thieves</text>
+
+      <!-- bottom-end callout on W2 -->
+      <line class="leader" x1="416" y1="224" x2="404" y2="224"/>
+      <text class="tag-bot" x="400" y="220" text-anchor="end">▼ BOTTOM</text>
+      <text class="tag-sub" x="400" y="234" text-anchor="end">owner</text>
+
+      <!-- push/pop double arrow at W2 bottom -->
+      <line class="pp" x1="480" y1="270" x2="480" y2="296" marker-start="url(#ah)" marker-end="url(#ah)"/>
+      <text class="pp-label" x="496" y="287" text-anchor="start">push / pop (LIFO)</text>
+
+      <!-- state pills -->
+      <rect class="pill pill-run"   x="44"  y="318" width="104" height="26" rx="13"/>
+      <text class="pilltext pill-run-t"   x="96"  y="335" text-anchor="middle">running</text>
+      <rect class="pill pill-run"   x="236" y="318" width="104" height="26" rx="13"/>
+      <text class="pilltext pill-run-t"   x="288" y="335" text-anchor="middle">running</text>
+      <rect class="pill pill-run"   x="428" y="318" width="104" height="26" rx="13"/>
+      <text class="pilltext pill-run-t"   x="480" y="335" text-anchor="middle">victim</text>
+      <rect class="pill pill-steal" x="620" y="318" width="104" height="26" rx="13"/>
+      <text class="pilltext pill-steal-t" x="672" y="335" text-anchor="middle">idle → steal</text>
+    </svg>
+    <figcaption>Each worker owns one deque. <b>W3</b>'s deque has run dry, so it becomes a thief:
+      it picks a random busy worker (<b>W2</b>) and takes the task off the
+      <span style="color:var(--spawn)">top</span> — the oldest, and usually the largest untouched
+      subtree, so one steal moves a lot of work. Meanwhile every worker pushes and pops its own
+      newest tasks at the <span style="color:var(--spawn)">bottom</span>, keeping hot data on the
+      same core. Owner and thief touch opposite ends, so they rarely contend.</figcaption>
+  </figure>
+
+  <div class="legend">
+    <div><svg width="20" height="16"><rect x="1" y="2" width="18" height="12" rx="3" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/></svg><span><b>task</b> — a spawned continuation</span></div>
+    <div><svg width="20" height="16"><rect x="1" y="2" width="18" height="12" rx="3" fill="var(--spawn-soft)" stroke="var(--spawn)" stroke-width="2"/></svg><span><b>task being stolen</b></span></div>
+    <div><svg width="34" height="12"><line x1="1" y1="6" x2="27" y2="6" stroke="var(--spawn)" stroke-width="2.6"/><path d="M27 2 L33 6 L27 10 z" fill="var(--spawn)"/></svg><span><b>steal</b> — from a random victim</span></div>
+    <div class="lg-mut"><svg width="20" height="16"><rect x="1" y="2" width="18" height="12" rx="3" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/></svg><span><b>idle</b> deque — empty</span></div>
+  </div>
+
+  <h2>The three rules</h2>
+  <div class="cards">
+    <div class="card">
+      <p class="k">Owner → bottom</p>
+      <p class="t">pop newest, LIFO</p>
+      <p class="d">A worker always takes the task it spawned most recently. Its data is still in
+        cache, and depth-first execution keeps memory use bounded — same order as the serial run.</p>
+    </div>
+    <div class="card">
+      <p class="k">Thief → top</p>
+      <p class="t">steal oldest, FIFO</p>
+      <p class="d">The top task is the earliest, highest-up spawn — typically the largest untouched
+        subtree. Stealing it moves a big chunk of work in one shot, so steals stay rare.</p>
+    </div>
+    <div class="card">
+      <p class="k">Victim → random</p>
+      <p class="t">no coordinator</p>
+      <p class="d">An idle worker picks a victim at random. There is no shared queue to serialize on;
+        random targeting spreads contention and is provably close to optimal.</p>
+    </div>
+  </div>
+
+  <p class="note">Why this matters: work-stealing only does work when a worker goes <em>idle</em>, so
+     it costs almost nothing until there is an imbalance to fix — then it fixes it automatically.
+     That is a great deal on irregular workloads (<span class="mono">qsort_steal.c</span>) and a
+     standing overhead with nothing to buy on regular ones (<span class="mono">mergesort_balanced.c</span>).
+     See <span class="mono">cilk/work_stealing_vs_static.md</span> for the head-to-head, and
+     <span class="mono">cilk/fib.c</span> for where the spawned tasks come from.</p>
+</div>
