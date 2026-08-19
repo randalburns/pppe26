@@ -1,0 +1,649 @@
+<title>Four Lanes at a Time</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --bg:        #F2F4F8;
+    --surface:   #FFFFFF;
+    --panel:     #FAFBFD;
+    --ink:       #151922;
+    --ink-2:     #4A5566;
+    --ink-3:     #79839a;
+    --rule:      #D3D9E3;
+    --rule-soft: #E6EAF1;
+    --accent:    #1F4FBF;
+    --accent-bg: #E4EBFA;
+    --hit:       #C43F14;
+    --hit-bg:    #FBE6DD;
+
+    --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --cond: "IBM Plex Sans Condensed", "IBM Plex Sans", ui-sans-serif, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:        #0D1117;
+      --surface:   #151B24;
+      --panel:     #111823;
+      --ink:       #E6EBF3;
+      --ink-2:     #98A5B8;
+      --ink-3:     #6D7A8D;
+      --rule:      #28313E;
+      --rule-soft: #1E2733;
+      --accent:    #7BA4FF;
+      --accent-bg: #16233C;
+      --hit:       #FF8158;
+      --hit-bg:    #2E1810;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg:        #0D1117;
+    --surface:   #151B24;
+    --panel:     #111823;
+    --ink:       #E6EBF3;
+    --ink-2:     #98A5B8;
+    --ink-3:     #6D7A8D;
+    --rule:      #28313E;
+    --rule-soft: #1E2733;
+    --accent:    #7BA4FF;
+    --accent-bg: #16233C;
+    --hit:       #FF8158;
+    --hit-bg:    #2E1810;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+
+  /* ---------- masthead ---------- */
+
+  header.masthead {
+    padding: 72px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--cond);
+    font-weight: 700;
+    font-size: clamp(2.6rem, 7vw, 4.1rem);
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 1.2rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 60ch;
+    margin: 0;
+  }
+
+  .sig {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    border-radius: 2px;
+    padding: 14px 18px;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 0;
+  }
+  .sig .k { color: var(--accent); }
+  .sig .c { color: var(--ink-3); }
+
+  /* ---------- prose ---------- */
+
+  section { display: flex; flex-direction: column; gap: 20px; }
+
+  h2 {
+    font-family: var(--cond);
+    font-weight: 700;
+    font-size: 1.85rem;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin: 0;
+    text-wrap: balance;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  h2 .step {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--hit);
+    border: 1px solid var(--hit);
+    border-radius: 2px;
+    padding: 2px 7px;
+    flex: none;
+    transform: translateY(-3px);
+  }
+
+  p { margin: 0; max-width: 68ch; }
+  p + p { margin-top: -4px; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--accent-bg);
+    color: var(--ink);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  .rule { height: 1px; background: var(--rule); border: 0; margin: 0; }
+
+  /* ---------- figures ---------- */
+
+  figure {
+    margin: 0;
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 26px 26px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .scroller { overflow-x: auto; }
+
+  figure svg {
+    display: block;
+    width: 100%;
+    min-width: 620px;
+    max-width: 100%;
+    height: auto;
+    color: var(--ink);
+  }
+
+  figcaption {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    max-width: 74ch;
+    border-top: 1px solid var(--rule-soft);
+    padding-top: 14px;
+  }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- svg element classes ---------- */
+
+  .cell      { fill: var(--surface); stroke: var(--rule); stroke-width: 1; }
+  .cell-seen { fill: var(--accent-bg); stroke: var(--accent); stroke-width: 1; }
+  .cell-hit  { fill: var(--hit-bg); stroke: var(--hit); stroke-width: 1.6; }
+
+  .t        { font-family: var(--mono); font-size: 12.5px; fill: var(--ink); }
+  .t-sm     { font-family: var(--mono); font-size: 11px; fill: var(--ink-3); }
+  .t-lab    { font-family: var(--cond); font-size: 14px; font-weight: 600; fill: var(--ink); }
+  .t-mut    { font-family: var(--sans); font-size: 12.5px; fill: var(--ink-2); }
+  .t-acc    { font-family: var(--mono); font-size: 12px; font-weight: 500; fill: var(--accent); }
+  .t-hit    { font-family: var(--mono); font-size: 12.5px; font-weight: 600; fill: var(--hit); }
+  .t-hit-lab{ font-family: var(--cond); font-size: 13px; font-weight: 600; fill: var(--hit); }
+
+  .ln       { stroke: var(--ink-3); stroke-width: 1.2; fill: none; }
+  .ln-acc   { stroke: var(--accent); stroke-width: 1.4; fill: none; }
+  .ln-hit   { stroke: var(--hit); stroke-width: 1.6; fill: none; }
+  .ln-soft  { stroke: var(--rule); stroke-width: 1; fill: none; }
+  .ln-dash  { stroke: var(--ink-3); stroke-width: 1.2; fill: none; stroke-dasharray: 4 4; }
+
+  .arrowhead     { fill: var(--ink-3); }
+  .arrowhead-acc { fill: var(--accent); }
+  .arrowhead-hit { fill: var(--hit); }
+
+  .box      { fill: var(--surface); stroke: var(--rule); stroke-width: 1; }
+  .box-acc  { fill: var(--accent-bg); stroke: var(--accent); stroke-width: 1; }
+  .box-hit  { fill: var(--hit-bg); stroke: var(--hit); stroke-width: 1.6; }
+
+  /* ---------- results table ---------- */
+
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 520px; }
+  th, td { padding: 10px 16px; text-align: right; border-bottom: 1px solid var(--rule-soft); }
+  th:first-child, td:first-child { text-align: left; }
+  thead th {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    border-bottom: 1px solid var(--rule);
+  }
+  tbody td { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.win { color: var(--accent); font-weight: 600; }
+  td.lose { color: var(--hit); font-weight: 600; }
+
+  footer {
+    font-size: 13.5px;
+    color: var(--ink-3);
+    font-family: var(--mono);
+    border-top: 1px solid var(--rule);
+    padding-top: 18px;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    header.masthead { padding-top: 48px; }
+    figure { padding: 18px 16px 16px; }
+    .wrap { gap: 36px; padding: 0 16px 64px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Vectorization · find_first</p>
+    <h1>Four Lanes at a Time</h1>
+    <p class="standfirst">A loop that stops when it finds something has no trip count, so the
+      compiler refuses to vectorize it. Doing it by hand is worth 2–3.8&times; — and costs no
+      assumptions at all.</p>
+    <pre class="sig"><span class="c">// returns the index of the first match, or -1</span>
+<span class="k">long</span> find_first(<span class="k">const</span> int64_t* data, <span class="k">long</span> n, int64_t target);</pre>
+  </header>
+
+  <hr class="rule">
+
+  <!-- ============================= FIGURE A ============================= -->
+  <section>
+    <h2><span class="step">01</span> What the scan does</h2>
+    <p>The array below holds 16 values and the target sits at index&nbsp;10. The scalar loop
+      touches every element up to the match. The vector version reads four at a time, so it
+      reaches the same answer in three steps instead of eleven — and it still stops early.</p>
+
+    <figure>
+      <div class="scroller">
+        <svg viewBox="0 0 760 336" role="img" aria-label="A 16-element array with the target at index 10. The scalar loop performs 11 single-element compares to reach it. The vector version performs 3 four-element compares, stopping in the third vector.">
+          <defs>
+            <marker id="ahHit" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead-hit"/>
+            </marker>
+          </defs>
+
+          <!-- index ruler -->
+          <text x="60" y="20" class="t-sm">index</text>
+          <text x="79"  y="46" class="t-sm" text-anchor="middle">0</text>
+          <text x="121" y="46" class="t-sm" text-anchor="middle">1</text>
+          <text x="163" y="46" class="t-sm" text-anchor="middle">2</text>
+          <text x="205" y="46" class="t-sm" text-anchor="middle">3</text>
+          <text x="247" y="46" class="t-sm" text-anchor="middle">4</text>
+          <text x="289" y="46" class="t-sm" text-anchor="middle">5</text>
+          <text x="331" y="46" class="t-sm" text-anchor="middle">6</text>
+          <text x="373" y="46" class="t-sm" text-anchor="middle">7</text>
+          <text x="415" y="46" class="t-sm" text-anchor="middle">8</text>
+          <text x="457" y="46" class="t-sm" text-anchor="middle">9</text>
+          <text x="499" y="46" class="t-hit" text-anchor="middle">10</text>
+          <text x="541" y="46" class="t-sm" text-anchor="middle">11</text>
+          <text x="583" y="46" class="t-sm" text-anchor="middle">12</text>
+          <text x="625" y="46" class="t-sm" text-anchor="middle">13</text>
+          <text x="667" y="46" class="t-sm" text-anchor="middle">14</text>
+          <text x="709" y="46" class="t-sm" text-anchor="middle">15</text>
+
+          <!-- ===== scalar row ===== -->
+          <text x="60" y="76" class="t-lab">scalar &mdash; one element per step</text>
+
+          <rect x="60"  y="86" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="102" y="86" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="144" y="86" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="186" y="86" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="228" y="86" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="270" y="86" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="312" y="86" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="354" y="86" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="396" y="86" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="438" y="86" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="480" y="86" width="38" height="38" rx="2" class="cell-hit"/>
+          <rect x="522" y="86" width="38" height="38" rx="2" class="cell"/>
+          <rect x="564" y="86" width="38" height="38" rx="2" class="cell"/>
+          <rect x="606" y="86" width="38" height="38" rx="2" class="cell"/>
+          <rect x="648" y="86" width="38" height="38" rx="2" class="cell"/>
+          <rect x="690" y="86" width="38" height="38" rx="2" class="cell"/>
+          <text x="499" y="111" class="t-hit" text-anchor="middle">7</text>
+
+          <path d="M 499 132 L 499 146" class="ln-hit" marker-end="url(#ahHit)"/>
+          <text x="509" y="150" class="t-hit-lab">11 compares, then return 10</text>
+
+          <!-- ===== simd row ===== -->
+          <text x="60" y="196" class="t-lab">vector &mdash; four elements per step</text>
+
+          <rect x="60"  y="206" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="102" y="206" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="144" y="206" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="186" y="206" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="228" y="206" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="270" y="206" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="312" y="206" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="354" y="206" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="396" y="206" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="438" y="206" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="480" y="206" width="38" height="38" rx="2" class="cell-hit"/>
+          <rect x="522" y="206" width="38" height="38" rx="2" class="cell-seen"/>
+          <rect x="564" y="206" width="38" height="38" rx="2" class="cell"/>
+          <rect x="606" y="206" width="38" height="38" rx="2" class="cell"/>
+          <rect x="648" y="206" width="38" height="38" rx="2" class="cell"/>
+          <rect x="690" y="206" width="38" height="38" rx="2" class="cell"/>
+          <text x="499" y="231" class="t-hit" text-anchor="middle">7</text>
+
+          <!-- vector group brackets -->
+          <path d="M 60 254 L 60 260 L 224 260 L 224 254" class="ln-acc"/>
+          <text x="142" y="276" class="t-acc" text-anchor="middle">vector 1</text>
+
+          <path d="M 228 254 L 228 260 L 392 260 L 392 254" class="ln-acc"/>
+          <text x="310" y="276" class="t-acc" text-anchor="middle">vector 2</text>
+
+          <path d="M 396 254 L 396 260 L 560 260 L 560 254" class="ln-hit"/>
+          <text x="478" y="276" class="t-hit" text-anchor="middle">vector 3 &mdash; hit</text>
+
+          <path d="M 564 254 L 564 260 L 728 260 L 728 254" class="ln-soft"/>
+          <text x="646" y="276" class="t-sm" text-anchor="middle">never read</text>
+
+          <path d="M 478 288 L 478 302" class="ln-hit" marker-end="url(#ahHit)"/>
+          <text x="488" y="306" class="t-hit-lab">3 compares, then return 10</text>
+        </svg>
+      </div>
+      <figcaption><b>Same answer, same early exit, a quarter of the steps.</b> The vector version
+        never reads past the block containing the match — indices 12–15 are untouched by both. The
+        four values in vector&nbsp;3 are compared simultaneously, so finding the match costs the
+        same as not finding it.</figcaption>
+    </figure>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============================= FIGURE B ============================= -->
+  <section>
+    <h2><span class="step">02</span> Inside one vector step</h2>
+    <p>Vector&nbsp;3 covers <code>data[8..11]</code>. Four 64-bit values are compared against four
+      copies of the target in a single instruction. The result is not a boolean — it is a vector of
+      lanes, each all-ones or all-zeros, which then has to be collapsed into something a branch can
+      test and an index can be recovered from.</p>
+
+    <figure>
+      <div class="scroller">
+        <svg viewBox="0 0 760 470" role="img" aria-label="One vector iteration: four copies of the target 7 are compared against data 1042, 5531, 7, 8890. Lane 2 matches, producing all-ones. vmovmskpd collapses the lanes to the 4-bit mask 0100 binary, which is 4. tzcnt of 4 gives lane 2, so the returned index is 8 plus 2, which is 10.">
+          <defs>
+            <marker id="ahB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead"/>
+            </marker>
+            <marker id="ahBhit" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead-hit"/>
+            </marker>
+          </defs>
+
+          <!-- lane headers -->
+          <text x="299" y="20" class="t-sm" text-anchor="middle">lane 0</text>
+          <text x="431" y="20" class="t-sm" text-anchor="middle">lane 1</text>
+          <text x="563" y="20" class="t-hit" text-anchor="middle">lane 2</text>
+          <text x="695" y="20" class="t-sm" text-anchor="middle">lane 3</text>
+
+          <!-- row 1: broadcast target -->
+          <text x="228" y="54" class="t-lab" text-anchor="end">wanted</text>
+          <text x="228" y="70" class="t-sm" text-anchor="end">Set(d, target)</text>
+          <rect x="240" y="32" width="118" height="38" rx="2" class="box-acc"/>
+          <rect x="372" y="32" width="118" height="38" rx="2" class="box-acc"/>
+          <rect x="504" y="32" width="118" height="38" rx="2" class="box-acc"/>
+          <rect x="636" y="32" width="118" height="38" rx="2" class="box-acc"/>
+          <text x="299" y="56" class="t" text-anchor="middle">7</text>
+          <text x="431" y="56" class="t" text-anchor="middle">7</text>
+          <text x="563" y="56" class="t" text-anchor="middle">7</text>
+          <text x="695" y="56" class="t" text-anchor="middle">7</text>
+
+          <!-- row 2: data -->
+          <text x="228" y="124" class="t-lab" text-anchor="end">data[8..11]</text>
+          <text x="228" y="140" class="t-sm" text-anchor="end">LoadU</text>
+          <rect x="240" y="102" width="118" height="38" rx="2" class="box"/>
+          <rect x="372" y="102" width="118" height="38" rx="2" class="box"/>
+          <rect x="504" y="102" width="118" height="38" rx="2" class="box-hit"/>
+          <rect x="636" y="102" width="118" height="38" rx="2" class="box"/>
+          <text x="299" y="126" class="t" text-anchor="middle">1042</text>
+          <text x="431" y="126" class="t" text-anchor="middle">5531</text>
+          <text x="563" y="126" class="t-hit" text-anchor="middle">7</text>
+          <text x="695" y="126" class="t" text-anchor="middle">8890</text>
+
+          <!-- arrow: compare -->
+          <path d="M 299 146 L 299 176" class="ln" marker-end="url(#ahB)"/>
+          <path d="M 431 146 L 431 176" class="ln" marker-end="url(#ahB)"/>
+          <path d="M 563 146 L 563 176" class="ln-hit" marker-end="url(#ahBhit)"/>
+          <path d="M 695 146 L 695 176" class="ln" marker-end="url(#ahB)"/>
+          <text x="228" y="168" class="t-acc" text-anchor="end">vpcmpeqq</text>
+
+          <!-- row 3: compare result -->
+          <text x="228" y="202" class="t-lab" text-anchor="end">equal?</text>
+          <rect x="240" y="180" width="118" height="38" rx="2" class="box"/>
+          <rect x="372" y="180" width="118" height="38" rx="2" class="box"/>
+          <rect x="504" y="180" width="118" height="38" rx="2" class="box-hit"/>
+          <rect x="636" y="180" width="118" height="38" rx="2" class="box"/>
+          <text x="299" y="204" class="t" text-anchor="middle">0x0000…0000</text>
+          <text x="431" y="204" class="t" text-anchor="middle">0x0000…0000</text>
+          <text x="563" y="204" class="t-hit" text-anchor="middle">0xFFFF…FFFF</text>
+          <text x="695" y="204" class="t" text-anchor="middle">0x0000…0000</text>
+          <text x="563" y="234" class="t-sm" text-anchor="middle">all ones = match</text>
+
+          <!-- arrow: movemask -->
+          <path d="M 299 244 L 299 274" class="ln" marker-end="url(#ahB)"/>
+          <path d="M 431 244 L 431 274" class="ln" marker-end="url(#ahB)"/>
+          <path d="M 563 244 L 563 274" class="ln-hit" marker-end="url(#ahBhit)"/>
+          <path d="M 695 244 L 695 274" class="ln" marker-end="url(#ahB)"/>
+          <text x="228" y="266" class="t-acc" text-anchor="end">vmovmskpd</text>
+
+          <!-- row 4: mask bits -->
+          <text x="228" y="300" class="t-lab" text-anchor="end">mask bit</text>
+          <rect x="240" y="278" width="118" height="34" rx="2" class="box"/>
+          <rect x="372" y="278" width="118" height="34" rx="2" class="box"/>
+          <rect x="504" y="278" width="118" height="34" rx="2" class="box-hit"/>
+          <rect x="636" y="278" width="118" height="34" rx="2" class="box"/>
+          <text x="299" y="300" class="t" text-anchor="middle">0</text>
+          <text x="431" y="300" class="t" text-anchor="middle">0</text>
+          <text x="563" y="300" class="t-hit" text-anchor="middle">1</text>
+          <text x="695" y="300" class="t" text-anchor="middle">0</text>
+
+          <!-- collapse to scalar -->
+          <path d="M 299 318 L 299 334 L 563 334" class="ln-soft"/>
+          <path d="M 431 318 L 431 334" class="ln-soft"/>
+          <path d="M 695 318 L 695 334 L 563 334" class="ln-soft"/>
+          <path d="M 563 318 L 563 348" class="ln-hit" marker-end="url(#ahBhit)"/>
+
+          <rect x="466" y="352" width="194" height="36" rx="2" class="box-hit"/>
+          <text x="563" y="375" class="t-hit" text-anchor="middle">mask = 4</text>
+          <text x="228" y="374" class="t-lab" text-anchor="end">one scalar register</text>
+
+          <path d="M 563 390 L 563 414" class="ln-hit" marker-end="url(#ahBhit)"/>
+          <text x="574" y="406" class="t-acc">tzcnt &rarr; lowest set bit is 2</text>
+
+          <rect x="440" y="418" width="246" height="38" rx="2" class="box-acc"/>
+          <text x="563" y="442" class="t" text-anchor="middle">return i + 2  =  8 + 2  =  10</text>
+        </svg>
+      </div>
+      <figcaption><b>Four compares, one branch, one bit-scan.</b> The whole point of
+        <code>vmovmskpd</code> is to get out of vector-land: it takes the top bit of each lane and
+        packs them into an ordinary integer a <code>test</code> can branch on. Bit&nbsp;<i>k</i>
+        carries lane&nbsp;<i>k</i>, so the mask written as a number reads right-to-left — lane&nbsp;2
+        matching gives <code>0b0100</code>, which is 4, and the lowest set bit recovers the lane.
+        Highway's <code>FindFirstTrue</code> compiles to exactly this.</figcaption>
+    </figure>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============================= FIGURE C ============================= -->
+  <section>
+    <h2><span class="step">03</span> Why the compiler won't</h2>
+    <p>Auto-vectorization is a planning problem. Before the loop runs, the compiler has to divide
+      the work into whole vectors plus a remainder — and that division needs the number of
+      iterations up front. A loop that exits on a condition it hasn't evaluated yet cannot supply
+      one, so there is no plan to make.</p>
+
+    <figure>
+      <div class="scroller">
+        <svg viewBox="-10 0 772 320" role="img" aria-label="Left: a countable loop has trip count n known before entry, so the compiler plans n over 4 whole vectors plus a remainder and vectorizes. Right: an early-exit loop has a trip count that depends on the data, so no plan can be made and the compiler emits scalar code.">
+          <defs>
+            <marker id="ahC" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead"/>
+            </marker>
+            <marker id="ahCacc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead-acc"/>
+            </marker>
+            <marker id="ahChit" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead-hit"/>
+            </marker>
+          </defs>
+
+          <!-- divider -->
+          <line x1="380" y1="8" x2="380" y2="312" class="ln-soft"/>
+
+          <!-- ==== LEFT: countable ==== -->
+          <text x="0" y="22" class="t-lab">countable loop</text>
+          <text x="0" y="48" class="t">for (i = 0; i &lt; n; i++)</text>
+          <text x="0" y="68" class="t">    sum += a[i];</text>
+
+          <text x="0" y="106" class="t-mut">trip count is n &mdash; known before entry</text>
+
+          <path d="M 0 118 L 0 140" class="ln-acc" marker-end="url(#ahCacc)"/>
+
+          <!-- planned blocks -->
+          <text x="0" y="164" class="t-sm">plan</text>
+          <rect x="0"   y="174" width="74" height="34" rx="2" class="box-acc"/>
+          <rect x="80"  y="174" width="74" height="34" rx="2" class="box-acc"/>
+          <rect x="160" y="174" width="74" height="34" rx="2" class="box-acc"/>
+          <rect x="240" y="174" width="42" height="34" rx="2" class="box"/>
+          <text x="37"  y="196" class="t-acc" text-anchor="middle">4 lanes</text>
+          <text x="117" y="196" class="t-acc" text-anchor="middle">4 lanes</text>
+          <text x="197" y="196" class="t-acc" text-anchor="middle">4 lanes</text>
+          <text x="261" y="196" class="t-sm" text-anchor="middle">tail</text>
+
+          <path d="M 0 220 L 282 220" class="ln-soft"/>
+          <text x="141" y="240" class="t-sm" text-anchor="middle">&#8970;n/4&#8971; whole vectors, then the remainder</text>
+
+          <rect x="0" y="258" width="282" height="38" rx="2" class="box-acc"/>
+          <text x="141" y="282" class="t-acc" text-anchor="middle">vectorized</text>
+
+          <!-- ==== RIGHT: early exit ==== -->
+          <text x="420" y="22" class="t-lab">early-exit loop</text>
+          <text x="420" y="48" class="t">for (i = 0; i &lt; n; i++)</text>
+          <text x="420" y="68" class="t">    if (a[i] == t) return i;</text>
+
+          <text x="420" y="106" class="t-mut">trip count depends on the data</text>
+
+          <path d="M 420 118 L 420 140" class="ln-hit" marker-end="url(#ahChit)"/>
+
+          <text x="420" y="164" class="t-sm">no plan</text>
+          <rect x="420" y="174" width="74" height="34" rx="2" class="box"/>
+          <rect x="500" y="174" width="74" height="34" rx="2" class="box"/>
+          <rect x="580" y="174" width="74" height="34" rx="2" class="box"/>
+          <rect x="660" y="174" width="74" height="34" rx="2" class="box"/>
+          <text x="457" y="196" class="t-sm" text-anchor="middle">?</text>
+          <text x="537" y="196" class="t-sm" text-anchor="middle">?</text>
+          <text x="617" y="196" class="t-sm" text-anchor="middle">?</text>
+          <text x="697" y="196" class="t-sm" text-anchor="middle">?</text>
+
+          <path d="M 420 220 L 734 220" class="ln-dash"/>
+          <path d="M 537 208 L 537 236" class="ln-hit" marker-end="url(#ahChit)"/>
+          <text x="548" y="240" class="t-hit-lab">exits &mdash; somewhere</text>
+
+          <rect x="420" y="258" width="314" height="38" rx="2" class="box-hit"/>
+          <text x="577" y="282" class="t-hit" text-anchor="middle">not vectorized &mdash; scalar code</text>
+        </svg>
+      </div>
+      <figcaption><b>The compiler states this itself.</b> Build with
+        <code>-Rpass-analysis=loop-vectorize</code> and it reports
+        <i>&ldquo;loop not vectorized: could not determine number of loop iterations.&rdquo;</i> It
+        is not a heuristic declining a marginal win — the vectorizer is built around a trip count,
+        and this loop does not have one. Writing it by hand is legal because we only ever load
+        inside the array: the bound is <code>i + 4 &lt;= n</code>, and the leftovers stay
+        scalar.</figcaption>
+    </figure>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============================= RESULTS ============================= -->
+  <section>
+    <h2><span class="step">04</span> What it's worth</h2>
+    <p>8192 <code>int64</code> values, L1-resident, on a Ryzen&nbsp;AI&nbsp;9&nbsp;HX&nbsp;370
+      (Zen&nbsp;5) with clang&nbsp;18 at <code>-O3</code>. Median of seven pinned runs, in
+      nanoseconds per call.</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">First match at</th>
+            <th scope="col">Scalar</th>
+            <th scope="col">Intrinsics</th>
+            <th scope="col">Highway</th>
+            <th scope="col">Speedup</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0</td><td>0.5</td><td>0.9</td><td>1.0</td><td class="lose">0.56&times;</td></tr>
+          <tr><td>16</td><td>6.8</td><td>1.8</td><td>1.8</td><td class="win">3.78&times;</td></tr>
+          <tr><td>256</td><td>60.6</td><td>25.3</td><td>26.6</td><td class="win">2.40&times;</td></tr>
+          <tr><td>4096</td><td>909.1</td><td>329.9</td><td>312.6</td><td class="win">2.76&times;</td></tr>
+          <tr><td>8191</td><td>1596.1</td><td>773.9</td><td>698.5</td><td class="win">2.06&times;</td></tr>
+          <tr><td>no match</td><td>1318.8</td><td>666.0</td><td>651.1</td><td class="win">1.98&times;</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The crossover is about a dozen elements. With the match at index&nbsp;0 the scalar version
+      wins outright — it compares once and returns, while the vector version still loads and tests a
+      whole register. Past that it is 2–3.8&times;, and Google Highway's portable
+      <code>hn::Find</code> matches the hand-written AVX2 within noise, because it compiles to the
+      same four instructions.</p>
+
+    <p>What makes this example unusual is what the fast version does <i>not</i> assume. It returns
+      the same index, and the same <code>-1</code>, as the scalar loop for every possible input —
+      no narrowed accumulator, no bound on <code>n</code>, nothing about the values or how many
+      matches exist. The speed comes entirely from a capability gap in the vectorizer.</p>
+  </section>
+
+  <footer>
+    pppe26 / vectorization &middot; find_first.cpp<br>
+    verified against the scalar version with 120,000 fuzz checks &mdash; n = 0..39, every
+    remainder, duplicate-heavy data, target present and absent
+  </footer>
+
+</div>

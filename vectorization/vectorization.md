@@ -7,6 +7,10 @@ clang++ -O3 -mavx2 -std=c++17 -stdlib=libc++ find_first.cpp -o find_first
 ./find_first
 ```
 
+[find_first_diagram.html](find_first_diagram.html) draws the computation: the
+scalar and vector scans side by side, what happens inside one vector step, and
+why the vectorizer refuses this loop. Open it in a browser.
+
 ---
 
 # Vectorization: a loop the compiler will not do for you
