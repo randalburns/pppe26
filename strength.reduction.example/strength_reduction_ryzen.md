@@ -80,6 +80,23 @@ bottleneck on either CPU.
 
 ## Summary
 
+**How the x86 (Ryzen) picture differs from ARM (M5):** on M5, none of the classic x86 "IDIV/IMUL
+are slow" folklore held up — modern out-of-order execution hides divide/multiply latency as long
+as there's independent work in the loop, so only the two count-reducing tests (eliminating
+`pow()` calls, collapsing 3 divides into 1) showed real wins. On Ryzen, that same "OoO hides it"
+story holds for most of the substitution tests too — mod→AND, mul→shift, induction→accumulate are
+all still roughly neutral, same as on M5. But two things break the pattern:
+
+- **Div→shift actually wins on Ryzen (1.29x)** but not on M5 (1.00x) — the one case where the
+  textbook x86 IDIV-is-expensive story is true on real x86 hardware, even though it isn't on ARM.
+- **Reciprocal multiply doesn't regress on Ryzen**, whereas on M5 it got *slower*. That M5
+  regression was a register-spill artifact from `optnone`; the same spill happens on Ryzen but
+  doesn't cost as much relative to the FDIV it replaces.
+
+So the headline: the two "always win" transformations (count reduction) are architecture-independent
+and validated on both chips. Nearly everything else is a wash on both, with div→shift being the sole
+case where x86 actually rewards the classic substitution and ARM doesn't.
+
 | Rule | Reliable on Ryzen (Zen 5)? | Reliable on M5? |
 |------|:---:|:---:|
 | `pow(x,n)` → `x*x*...` | Yes | Yes |

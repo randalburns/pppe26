@@ -89,7 +89,8 @@ static const int RUNS      = 5;
 static const int MISPREDICT_PENALTY = 15;
 
 // CPU frequency (Apple M5 performance core).
-// Adjust: M1/M2 ≈ 3.2 GHz, M3 ≈ 3.7 GHz, M5 ≈ 4.0 GHz.
+// Adjust: M1 ≈ 3.2 GHz, M2 ≈ 3.5 GHz, M3 ≈ 4.05 GHz,
+//         M4 ≈ 4.4 GHz, M5 ≈ 4.6 GHz.
 static const double CPU_GHZ = 4.0;
 
 template <typename T>

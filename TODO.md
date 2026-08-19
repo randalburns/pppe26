@@ -1,3 +1,8 @@
+## Different on Ryzen than M5
+  * vectorization 
+  * sorting -- highway has native performance (do it on Ryzen)
+  * 
+
 ## RB Thoughts
 
 There are really only 2 computations in all of CS.
@@ -22,6 +27,8 @@ There are really only 2 computations in all of CS.
 
 * Intro (Currently Lec 0)
   * what simple example to DO???
+
+
 
 * Amdahl's law and speedup (Lec 2)
 * Looping unrolling as first form of optimization
