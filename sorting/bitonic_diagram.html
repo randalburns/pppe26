@@ -1,0 +1,428 @@
+<title>Bitonic Sort</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#F6F8F9; --surface:#FFFFFF; --panel:#FBFCFD;
+    --ink:#16202B; --muted:#5D6D7B; --rule:#DAE1E7; --rule-soft:#E9EEF2;
+    --asc:#0E7C86; --desc:#C0611D;
+    --asc-wash:#E4F1F2; --desc-wash:#FBEDE1;
+    --display:"IBM Plex Sans Condensed",ui-sans-serif,system-ui,sans-serif;
+    --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0F151A; --surface:#172029; --panel:#141C24;
+      --ink:#E3EAF0; --muted:#91A1B0; --rule:#2B3945; --rule-soft:#212C36;
+      --asc:#3FBDC7; --desc:#EE9448;
+      --asc-wash:#153034; --desc-wash:#33220F;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0F151A; --surface:#172029; --panel:#141C24;
+    --ink:#E3EAF0; --muted:#91A1B0; --rule:#2B3945; --rule-soft:#212C36;
+    --asc:#3FBDC7; --desc:#EE9448;
+    --asc-wash:#153034; --desc-wash:#33220F;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:var(--body); font-size:17px; line-height:1.65;
+    margin:0; padding:clamp(28px,6vw,72px) clamp(18px,5vw,32px) 96px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:840px; margin:0 auto; display:flex; flex-direction:column; gap:44px}
+  .measure{max-width:66ch}
+
+  header{display:flex; flex-direction:column; gap:14px; padding-bottom:34px; border-bottom:1px solid var(--rule)}
+  .eyebrow{
+    font-family:var(--mono); font-size:11.5px; font-weight:500;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+  }
+  h1{
+    font-family:var(--display); font-weight:700;
+    font-size:clamp(40px,8vw,62px); line-height:.98; letter-spacing:-.02em;
+    margin:0; text-wrap:balance;
+  }
+  .standfirst{font-size:clamp(17px,2.4vw,19.5px); color:var(--muted); margin:0; max-width:60ch}
+
+  section{display:flex; flex-direction:column; gap:18px}
+  h2{
+    font-family:var(--display); font-weight:600;
+    font-size:clamp(23px,3.6vw,30px); line-height:1.12; letter-spacing:-.01em;
+    margin:0; display:flex; align-items:baseline; gap:13px; text-wrap:balance;
+  }
+  .step{
+    font-family:var(--mono); font-size:13px; font-weight:500;
+    color:var(--muted); border:1px solid var(--rule); border-radius:3px;
+    padding:1px 7px; flex:none; transform:translateY(-2px);
+  }
+  p{margin:0}
+  .measure + .measure{margin-top:-4px}
+  strong{font-weight:600}
+  em{font-style:normal; font-family:var(--mono); font-size:.93em; color:var(--asc)}
+  .term{font-weight:600; border-bottom:2px solid var(--asc-wash); padding-bottom:1px}
+
+  figure{
+    margin:6px 0 0; background:var(--panel);
+    border:1px solid var(--rule); border-radius:5px;
+    padding:22px 20px 16px; display:flex; flex-direction:column; gap:14px;
+    overflow-x:auto;
+  }
+  figure svg{display:block; width:100%; max-width:100%; height:auto; color:var(--ink); min-width:440px}
+  figcaption{
+    font-size:14px; line-height:1.55; color:var(--muted);
+    border-top:1px solid var(--rule-soft); padding-top:12px; margin:0;
+  }
+  figcaption b{color:var(--ink); font-weight:600}
+
+  .keys{display:flex; flex-wrap:wrap; gap:8px 22px; font-family:var(--mono); font-size:12.5px; color:var(--muted)}
+  .key{display:flex; align-items:center; gap:7px}
+  .swatch{width:15px; height:3px; border-radius:2px; flex:none}
+
+  table{border-collapse:collapse; width:100%; font-family:var(--mono); font-size:13.5px; font-variant-numeric:tabular-nums}
+  caption{text-align:left; font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); padding-bottom:11px}
+  th,td{padding:6px 4px; text-align:center; border-bottom:1px solid var(--rule-soft)}
+  th.lbl,td.lbl{text-align:left; padding-right:16px; white-space:nowrap; color:var(--muted); font-weight:400}
+  thead th{font-weight:500; color:var(--muted); font-size:11.5px; letter-spacing:.06em}
+  tbody tr:last-child td{border-bottom:none}
+  tr.mark{background:var(--asc-wash)}
+  tr.mark td{color:var(--ink)}
+  tr.mark td.lbl{color:var(--asc); font-weight:500}
+  .note{font-size:13.5px; color:var(--muted); font-family:var(--body); margin-top:10px}
+
+  .facts{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px;
+    background:var(--rule); border:1px solid var(--rule); border-radius:5px; overflow:hidden;
+  }
+  .fact{background:var(--surface); padding:16px 18px; display:flex; flex-direction:column; gap:5px}
+  .fact dt{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--muted)}
+  .fact dd{margin:0; font-family:var(--display); font-size:26px; font-weight:600; letter-spacing:-.01em}
+  .fact .sub{font-size:12.5px; font-family:var(--body); font-weight:400; color:var(--muted); letter-spacing:0}
+
+  footer{border-top:1px solid var(--rule); padding-top:22px; font-size:14px; color:var(--muted)}
+  a{color:var(--asc); text-underline-offset:3px}
+  a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--asc); outline-offset:3px; border-radius:2px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Sorting networks</div>
+    <h1>Bitonic Sort</h1>
+    <p class="standfirst">A sorting algorithm with no branches and no data-dependent decisions. The sequence of comparisons is fixed before the data arrives — which is exactly what makes it run on SIMD hardware.</p>
+  </header>
+
+  <section>
+    <p class="measure">Most sorts decide what to do next by looking at the data. Bitonic sort does not. It runs a <span class="term">fixed network</span> of compare-exchange operations, laid out in advance, and the same operations execute in the same order no matter what the input is. Sorting eight numbers always takes exactly 24 comparisons across 6 columns.</p>
+    <p class="measure">That rigidity costs comparisons — it does more work than an optimal sort. It buys something worth more on modern hardware: every column is independent, so a whole column runs in one SIMD instruction, and there is never a branch to mispredict.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">1</span>The comparator</h2>
+    <p class="measure">The only operation. It takes two values and puts the smaller on one wire, the larger on the other. Which end receives the larger value is baked into the network — the arrow, not the data, decides.</p>
+
+    <figure>
+      <svg viewBox="0 0 620 150" role="img" aria-label="Two comparators. An ascending comparator receives 7 and 3 and outputs 3 on the upper wire and 7 on the lower. A descending comparator receives 3 and 7 and outputs 7 on the upper wire and 3 on the lower.">
+        <defs>
+          <marker id="f1-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <polygon points="0,1 10,5 0,9" fill="var(--asc)"></polygon>
+          </marker>
+          <marker id="f1-d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <polygon points="0,1 10,5 0,9" fill="var(--desc)"></polygon>
+          </marker>
+        </defs>
+        <g font-family="IBM Plex Mono, monospace" font-size="13">
+          <!-- Panel A : ascending -->
+          <text x="148" y="24" text-anchor="middle" fill="var(--asc)" font-size="12" letter-spacing="1.4">ASCENDING</text>
+          <line x1="44" y1="62" x2="252" y2="62" stroke="currentColor" stroke-opacity=".28" stroke-width="1.5"></line>
+          <line x1="44" y1="118" x2="252" y2="118" stroke="currentColor" stroke-opacity=".28" stroke-width="1.5"></line>
+          <text x="32" y="67" text-anchor="end" fill="currentColor">7</text>
+          <text x="32" y="123" text-anchor="end" fill="currentColor">3</text>
+          <line x1="148" y1="62" x2="148" y2="112" stroke="var(--asc)" stroke-width="2" marker-end="url(#f1-a)"></line>
+          <circle cx="148" cy="62" r="4.5" fill="var(--asc)"></circle>
+          <text x="264" y="67" fill="var(--ink)" font-weight="500">3</text>
+          <text x="284" y="67" fill="var(--muted)" font-size="11">min</text>
+          <text x="264" y="123" fill="var(--ink)" font-weight="500">7</text>
+          <text x="284" y="123" fill="var(--muted)" font-size="11">max</text>
+
+          <!-- Panel B : descending -->
+          <text x="468" y="24" text-anchor="middle" fill="var(--desc)" font-size="12" letter-spacing="1.4">DESCENDING</text>
+          <line x1="364" y1="62" x2="572" y2="62" stroke="currentColor" stroke-opacity=".28" stroke-width="1.5"></line>
+          <line x1="364" y1="118" x2="572" y2="118" stroke="currentColor" stroke-opacity=".28" stroke-width="1.5"></line>
+          <text x="352" y="67" text-anchor="end" fill="currentColor">3</text>
+          <text x="352" y="123" text-anchor="end" fill="currentColor">7</text>
+          <line x1="468" y1="118" x2="468" y2="68" stroke="var(--desc)" stroke-width="2" marker-end="url(#f1-d)"></line>
+          <circle cx="468" cy="118" r="4.5" fill="var(--desc)"></circle>
+          <text x="584" y="67" fill="var(--ink)" font-weight="500">7</text>
+          <text x="604" y="67" fill="var(--muted)" font-size="11">max</text>
+          <text x="584" y="123" fill="var(--ink)" font-weight="500">3</text>
+          <text x="604" y="123" fill="var(--muted)" font-size="11">min</text>
+        </g>
+      </svg>
+      <figcaption>Values travel left to right along wires. A comparator joins two wires; <b>the arrow points to the wire that receives the larger value</b>. In code this is a min and a max, with no <span style="font-family:var(--mono)">if</span> anywhere.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="step">2</span>A bitonic sequence</h2>
+    <p class="measure">A sequence is <span class="term">bitonic</span> when it rises and then falls — or is a rotation of such a sequence. It has one peak, not many. This is the shape the whole algorithm is built to exploit.</p>
+
+    <figure>
+      <svg viewBox="0 0 560 200" role="img" aria-label="A line chart of the eight values 3, 4, 7, 8, 6, 5, 2, 1. The line rises from 3 to a peak of 8, then falls to 1, forming a single peak.">
+        <g font-family="IBM Plex Mono, monospace" font-size="12.5">
+          <line x1="40" y1="176" x2="524" y2="176" stroke="currentColor" stroke-opacity=".18" stroke-width="1"></line>
+          <polyline points="56,140 122,124 188,76 254,60 320,92 386,108 452,156 518,172"
+                    fill="none" stroke="var(--asc)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+          <polyline points="254,60 320,92 386,108 452,156 518,172"
+                    fill="none" stroke="var(--desc)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+          <g fill="var(--asc)">
+            <circle cx="56" cy="140" r="4"></circle><circle cx="122" cy="124" r="4"></circle>
+            <circle cx="188" cy="76" r="4"></circle><circle cx="254" cy="60" r="4"></circle>
+          </g>
+          <g fill="var(--desc)">
+            <circle cx="320" cy="92" r="4"></circle><circle cx="386" cy="108" r="4"></circle>
+            <circle cx="452" cy="156" r="4"></circle><circle cx="518" cy="172" r="4"></circle>
+          </g>
+          <g fill="currentColor" text-anchor="middle" font-weight="500">
+            <text x="56" y="196">3</text><text x="122" y="196">4</text>
+            <text x="188" y="196">7</text><text x="254" y="196">8</text>
+            <text x="320" y="196">6</text><text x="386" y="196">5</text>
+            <text x="452" y="196">2</text><text x="518" y="196">1</text>
+          </g>
+          <text x="150" y="36" text-anchor="middle" fill="var(--asc)" font-size="12" letter-spacing="1.2">RISES</text>
+          <text x="416" y="36" text-anchor="middle" fill="var(--desc)" font-size="12" letter-spacing="1.2">THEN FALLS</text>
+          <line x1="254" y1="46" x2="254" y2="176" stroke="currentColor" stroke-opacity=".18" stroke-width="1" stroke-dasharray="3 4"></line>
+        </g>
+      </svg>
+      <figcaption>The sequence <b>3 4 7 8 6 5 2 1</b> is bitonic: one run up, one run down. A sorted sequence is a special case — the falling run is empty.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="step">3</span>The half-cleaner</h2>
+    <p class="measure">Here is the property everything rests on. Take a bitonic sequence of <em>n</em> values and compare each element with the one <em>n/2</em> positions away. The result splits cleanly in two:</p>
+    <p class="measure"><strong>Every value in the left half is now smaller than every value in the right half — and each half is still bitonic.</strong> So the halves never need to be compared against each other again. Repeat on each half, and after <em>log n</em> rounds the sequence is sorted.</p>
+
+    <figure>
+      <svg viewBox="0 0 640 320" role="img" aria-label="Eight wires carrying the bitonic sequence 3, 4, 7, 8, 6, 5, 2, 1. Four ascending comparators connect wire 0 to 4, 1 to 5, 2 to 6, and 3 to 7. The output is 3, 4, 2, 1 on the top half and 6, 5, 7, 8 on the bottom half. The top half is all 4 or less, the bottom half is all 5 or more, and both halves are still bitonic.">
+        <defs>
+          <marker id="f3-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <polygon points="0,1 10,5 0,9" fill="var(--asc)"></polygon>
+          </marker>
+        </defs>
+        <g font-family="IBM Plex Mono, monospace" font-size="13">
+          <text x="66" y="26" text-anchor="end" fill="var(--muted)" font-size="11" letter-spacing="1.2">IN</text>
+          <text x="418" y="26" fill="var(--muted)" font-size="11" letter-spacing="1.2">OUT</text>
+
+          <g stroke="currentColor" stroke-opacity=".28" stroke-width="1.5">
+            <line x1="84" y1="46" x2="398" y2="46"></line>
+            <line x1="84" y1="78" x2="398" y2="78"></line>
+            <line x1="84" y1="110" x2="398" y2="110"></line>
+            <line x1="84" y1="142" x2="398" y2="142"></line>
+            <line x1="84" y1="174" x2="398" y2="174"></line>
+            <line x1="84" y1="206" x2="398" y2="206"></line>
+            <line x1="84" y1="238" x2="398" y2="238"></line>
+            <line x1="84" y1="270" x2="398" y2="270"></line>
+          </g>
+
+          <g fill="currentColor" text-anchor="end">
+            <text x="66" y="51">3</text><text x="66" y="83">4</text>
+            <text x="66" y="115">7</text><text x="66" y="147">8</text>
+            <text x="66" y="179">6</text><text x="66" y="211">5</text>
+            <text x="66" y="243">2</text><text x="66" y="275">1</text>
+          </g>
+
+          <g stroke="var(--asc)" stroke-width="2" marker-end="url(#f3-a)">
+            <line x1="176" y1="46"  x2="176" y2="168"></line>
+            <line x1="200" y1="78"  x2="200" y2="200"></line>
+            <line x1="224" y1="110" x2="224" y2="232"></line>
+            <line x1="248" y1="142" x2="248" y2="264"></line>
+          </g>
+          <g fill="var(--asc)">
+            <circle cx="176" cy="46" r="4.5"></circle><circle cx="200" cy="78" r="4.5"></circle>
+            <circle cx="224" cy="110" r="4.5"></circle><circle cx="248" cy="142" r="4.5"></circle>
+          </g>
+
+          <g fill="var(--ink)" font-weight="500">
+            <text x="418" y="51">3</text><text x="418" y="83">4</text>
+            <text x="418" y="115">2</text><text x="418" y="147">1</text>
+            <text x="418" y="179">6</text><text x="418" y="211">5</text>
+            <text x="418" y="243">7</text><text x="418" y="275">8</text>
+          </g>
+
+          <path d="M452 42 L462 42 L462 146 L452 146" fill="none" stroke="var(--asc)" stroke-width="1.5" stroke-opacity=".7"></path>
+          <path d="M452 170 L462 170 L462 274 L452 274" fill="none" stroke="var(--asc)" stroke-width="1.5" stroke-opacity=".7"></path>
+          <text x="474" y="88" fill="var(--asc)" font-size="12.5" font-weight="500">all &#8804; 4</text>
+          <text x="474" y="108" fill="var(--muted)" font-size="11.5">still bitonic</text>
+          <text x="474" y="216" fill="var(--asc)" font-size="12.5" font-weight="500">all &#8805; 5</text>
+          <text x="474" y="236" fill="var(--muted)" font-size="11.5">still bitonic</text>
+        </g>
+      </svg>
+      <figcaption>One half-cleaner on a bitonic input. Nothing in the top half exceeds <b>4</b>; nothing in the bottom half is below <b>5</b>. The two halves are now independent sub-problems of half the size — and both are bitonic, so the same step applies again.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="step">4</span>The whole network</h2>
+    <p class="measure">Step 3 needs a bitonic input, so the network builds one. It sorts adjacent pairs in <span style="color:var(--asc);font-weight:600">alternating directions</span> — up, down, up, down — which makes every neighbouring pair of runs bitonic. Merging those gives bitonic runs of 4, then of 8, doubling until the whole array is one sorted run.</p>
+
+    <figure>
+      <svg viewBox="0 0 560 340" role="img" aria-label="The complete 8-element bitonic sorting network: three stages containing six columns and 24 comparators. Stage 1 has one column of alternating ascending and descending comparators. Stage 2 has two columns. Stage 3 has three columns, all ascending. Input 3 7 4 8 6 2 1 5 becomes output 1 through 8 in order.">
+        <defs>
+          <marker id="f4-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <polygon points="0,1 10,5 0,9" fill="var(--asc)"></polygon>
+          </marker>
+          <marker id="f4-d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <polygon points="0,1 10,5 0,9" fill="var(--desc)"></polygon>
+          </marker>
+        </defs>
+        <g font-family="IBM Plex Mono, monospace" font-size="12.5">
+
+          <g fill="var(--muted)" font-size="11" letter-spacing="1.1" text-anchor="middle">
+            <text x="118" y="26">STAGE 1</text>
+            <text x="211" y="26">STAGE 2</text>
+            <text x="374" y="26">STAGE 3</text>
+          </g>
+          <g stroke="currentColor" stroke-opacity=".2" stroke-width="1">
+            <line x1="100" y1="36" x2="136" y2="36"></line>
+            <line x1="170" y1="36" x2="252" y2="36"></line>
+            <line x1="284" y1="36" x2="464" y2="36"></line>
+          </g>
+          <g fill="var(--muted)" font-size="10.5" text-anchor="middle" fill-opacity=".85">
+            <text x="118" y="316">runs of 2</text>
+            <text x="211" y="316">runs of 4</text>
+            <text x="374" y="316">runs of 8</text>
+          </g>
+
+          <g stroke="currentColor" stroke-opacity=".26" stroke-width="1.5">
+            <line x1="80" y1="60" x2="490" y2="60"></line>
+            <line x1="80" y1="92" x2="490" y2="92"></line>
+            <line x1="80" y1="124" x2="490" y2="124"></line>
+            <line x1="80" y1="156" x2="490" y2="156"></line>
+            <line x1="80" y1="188" x2="490" y2="188"></line>
+            <line x1="80" y1="220" x2="490" y2="220"></line>
+            <line x1="80" y1="252" x2="490" y2="252"></line>
+            <line x1="80" y1="284" x2="490" y2="284"></line>
+          </g>
+
+          <g fill="currentColor" text-anchor="end">
+            <text x="66" y="65">3</text><text x="66" y="97">7</text>
+            <text x="66" y="129">4</text><text x="66" y="161">8</text>
+            <text x="66" y="193">6</text><text x="66" y="225">2</text>
+            <text x="66" y="257">1</text><text x="66" y="289">5</text>
+          </g>
+
+          <!-- Stage 1 : k=2 d=1 -->
+          <g stroke-width="2">
+            <line x1="118" y1="60"  x2="118" y2="86"  stroke="var(--asc)"  marker-end="url(#f4-a)"></line>
+            <line x1="118" y1="156" x2="118" y2="130" stroke="var(--desc)" marker-end="url(#f4-d)"></line>
+            <line x1="118" y1="188" x2="118" y2="214" stroke="var(--asc)"  marker-end="url(#f4-a)"></line>
+            <line x1="118" y1="284" x2="118" y2="258" stroke="var(--desc)" marker-end="url(#f4-d)"></line>
+          </g>
+          <g><circle cx="118" cy="60" r="4" fill="var(--asc)"></circle><circle cx="118" cy="156" r="4" fill="var(--desc)"></circle>
+             <circle cx="118" cy="188" r="4" fill="var(--asc)"></circle><circle cx="118" cy="284" r="4" fill="var(--desc)"></circle></g>
+
+          <!-- Stage 2 : k=4 d=2 -->
+          <g stroke-width="2">
+            <line x1="182" y1="60"  x2="182" y2="118" stroke="var(--asc)"  marker-end="url(#f4-a)"></line>
+            <line x1="198" y1="92"  x2="198" y2="150" stroke="var(--asc)"  marker-end="url(#f4-a)"></line>
+            <line x1="182" y1="252" x2="182" y2="194" stroke="var(--desc)" marker-end="url(#f4-d)"></line>
+            <line x1="198" y1="284" x2="198" y2="226" stroke="var(--desc)" marker-end="url(#f4-d)"></line>
+          </g>
+          <g><circle cx="182" cy="60" r="4" fill="var(--asc)"></circle><circle cx="198" cy="92" r="4" fill="var(--asc)"></circle>
+             <circle cx="182" cy="252" r="4" fill="var(--desc)"></circle><circle cx="198" cy="284" r="4" fill="var(--desc)"></circle></g>
+
+          <!-- Stage 2 : k=4 d=1 -->
+          <g stroke-width="2">
+            <line x1="240" y1="60"  x2="240" y2="86"  stroke="var(--asc)"  marker-end="url(#f4-a)"></line>
+            <line x1="240" y1="124" x2="240" y2="150" stroke="var(--asc)"  marker-end="url(#f4-a)"></line>
+            <line x1="240" y1="220" x2="240" y2="194" stroke="var(--desc)" marker-end="url(#f4-d)"></line>
+            <line x1="240" y1="284" x2="240" y2="258" stroke="var(--desc)" marker-end="url(#f4-d)"></line>
+          </g>
+          <g><circle cx="240" cy="60" r="4" fill="var(--asc)"></circle><circle cx="240" cy="124" r="4" fill="var(--asc)"></circle>
+             <circle cx="240" cy="220" r="4" fill="var(--desc)"></circle><circle cx="240" cy="284" r="4" fill="var(--desc)"></circle></g>
+
+          <!-- Stage 3 : k=8 d=4  (the half-cleaner) -->
+          <g stroke-width="2" stroke="var(--asc)" marker-end="url(#f4-a)">
+            <line x1="298" y1="60"  x2="298" y2="182"></line>
+            <line x1="314" y1="92"  x2="314" y2="214"></line>
+            <line x1="330" y1="124" x2="330" y2="246"></line>
+            <line x1="346" y1="156" x2="346" y2="278"></line>
+          </g>
+          <g fill="var(--asc)"><circle cx="298" cy="60" r="4"></circle><circle cx="314" cy="92" r="4"></circle>
+             <circle cx="330" cy="124" r="4"></circle><circle cx="346" cy="156" r="4"></circle></g>
+
+          <!-- Stage 3 : k=8 d=2 -->
+          <g stroke-width="2" stroke="var(--asc)" marker-end="url(#f4-a)">
+            <line x1="392" y1="60"  x2="392" y2="118"></line>
+            <line x1="408" y1="92"  x2="408" y2="150"></line>
+            <line x1="392" y1="188" x2="392" y2="246"></line>
+            <line x1="408" y1="220" x2="408" y2="278"></line>
+          </g>
+          <g fill="var(--asc)"><circle cx="392" cy="60" r="4"></circle><circle cx="408" cy="92" r="4"></circle>
+             <circle cx="392" cy="188" r="4"></circle><circle cx="408" cy="220" r="4"></circle></g>
+
+          <!-- Stage 3 : k=8 d=1 -->
+          <g stroke-width="2" stroke="var(--asc)" marker-end="url(#f4-a)">
+            <line x1="452" y1="60"  x2="452" y2="86"></line>
+            <line x1="452" y1="124" x2="452" y2="150"></line>
+            <line x1="452" y1="188" x2="452" y2="214"></line>
+            <line x1="452" y1="252" x2="452" y2="278"></line>
+          </g>
+          <g fill="var(--asc)"><circle cx="452" cy="60" r="4"></circle><circle cx="452" cy="124" r="4"></circle>
+             <circle cx="452" cy="188" r="4"></circle><circle cx="452" cy="252" r="4"></circle></g>
+
+          <g fill="var(--ink)" font-weight="500">
+            <text x="506" y="65">1</text><text x="506" y="97">2</text>
+            <text x="506" y="129">3</text><text x="506" y="161">4</text>
+            <text x="506" y="193">5</text><text x="506" y="225">6</text>
+            <text x="506" y="257">7</text><text x="506" y="289">8</text>
+          </g>
+        </g>
+      </svg>
+      <div class="keys">
+        <span class="key"><span class="swatch" style="background:var(--asc)"></span>ascending — larger value moves down</span>
+        <span class="key"><span class="swatch" style="background:var(--desc)"></span>descending — larger value moves up</span>
+      </div>
+      <figcaption>The complete 8-element network. Stage 3 is the half-cleaner from step 3, followed by two more rounds on the halves. <b>Every comparator in a column is independent</b>, so each column is one parallel step — six steps to sort eight numbers.</figcaption>
+    </figure>
+
+    <table>
+      <caption>The same network, traced</caption>
+      <thead>
+        <tr><th class="lbl">after</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="lbl">input</td><td>3</td><td>7</td><td>4</td><td>8</td><td>6</td><td>2</td><td>1</td><td>5</td></tr>
+        <tr><td class="lbl">stage 1</td><td>3</td><td>7</td><td>8</td><td>4</td><td>2</td><td>6</td><td>5</td><td>1</td></tr>
+        <tr><td class="lbl">stage 2 · span 2</td><td>3</td><td>4</td><td>8</td><td>7</td><td>5</td><td>6</td><td>2</td><td>1</td></tr>
+        <tr class="mark"><td class="lbl">stage 2 · span 1</td><td>3</td><td>4</td><td>7</td><td>8</td><td>6</td><td>5</td><td>2</td><td>1</td></tr>
+        <tr><td class="lbl">stage 3 · span 4</td><td>3</td><td>4</td><td>2</td><td>1</td><td>6</td><td>5</td><td>7</td><td>8</td></tr>
+        <tr><td class="lbl">stage 3 · span 2</td><td>2</td><td>1</td><td>3</td><td>4</td><td>6</td><td>5</td><td>7</td><td>8</td></tr>
+        <tr><td class="lbl">stage 3 · span 1</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+      </tbody>
+    </table>
+    <p class="note">The highlighted row is the bitonic checkpoint: <b>3 4 7 8</b> rising, <b>6 5 2 1</b> falling — the shape from step 2, which is exactly what stage 3 needs.</p>
+  </section>
+
+  <section>
+    <h2>What it costs, what it buys</h2>
+    <p class="measure">The network for <em>n</em> values has <em>log n</em> stages, and stage <em>i</em> contributes <em>i</em> columns — so <em>½·log n·(log n+1)</em> columns in total, each holding <em>n/2</em> comparators.</p>
+    <dl class="facts">
+      <div class="fact"><dt>8 values</dt><dd>24<span class="sub">comparators, 6 columns</span></dd></div>
+      <div class="fact"><dt>16 values</dt><dd>80<span class="sub">comparators, 10 columns</span></dd></div>
+      <div class="fact"><dt>Work</dt><dd>n log&#178;n<span class="sub">more than optimal</span></dd></div>
+      <div class="fact"><dt>Depth</dt><dd>log&#178;n<span class="sub">parallel steps</span></dd></div>
+    </dl>
+    <p class="measure">Bitonic sort does more comparisons than a good quicksort. It wins anyway on the hardware it suits, for three reasons: the comparator is a min and a max with <strong>no branch to mispredict</strong>; every comparator in a column is independent, so a whole column becomes <strong>one SIMD instruction</strong>; and the pattern of comparisons is <strong>known at compile time</strong>, so the whole network can be unrolled flat with no loop and no indexing logic.</p>
+    <p class="measure">This is why it appears as the base case inside larger vectorised sorts — the small-array kernel that a bigger algorithm falls back on.</p>
+  </section>
+
+  <footer>Sorting network figures follow the standard Knuth diagram convention: wires run left to right, comparators join two wires, and the trace above is a complete run of the 8-element network.</footer>
+
+</div>

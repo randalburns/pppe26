@@ -1,5 +1,5 @@
 CXX      := clang++
-CXXFLAGS := -std=c++14
+CXXFLAGS := -std=c++14 -stdlib=libc++
 
 SRC  := strength_reduction.cpp
 BINS := sr_O0 sr_O1 sr_O2 sr_O3
