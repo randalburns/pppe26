@@ -1,14 +1,15 @@
-# Branch Optimizations under Clang — AMD Ryzen AI 9 HX 370
+# Branch Optimizations under Clang — Ryzen vs Apple M5
 
 All three branch-optimization examples built with **Clang 18.1.3** on AMD Ryzen AI 9 HX 370
-(Zen 5, "Strix Point" mobile, 12C/24T), Ubuntu. No GCC results appear in this document.
+(Zen 5, "Strix Point" mobile, 12C/24T), Ubuntu, and with **Apple Clang 17** on Apple M5
+(§4). No GCC results appear in this document.
 
 These numbers use the **`KEEP_BRANCH()` sources**, which replaced the old `-fno-if-conversion`
 build flag. That change is what makes a Clang-vs-Clang comparison possible at all — see
 [Why the flag had to go](#why-the-flag-had-to-go).
 
-**Status:** the Ryzen side is complete. The M5 side needs a re-run with the new sources; commands
-are in [Completing the comparison](#completing-the-comparison).
+**Status:** both sides are complete. M5 results and the cross-machine comparison are in
+[4. Apple M5 comparison](#4-apple-m5-comparison).
 
 ---
 
@@ -123,16 +124,18 @@ At `-O2` Clang vectorizes `apply_unswitched` while leaving `apply_switched` scal
 scalar-vs-SIMD mechanism [loop_unswitch.md](loop_unswitch.md) describes. At `-O3` it unswitches
 automatically and the gap closes to exactly 1.00x, also as that doc predicts.
 
-Against the M5's `-O2` figures (3.25x / 2.00x / 3.00x), the mechanism matches but the magnitude does
-not, and the reason is **memory bandwidth**: both loops are bandwidth-bound over 384 MB, and the
-unswitched variants converge to 16 ms here (≈24 GB/s single-thread) against M5's 4 ms (≈96 GB/s).
-A 4x lower ceiling compresses the same transformation into a smaller win.
+Against the M5's `-O2` figures (4.00x / 2.33x / 4.00x, see below), the mechanism matches but the
+magnitude does not, and the reason is **memory bandwidth**: both loops are bandwidth-bound over
+384 MB, and the unswitched variants converge to 16 ms here (≈24 GB/s single-thread) against M5's
+3 ms (≈128 GB/s). A ~5.3x lower ceiling compresses the same transformation into a smaller win.
 
 ---
 
-## Completing the comparison
+## 4. Apple M5 comparison
 
-Run on the M5 with Apple Clang, from the same commit:
+Same protocol, same commit, run on Apple M5 with Apple Clang 17: minimum across 3 invocations of
+each binary, each an internal best-of-5 (min-of-15 overall). No `-fno-if-conversion` anywhere — it
+no longer appears in any build line, and Clang would reject it.
 
 ```bash
 for lvl in O0 O1 O2 O3; do
@@ -142,12 +145,56 @@ for lvl in O0 O1 O2 O3; do
 done
 ```
 
-Run each binary **3 times and take the minimum** — a single run is not enough to separate these
-effects from noise. No `-fno-if-conversion`: it no longer appears in any build line, and Clang
-would reject it.
+### branch_free (N=32M bytes, random / sorted)
 
-`loop_unswitch` should be re-run too. Its existing M5 numbers are Apple Clang and still valid, but
-predate the min-of-3 protocol, so regenerating them puts both machines on equal footing.
+| level | branchy | ternary | arith | branchy→ternary |
+|---|---:|---:|---:|---:|
+| O0 | 216 / 39 ms | 181 / 56 ms | 90 / 64 ms | 1.19x |
+| O1 | 123 / 14 ms | 13 / 13 ms | 13 / 13 ms | 9.46x |
+| **O2** | **121 / 12 ms** | **5 / 5 ms** | 5 / 5 ms | **24.20x** |
+| O3 | 119 / 10 ms | 5 / 5 ms | 5 / 5 ms | **23.80x** |
+
+### lut_branch (N=32M bytes)
+
+| level | branchy | lut | speedup |
+|---|---:|---:|---:|
+| O0 | 206 ms | 39 ms | 5.28x |
+| O1 | 126 ms | 10 ms | **12.60x** |
+| O2 | 121 ms | 10 ms | **12.10x** |
+| O3 | 119 ms | 10 ms | **11.90x** |
+
+### loop_unswitch (N=32M floats, switched / unswitched)
+
+| level | add | mul | abssum |
+|---|---|---|---|
+| O0 | 32 / 29 ms — 1.10x | 34 / 29 ms — 1.17x | 34 / 29 ms — 1.17x |
+| O1 | 12 / 7 ms — 1.71x | 7 / 7 ms — 1.00x | 15 / 7 ms — 2.14x |
+| **O2** | 12 / 3 ms — **4.00x** | 7 / 3 ms — 2.33x | 12 / 3 ms — **4.00x** |
+| O3 | 3 / 3 ms — 1.00x | 3 / 3 ms — 1.00x | 3 / 3 ms — 1.00x |
+
+### Cross-machine synthesis
+
+**Same code, same compiler, different absolute speed.** With `-fno-if-conversion` gone, this is now
+a genuine Clang-vs-Clang comparison, and M5 is faster in absolute terms everywhere, not just by a
+different ratio: `branch_free` branchless bottoms out at 5 ms on M5 vs 14 ms (ternary) / 20 ms
+(arith) on Ryzen at `-O2`; `lut_branch`'s branchy path is 121 ms vs 152 ms.
+
+**The LUT itself is identical on both machines: 10 ms.** `encode_lut` is one load, one store, table
+resident in L1 — there's no throughput to differentiate on, so it lands on the same number on both
+microarchitectures. Everything that differs between M5 and Ryzen in this doc shows up in the
+*branchy* and *compute-bound* paths, never in the memory-latency-bound LUT.
+
+**`ternary` and `arith` are identical on M5, not on Ryzen.** Apple Clang emits the same CSEL-based
+code for both (5 / 5 ms at every level `-O2` and up); Linux Clang keeps `arith` measurably behind
+`ternary` (5/5 → still true only up to O1, then 20 vs 14 ms from `-O2` on, see §1). The "write the
+ternary, not the bitmask" advice in the key takeaways below is therefore Ryzen-specific — on M5 it
+doesn't matter which form is written.
+
+**`loop_unswitch`'s M5 gap is bandwidth, confirmed.** M5 unswitched converges to 3 ms (≈128 GB/s
+single-thread) vs Ryzen's 16 ms (≈24 GB/s) — a ~5.3x bandwidth ratio that lines up with the ratio of
+`-O2` speedups (4.00x/2.33x/4.00x vs 1.19x/1.19x/1.44x). Both machines converge to 1.00x at `-O3`
+once the compiler auto-unswitches, confirming the mechanism (not the hardware) drives the gap's
+existence, while bandwidth drives its size.
 
 ---
 
@@ -161,14 +208,21 @@ predate the min-of-3 protocol, so regenerating them puts both machines on equal 
    single comparison is the cleanest statement of the lesson in the whole set, and it was invisible
    before the fix.
 
-3. **Hand-written bitmask arithmetic is not the fastest branchless form on this hardware.** `arith`
+3. **Hand-written bitmask arithmetic is not the fastest branchless form on Ryzen.** `arith`
    (20 ms) loses to plain `?:` (14 ms) from `-O2` on. Write the ternary and let the compiler emit
-   the CMOV, unless targeting SIMD lanes, GPUs, or in-order cores.
+   the CMOV, unless targeting SIMD lanes, GPUs, or in-order cores. (On M5, Apple Clang emits
+   identical code for both — see takeaway 6.)
 
-4. **`loop_unswitch`'s remaining M5 gap is hardware, not compiler.** Same Clang, same
-   transformation, same instruction classes; ≈4x less single-thread memory bandwidth accounts for
-   1.44x here vs 3.00x there.
+4. **`loop_unswitch`'s M5-vs-Ryzen gap is hardware, not compiler.** Same Clang, same
+   transformation, same instruction classes; ≈5.3x less single-thread memory bandwidth (24 GB/s vs
+   128 GB/s) accounts for 1.44x on Ryzen vs 4.00x on M5 at `-O2`, and both converge to 1.00x at
+   `-O3` once the compiler unswitches automatically.
 
 5. **A build flag that "only affects `if`-statements" deserves verification.** `-fno-if-conversion`
    was doing nothing at the level it was used at, and the docs built three separate conclusions on
    top of it. Diffing the disassembly with and without takes one command.
+
+6. **M5 is faster in absolute terms on every compute- or prediction-bound path, but ties Ryzen on
+   the memory-latency-bound one.** `lut_branch`'s LUT lookup is 10 ms on both machines; everything
+   else — branchy misprediction cost, branchless throughput, unswitched bandwidth — favors M5, by
+   margins that track each path's bottleneck rather than a single hardware ratio.

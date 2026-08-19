@@ -125,43 +125,45 @@ no `if` statements and are unaffected by the barrier.
 
 ---
 
-## Results (Apple M5, N=32M bytes)
+## Results (Apple M5, Apple Clang 17, N=32M bytes)
 
-> **Stale.** These figures were measured with the previous
-> `g++-15 -O1 -fno-if-conversion` build, before `KEEP_BRANCH()` was added.
-> They are GCC numbers, not Clang, and are not comparable to the current
-> source.  Pending a re-run.
+Minimum across 3 invocations, each an internal best-of-5.
 
 | version | random | sorted | random speedup |
 |---------|--------|--------|----------------|
-| branchy (3 ifs) | 123 ms | 13 ms | 1.00x |
-| ternary (CSEL) | 14 ms | 14 ms | **8.79x** |
-| arith (bitmask) | 16 ms | 15 ms | **7.69x** |
+| branchy (3 ifs) | 121 ms | 12 ms | 1.00x |
+| ternary (CSEL) | 5 ms | 5 ms | **24.20x** |
+| arith (bitmask) | 5 ms | 5 ms | **24.20x** |
+
+See [clang_ryzen.md](clang_ryzen.md) for the full `-O0`–`-O3` sweep and the Ryzen comparison.
 
 ---
 
 ## Analysis
 
-**Branchy on random data: 123 ms**
+**Branchy on random data: 121 ms**
 
 The three branches fire unpredictably.  The expected overhead from
 mispredictions alone is `32M × 1.0 × 15 / 4GHz ≈ 126 ms`, which closely
-matches the measurement.  Virtually all execution time is wasted flushing
-and re-filling the pipeline.
+matches the measurement (measured overhead 116 ms).  Virtually all execution
+time is wasted flushing and re-filling the pipeline.
 
-**Branchless on random data: 14–16 ms**
+**Branchless on random data: 5 ms**
 
 No branches → no mispredictions → no flushes.  The loop body is a straight
 sequence of arithmetic and compare instructions.  Execution time reflects
 only the actual work: one load, three arithmetic ops, one conditional
 increment, one add, one store per element.
 
-**Branchy on sorted data: 13 ms**
+**Branchy on sorted data: 12 ms**
 
 When the data is sorted, all `< LO` elements appear first, then `LO..HI`,
 then `> HI`.  The predictor learns "always not taken" then "always taken",
-mispredicting exactly once per transition.  Prediction is near-perfect, so
-the branchy loop runs at roughly the same throughput as the branchless loop.
+mispredicting exactly once per transition.  Prediction is near-perfect, but
+the branchy loop still runs noticeably slower than the branchless loop —
+unlike the earlier GCC/`-fno-if-conversion` measurement, Clang's branchless
+codegen at `-O2` is fast enough that even a well-predicted branch can't
+match it.
 
 **Branchless on sorted vs. random: identical**
 
@@ -173,9 +175,9 @@ the data is random, sorted, or pathological.
 
 | data pattern | branchy | branchless | winner |
 |---|---|---|---|
-| random | 123 ms | 15 ms | branchless (~8x) |
-| sorted | 13 ms | 15 ms | branchy (slightly) |
-| unknown | unpredictable | 15 ms | branchless (safe choice) |
+| random | 121 ms | 5 ms | branchless (~24x) |
+| sorted | 12 ms | 5 ms | branchless (~2.4x) |
+| unknown | unpredictable | 5 ms | branchless (safe choice) |
 
 When the data access pattern is unknown or adversarially controlled (e.g.,
 from user input), branchless code provides a predictable performance floor.

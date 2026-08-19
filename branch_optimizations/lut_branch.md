@@ -67,18 +67,18 @@ branchy path into a SIMD select and beat the LUT outright.
 
 ---
 
-## Results (Apple M5, N=32M bytes)
+## Results (Apple M5, Apple Clang 17, N=32M bytes)
 
-> **Stale.** Measured with the previous
-> `g++-15 -O1 -fno-if-conversion` build, before `KEEP_BRANCH()` was added.
-> GCC numbers, not Clang; not comparable to the current source.  Pending a re-run.
+Minimum across 3 invocations, each an internal best-of-5.
 
 | version | time | cycles/byte | speedup |
 |---------|------|-------------|---------|
-| branchy | 125 ms | 14.9 | 1.00x |
-| lut     | 12 ms  | 1.4  | **10.42x** |
+| branchy | 121 ms | 14.42 | 1.00x |
+| lut     | 10 ms  | 1.19  | **12.10x** |
 
-Measured misprediction overhead: 113 ms (expected: 94 ms).
+Measured misprediction overhead: 111 ms (expected: 94 ms).
+
+See [clang_ryzen.md](clang_ryzen.md) for the full `-O0`–`-O3` sweep and the Ryzen comparison.
 
 ---
 

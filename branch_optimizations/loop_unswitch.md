@@ -73,17 +73,21 @@ explicit in source.
 
 ---
 
-## Results (Apple M5, N=32M floats)
+## Results (Apple M5, Apple Clang 17, N=32M floats)
+
+Minimum across 3 invocations, each an internal best-of-5.
 
 | mode | switched | unswitched | speedup |
 |------|----------|------------|---------|
-| 0 — add | 13 ms | 4 ms | **3.25x** |
-| 1 — mul | 8 ms | 4 ms | **2.00x** |
-| 2 — abssum | 12 ms | 4 ms | **3.00x** |
+| 0 — add | 12 ms | 3 ms | **4.00x** |
+| 1 — mul | 7 ms | 3 ms | **2.33x** |
+| 2 — abssum | 12 ms | 3 ms | **4.00x** |
 
-All three unswitched loops converge to 4 ms: memory bandwidth limited
-(384 MB / ~100 GB/s ≈ 3.8 ms).  The switched loops are compute-limited
+All three unswitched loops converge to 3 ms: memory bandwidth limited
+(384 MB / 3 ms ≈ 128 GB/s).  The switched loops are compute-limited
 by their scalar throughput.
+
+See [clang_ryzen.md](clang_ryzen.md) for the full `-O0`–`-O3` sweep and the Ryzen comparison.
 
 ---
 
