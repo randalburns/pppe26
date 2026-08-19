@@ -19,15 +19,15 @@
 *.dSYM/
 
 # Compiled binaries (add specific names as needed)
-pipeline
-pipeline.cse
-pipeline.dce
-pipeline.tempvar
-pipeline_O0
-pipeline_O1
-pipeline_O2
-pipeline_O3
-pipeline_stall_elimination
+pipeline/pipeline
+pipeline/pipeline.cse
+pipeline/pipeline.dce
+pipeline/pipeline.tempvar
+pipeline/pipeline_O0
+pipeline/pipeline_O1
+pipeline/pipeline_O2
+pipeline/pipeline_O3
+pipeline/pipeline_stall_elimination
 strength.reduction/strength.reduction
 strength.reduction/a.out
 
