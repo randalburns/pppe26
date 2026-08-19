@@ -41,3 +41,10 @@ __pycache__/
 # Logs and temp files
 *.log
 *.tmp
+
+# branch_optimizations build artifacts
+branch_optimizations/branch_free_*
+branch_optimizations/lut_branch_*
+branch_optimizations/loop_unswitch_*
+!branch_optimizations/*.md
+!branch_optimizations/*.cpp
