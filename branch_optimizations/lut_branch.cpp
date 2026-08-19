@@ -26,12 +26,13 @@
 // misprediction rate of ~37% per branch on random data.
 //
 // Build:
-//   g++-15 -O1 -fno-if-conversion -o lut_branch lut_branch.cpp && ./lut_branch
+//   clang++ -O2 -o lut_branch lut_branch.cpp && ./lut_branch
+//   g++     -O2 -o lut_branch lut_branch.cpp && ./lut_branch
 //
-// -fno-if-conversion keeps the ternary in encode_branchy as a real branch
-// instruction.  Without it GCC (and Apple Clang) emit CSEL, which is already
-// branchless and closes the performance gap.  The flag is needed only to show
-// the full cost of the branchy version.
+// encode_branchy uses single-armed ifs each holding a KEEP_BRANCH() compiler
+// barrier, which keeps them as real conditional jumps on both GCC and Clang at
+// every optimization level.  This replaces the old -fno-if-conversion flag,
+// which was GCC-only and stopped working at -O2.
 
 #include <iostream>
 #include <chrono>
@@ -69,11 +70,11 @@ long long bench(Func f) {
 }
 
 // ================================================================
-// Branchy: ternary per nibble — becomes a branch instruction with
-// -fno-if-conversion; otherwise the compiler emits CSEL (branchless).
+// Branchy: one conditional per nibble, held as a real branch by the
+// KEEP_BRANCH() barrier (see above) rather than by a compiler flag.
 //
 // Two branches per byte, each with a ~37.5% misprediction rate on
-// random data.  Assembly (GCC -O1 -fno-if-conversion):
+// random data.  Assembly (GCC -O2):
 //
 //   ldrb   w3, [x0], #1       ; load byte
 //   lsr    w4, w3, #4         ; hi nibble
@@ -91,12 +92,22 @@ long long bench(Func f) {
 //   ...
 // ================================================================
 
+#define KEEP_BRANCH() asm volatile("" ::: "memory")
+
 void encode_branchy(const uint8_t* in, char* out, int n) {
     for (int i = 0; i < n; i++) {
         int hi = in[i] >> 4;
         int lo = in[i] & 0xF;
-        out[i*2]   = hi < 10 ? '0' + hi : 'a' + hi - 10;
-        out[i*2+1] = lo < 10 ? '0' + lo : 'a' + lo - 10;
+        // Single-armed ifs: KEEP_BRANCH sits in only one path, so the
+        // compiler cannot hoist it out and re-form a conditional select.
+        // (With a barrier in both arms of an if/else, Clang factors the
+        // common barrier out and emits CMOV anyway.)
+        int chi = 'a' + hi - 10;
+        int clo = 'a' + lo - 10;
+        if (hi < 10) { KEEP_BRANCH(); chi = '0' + hi; }
+        if (lo < 10) { KEEP_BRANCH(); clo = '0' + lo; }
+        out[i*2]   = chi;
+        out[i*2+1] = clo;
     }
 }
 
@@ -163,7 +174,7 @@ int main() {
     };
 
     cout << "\n" << string(60, '-') << "\n";
-    cout << "hex encode   N=32M bytes → 64M chars   -O1 -fno-if-conversion\n";
+    cout << "hex encode   N=32M bytes → 64M chars   -O2                   \n";
     cout << string(60, '-') << "\n";
     cout << left  << setw(16) << "version"
          << right << setw(10) << "time"

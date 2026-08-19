@@ -57,13 +57,15 @@
 //
 //        count += (v > MID);            // 0 or 1, no branch
 //
-// Build (GCC required — Apple Clang converts if-statements to CSEL at -O1,
-// eliminating branches before we can observe their cost):
+// Build (any compiler, any optimization level — no special flags needed):
 //
-//   g++-15 -O1 -fno-if-conversion -o branch_free branch_free.cpp && ./branch_free
+//   clang++ -O2 -o branch_free branch_free.cpp && ./branch_free
+//   g++     -O2 -o branch_free branch_free.cpp && ./branch_free
 //
-// -fno-if-conversion: prevents GCC from converting if-statements to CSEL.
-// This is needed only to demonstrate the branchy version's cost.
+// process_branchy uses KEEP_BRANCH() (see below) to hold its if-statements
+// as real conditional branches.  This replaces the old -fno-if-conversion
+// build flag, which was GCC-only, had no effect at all at -O1, and failed
+// to prevent branchless rewrites at -O2/-O3.
 // The ternary and arith versions have no if-statements and are unaffected.
 
 #include <iostream>
@@ -92,6 +94,20 @@ static const int MISPREDICT_PENALTY = 15;
 // Adjust: M1 ≈ 3.2 GHz, M2 ≈ 3.5 GHz, M3 ≈ 4.05 GHz,
 //         M4 ≈ 4.4 GHz, M5 ≈ 4.6 GHz.
 static const double CPU_GHZ = 4.0;
+
+// ================================================================
+// KEEP_BRANCH — an empty asm block with a memory clobber.
+//
+// Placed inside a branch body it is a compiler barrier: the optimizer
+// may not speculate across it, so the branch cannot be turned into a
+// conditional move (CSEL/CMOV) or folded into a vectorized select.
+// It emits no instructions, so it costs nothing at run time; it only
+// removes the compiler's licence to delete the branch.
+//
+// This is what makes the "branchy" version genuinely branchy on both
+// GCC and Clang, at every optimization level.
+// ================================================================
+#define KEEP_BRANCH() asm volatile("" ::: "memory")
 
 template <typename T>
 static void sink(T const& val) { asm volatile("" : : "m"(val) : "memory"); }
@@ -122,7 +138,7 @@ struct Result { int64_t sum; int64_t count; };
 // Expected overhead: N × avg_mispredict × penalty / freq
 //   = 32M × 1.0 × 15 / 4GHz ≈ 120 ms
 //
-// Assembly (GCC -O1 -fno-if-conversion):
+// Assembly (GCC -O1, branch held by KEEP_BRANCH):
 //   ldrb  w2, [x3]          ; load v
 //   cmp   w2, #63
 //   ble   .L_clamp_lo        ; branch 1: v < LO?
@@ -138,9 +154,9 @@ Result process_branchy(const uint8_t* data, int n) {
     int64_t sum = 0, count = 0;
     for (int i = 0; i < n; i++) {
         int v = data[i];
-        if (v < LO)  v = LO;
-        if (v > HI)  v = HI;
-        if (v > MID) count++;
+        if (v < LO)  { KEEP_BRANCH(); v = LO; }
+        if (v > HI)  { KEEP_BRANCH(); v = HI; }
+        if (v > MID) { KEEP_BRANCH(); count++; }
         sum += v;
     }
     return {sum, count};
@@ -296,7 +312,7 @@ int main() {
 
     cout << "\n" << string(76, '-') << "\n";
     cout << "N=" << N/(1024*1024) << "M bytes   LO=" << LO << " HI=" << HI
-         << " MID=" << MID << "   -O1 -fno-if-conversion   CPU=" << CPU_GHZ << " GHz\n";
+         << " MID=" << MID << "   -O2                      CPU=" << CPU_GHZ << " GHz\n";
     cout << string(76, '-') << "\n";
     cout << left  << setw(18) << "version"
          << right << setw(14) << "random (ms)"

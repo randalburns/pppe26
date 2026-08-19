@@ -51,16 +51,27 @@ N × 2 nibbles × 37.5% miss × 15 cycles / 4 GHz ≈ 94 ms
 ## Build
 
 ```bash
-g++-15 -O1 -fno-if-conversion -o lut_branch lut_branch.cpp && ./lut_branch
+clang++ -O2 -o lut_branch lut_branch.cpp && ./lut_branch
 ```
 
-`-fno-if-conversion` keeps the ternary in `encode_branchy` as a real branch
-instruction.  Without it the compiler emits CSEL (conditional select), which
-is already branchless and narrows the gap considerably.
+No special flags are required, and any optimization level works.
+`encode_branchy` uses single-armed `if` statements each containing a
+`KEEP_BRANCH()` compiler barrier, which holds them as real conditional jumps
+on both GCC and Clang at every optimization level.  (The barrier must sit in
+only one arm: with a barrier in both arms of an `if`/`else`, Clang factors the
+common barrier out and re-forms a CMOV anyway.)
+
+This replaces the earlier `g++-15 -O1 -fno-if-conversion` build line, which was
+GCC-only and did not survive `-O2`, where the compiler auto-vectorized the
+branchy path into a SIMD select and beat the LUT outright.
 
 ---
 
 ## Results (Apple M5, N=32M bytes)
+
+> **Stale.** Measured with the previous
+> `g++-15 -O1 -fno-if-conversion` build, before `KEEP_BRANCH()` was added.
+> GCC numbers, not Clang; not comparable to the current source.  Pending a re-run.
 
 | version | time | cycles/byte | speedup |
 |---------|------|-------------|---------|

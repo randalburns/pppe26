@@ -107,19 +107,30 @@ instructions at `-O1`.  The explicit arithmetic form is useful when:
 ## Build
 
 ```bash
-g++-15 -O1 -fno-if-conversion -o branch_free branch_free.cpp && ./branch_free
+clang++ -O2 -o branch_free branch_free.cpp && ./branch_free
 ```
 
-`-fno-if-conversion` prevents GCC from converting the `if` statements in
-`process_branchy` into CSEL before we can observe their misprediction cost.
-The `ternary` and `arith` versions have no `if` statements and are unaffected.
+No special flags are required, and any optimization level works.
+`process_branchy` uses a `KEEP_BRANCH()` compiler barrier (an empty
+`asm volatile` with a memory clobber) inside each `if` body, which denies the
+optimizer permission to speculate across the branch.  The branch therefore
+survives as a real conditional jump on both GCC and Clang at `-O0` through
+`-O3`.  It emits no instructions, so it costs nothing at run time.
 
-Apple Clang always converts simple `if`/ternary to CSEL at `-O1`, so GCC
-is required to observe the full branchy penalty.
+This replaces the earlier `g++-15 -O1 -fno-if-conversion` build line.  That
+flag was GCC-only (Clang rejects it outright), was a **complete no-op at
+`-O1`** — byte-identical output with and without it — and failed to prevent
+branchless rewrites at `-O2`/`-O3`.  The `ternary` and `arith` versions have
+no `if` statements and are unaffected by the barrier.
 
 ---
 
 ## Results (Apple M5, N=32M bytes)
+
+> **Stale.** These figures were measured with the previous
+> `g++-15 -O1 -fno-if-conversion` build, before `KEEP_BRANCH()` was added.
+> They are GCC numbers, not Clang, and are not comparable to the current
+> source.  Pending a re-run.
 
 | version | random | sorted | random speedup |
 |---------|--------|--------|----------------|

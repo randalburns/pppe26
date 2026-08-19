@@ -1,5 +1,13 @@
 # Branch-Free Code Benchmarks — AMD Ryzen AI 9 HX 370
 
+> **Superseded methodology.** This document benchmarks the pre-`KEEP_BRANCH()` source
+> with GCC and (for two of the three examples) `-fno-if-conversion`.  That flag has since
+> been shown to be a no-op at `-O1` and ineffective at `-O2`+, and has been removed from the
+> source in favour of a compiler barrier.  See [clang_ryzen.md](clang_ryzen.md) for current
+> numbers.  The measurement protocol here also predates the noise correction (run-to-run
+> variance on this machine is ~30%, not the ~10% stated below).
+
+
 Measured on AMD Ryzen AI 9 HX 370 (Zen 5, "Strix Point" mobile, 12C/24T), Ubuntu, GCC 13.3.0,
 N=32M bytes, best of 5 runs. See [branch_free.md](branch_free.md) for the Apple M5 baseline this
 compares against.

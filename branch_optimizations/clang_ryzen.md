@@ -1,19 +1,14 @@
 # Branch Optimizations under Clang — AMD Ryzen AI 9 HX 370
 
-All three branch-optimization examples built and run with **Clang 18.1.3** on AMD Ryzen AI 9 HX 370
+All three branch-optimization examples built with **Clang 18.1.3** on AMD Ryzen AI 9 HX 370
 (Zen 5, "Strix Point" mobile, 12C/24T), Ubuntu. No GCC results appear in this document.
 
-The purpose is a **Clang-vs-Clang comparison against the Apple M5**, holding the compiler family
-constant so that any remaining difference is attributable to hardware rather than toolchain.
+These numbers use the **`KEEP_BRANCH()` sources**, which replaced the old `-fno-if-conversion`
+build flag. That change is what makes a Clang-vs-Clang comparison possible at all — see
+[Why the flag had to go](#why-the-flag-had-to-go).
 
-> **Scope warning — read before using the M5 comparisons below.**
-> Only one of the three M5 baselines was produced by Clang. [branch_free.md](branch_free.md) and
-> [lut_branch.md](lut_branch.md) both build with `g++-15` (real Homebrew GCC on macOS), not Apple
-> Clang; only [loop_unswitch.md](loop_unswitch.md) builds with `g++`, which on macOS is Apple Clang.
-> Those two M5 numbers are therefore **GCC results and have been excluded**, which leaves those
-> examples with no M5 side to compare against yet. The commands to generate them are in
-> [Completing the comparison](#completing-the-comparison). Only `loop_unswitch` has a genuine
-> Clang-vs-Clang result today.
+**Status:** the Ryzen side is complete. The M5 side needs a re-run with the new sources; commands
+are in [Completing the comparison](#completing-the-comparison).
 
 ---
 
@@ -23,195 +18,157 @@ constant so that any remaining difference is attributable to hardware rather tha
 clang++ --gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13 -O<n> -o <bin> <src>.cpp
 ```
 
-`--gcc-install-dir` is required on this machine: Clang picks the newest GCC toolchain directory it
-finds (`.../gcc/x86_64-linux-gnu/14`) but only `libstdc++-13-dev` is installed, so `#include
-<iostream>` fails. Pinning to 13 fixes it. (`-stdlib=libc++` also compiles but swaps the standard
-library as well; pinning keeps it stock.)
+`--gcc-install-dir` is needed only on this machine: Clang picks the newest GCC toolchain directory
+it finds (`.../gcc/x86_64-linux-gnu/14`) but only `libstdc++-13-dev` is installed, so
+`#include <iostream>` fails. Pinning to 13 fixes it and keeps Clang and GCC on the same standard
+library. On the M5 no such flag is needed.
 
-No source changes were needed — the `(long long)` cast on `duration_cast<...>::count()` is already
-committed, and Clang requires it for the same libstdc++ template-deduction reason.
+## Why the flag had to go
 
-### `-fno-if-conversion` does not exist in Clang
+`branch_free.md` and `lut_branch.md` previously built with `g++-15 -O1 -fno-if-conversion`, to stop
+the compiler turning the "branchy" version's `if` statements into branchless conditional moves.
+Three things were wrong with that:
 
-Both `branch_free.md` and `lut_branch.md` specify `-fno-if-conversion`. Clang rejects it outright:
+1. **Clang has no such flag.** `clang++: error: unknown argument: '-fno-if-conversion'`. The
+   `-mllvm` phi-folding thresholds are accepted but inert — the if-conversion happens in LLVM's
+   backend, below those knobs.
+2. **It was a no-op at `-O1`, the level both docs specified.** Building `branch_free.cpp` with and
+   without it under GCC 13 gives **byte-identical** code for `process_branchy`, `process_ternary`
+   and `process_arith`. GCC does not if-convert these at `-O1` regardless.
+3. **It did not survive `-O2`.** At higher levels the compiler reached the branchless form by other
+   routes, and in `lut_branch` auto-vectorized the branchy path into a SIMD select that beat the
+   hand-written LUT outright.
 
+The replacement is a compiler barrier in the branch body:
+
+```cpp
+#define KEEP_BRANCH() asm volatile("" ::: "memory")
+
+if (v < LO)  { KEEP_BRANCH(); v = LO; }
 ```
-clang++: error: unknown argument: '-fno-if-conversion'
-```
 
-There is no equivalent. `-mllvm -two-entry-phi-node-folding-threshold=0` and
-`-mllvm -phi-node-folding-threshold=0` are both genuinely accepted (verified: a deliberately bogus
-`-mllvm` option errors, these do not) but change nothing — the if-conversion happens in the LLVM
-backend, below the SimplifyCFG thresholds those knobs control.
+The optimizer may not speculate across it, so the branch cannot become a CMOV or fold into a
+vectorized select. It emits no instructions and costs nothing at run time. In `lut_branch` the
+barrier must sit in a **single-armed** `if`: with one in each arm of an `if`/`else`, Clang factors
+the common barrier out and re-forms the CMOV.
 
-This is the finding, not a workaround failure. [branch_free.md](branch_free.md) already states it
-for Apple Clang — *"Apple Clang always converts simple `if`/ternary to CSEL at `-O1`, so GCC is
-required to observe the full branchy penalty."* Linux Clang on x86 behaves the same way. **Under
-any Clang, at any `-O` level, the version named "branchy" does not contain the branches it is named
-for.** Two of these three examples are GCC-only demonstrations.
-
----
+Verified on both compilers at every level — `process_branchy` and `encode_branchy` keep real
+conditional jumps, zero CMOV, zero packed SIMD, at `-O0` through `-O3`. The branchless functions
+(`ternary`, `arith`, `encode_lut`) are **byte-identical** to before the patch, and all builds
+report `Correctness: PASS` with unchanged checksums.
 
 ## Measurement protocol
 
-The existing docs report results "stable within ~10%". That understates the noise here. Running the
-byte-identical committed `branch_free_ryzen` binary four times, pinned to one core:
+Minimum across **3 separate invocations** of each binary, each an internal best-of-5 (min-of-15),
+pinned with `taskset -c 2` (a 5.16 GHz Zen 5 core, not a 3.29 GHz Zen 5c core), run **rep-major** so
+thermal drift biases all configurations equally.
 
-```
-200 ms  →  152 ms  →  149 ms  →  153 ms
-```
-
-±30%, on a `powersave` governor and a thermally-constrained laptop SoC.
-
-All numbers below are the **minimum across 3 separate invocations** of each binary, each already an
-internal best-of-5 (so min-of-15), pinned with `taskset -c 2` (verified a 5.16 GHz Zen 5 core, not
-a 3.29 GHz Zen 5c core), run **rep-major** — every configuration once per round — so thermal drift
-biases all configurations equally rather than penalizing whichever ran last.
-
-All builds report `Correctness: PASS`.
+This matters more than it sounds: the byte-identical committed binary produced
+`200 → 152 → 149 → 153 ms` across four runs. Variance here is ~30%, not the ~10% the older docs
+claim.
 
 ---
 
-## 1. branch_free (Clang, N=32M bytes)
+## 1. branch_free (N=32M bytes, random / sorted)
 
-| level | branchy | ternary | arith | branchy→ternary | branchy→arith |
-|---|---:|---:|---:|---:|---:|
-| O0 | 191 / 33 ms | 164 / 52 ms | 65 / 65 ms | 1.16x | 2.94x |
-| **O1** | **64 / 15 ms** | **69 / 15 ms** | **19 / 19 ms** | **0.93x** | 3.37x |
-| O2 | 15 / 14 ms | 15 / 15 ms | 21 / 21 ms | 1.00x | 0.71x |
-| O3 | 16 / 15 ms | 16 / 15 ms | 23 / 22 ms | 1.00x | 0.70x |
+| level | branchy | ternary | arith | branchy→ternary |
+|---|---:|---:|---:|---:|
+| O0 | 176 / 28 ms | 151 / 43 ms | 55 / 55 ms | 1.17x |
+| O1 | 147 / 13 ms | 61 / 14 ms | 17 / 17 ms | 2.41x |
+| **O2** | **144 / 12 ms** | **14 / 14 ms** | 20 / 20 ms | **10.29x** |
+| O3 | 147 / 11 ms | 14 / 14 ms | 20 / 20 ms | **10.50x** |
 
-(random / sorted)
+**The example now demonstrates what it claims, at every optimization level.** Branchy stays at
+144–147 ms on random data from `-O1` up, while ternary drops to 14 ms — a 10.3–10.5x win that is
+stable across `-O2` and `-O3` rather than collapsing.
 
-**The example's central comparison does not exist under Clang.** At `-O1`, branchy (64 ms) is
-marginally *slower* than ternary (69 ms) — 0.93x. Disassembly shows the two functions compile to
-near-identical instruction sequences, differing only in the scheduling of one `xor` and a `jmp`.
-Clang if-converts two of the three `if`-statements: the clamp-LO becomes `cmovb`, and
-`count += (v > MID)` becomes `cmp` + `sbb` (borrow-based conditional increment). Only the clamp-HI
-survives as a real branch.
+**The data-pattern signature is back and unambiguous.** Branchy runs 144 ms on random data and
+12 ms on sorted — a 12x swing driven purely by whether the predictor can learn the pattern. The
+branchless versions show no such sensitivity (14/14, 20/20): identical time on random and sorted
+data, which is the entire point of the technique.
 
-At `-O2`/`-O3` both are vectorized to 40 packed SSE instructions and converge at 15–16 ms.
+**`arith` costs more than `ternary` from `-O2` on** (20 ms vs 14 ms). Both are branchless; the
+explicit shift-and-mask arithmetic is simply more work than the CMOV the compiler generates from
+plain ternaries. The hand-written bitmask is worth writing for SIMD lanes, GPUs, or in-order cores
+— but on an out-of-order x86 core with a competent compiler, `?:` wins.
 
-**Branchless-vs-branchy is invisible; what remains visible is `arith` being the wrong choice.** The
-hand-written bitmask version is the fastest variant at `-O0`/`-O1` (19 ms at `-O1`, 3.37x) but
-becomes the *slowest* at `-O2`/`-O3` (21–23 ms vs 15–16 ms, i.e. 0.70x). The explicit shift-and-mask
-arithmetic vectorizes worse than the plain source Clang is free to rewrite itself. The
-hand-optimization stops paying and starts costing at exactly the level most people ship.
-
-**Sorted-vs-random confirms there are no branches left.** From `-O1` up, every variant reports the
-same time on sorted and random data (15/15, 16/15, 21/21). Data-pattern sensitivity — the entire
-phenomenon the example demonstrates — is absent from `-O1` onward.
-
----
-
-## 2. lut_branch (Clang, N=32M bytes)
+## 2. lut_branch (N=32M bytes)
 
 | level | branchy | lut | speedup |
 |---|---:|---:|---:|
-| O0 | 205 ms | 43 ms | 4.77x |
-| O1 | 33 ms | 12 ms | 2.75x |
-| **O2** | **5 ms** | 12 ms | **0.42x — inverted** |
-| O3 | 4 ms | 12 ms | 0.33x — inverted |
+| O0 | 208 ms | 37 ms | 5.62x |
+| O1 | 155 ms | 10 ms | **15.50x** |
+| O2 | 152 ms | 10 ms | **15.20x** |
+| O3 | 157 ms | 10 ms | **15.70x** |
 
-**The LUT is only a win at `-O0`/`-O1`, and loses badly from `-O2` on.** At `-O2` Clang
-auto-vectorizes `encode_branchy` (`movdqu`, `pcmpeqb`, `pand`, `pandn`, `por`, `paddb`,
-`punpcklbw` — 30 packed instructions), reinventing the arithmetic-bitmask technique from
-`branch_free.cpp` on its own, vectorized, 16 bytes per iteration. The hand-written table cannot
-compete: `encode_lut` never picks up a single packed instruction at any level, because
-table-lookup-by-index does not auto-vectorize on this target (no AVX2 gather is emitted). It sits
-at 12 ms from `-O1` onward regardless of optimization level.
+**The `-O3` inversion is gone.** Previously the compiler auto-vectorized the branchy path at `-O2`
+and beat the LUT 3-to-1, making the example argue against its own thesis. With the branch held, the
+LUT wins 15.2–15.7x consistently from `-O1` through `-O3`.
 
-Even the `-O1` 2.75x is not measuring what the example claims. `encode_branchy` there is already
-branch-free — `lea`/`or`/`cmp`/`cmovb` — so the 33 ms vs 12 ms gap is scalar-select overhead plus
-loop shape, not misprediction cost.
+The LUT itself is flat at 10 ms regardless of optimization level — it is a load and a store, and
+there is nothing for the optimizer to improve. All of the variation is on the branchy side.
 
-**The 12 ms LUT figure is worth noting for a different reason:** it is identical to the 12 ms the
-M5 doc reports. A 16-byte L1-resident table is genuinely microarchitecture-independent — that
-particular number transfers across ISAs even though the surrounding comparison does not.
+## 3. loop_unswitch (N=32M floats, switched / unswitched)
 
----
-
-## 3. loop_unswitch — the one genuine Clang-vs-Clang result
-
-This is the only example whose M5 baseline was produced by a Clang (Apple Clang via `g++` on
-macOS), so it is the only one where a cross-machine comparison is valid.
-
-### Ryzen, Clang, all levels (switched / unswitched)
+Unmodified — this example never used `-fno-if-conversion` and needed no barrier.
 
 | level | add | mul | abssum |
 |---|---|---|---|
-| O0 | 40 / 35 ms — 1.14x | 47 / 36 ms — 1.31x | 50 / 41 ms — 1.22x |
-| O1 | 21 / 18 ms — 1.17x | 21 / 17 ms — 1.24x | 25 / 19 ms — 1.32x |
-| **O2** | **24 / 16 ms — 1.50x** | **21 / 17 ms — 1.24x** | **27 / 18 ms — 1.50x** |
-| O3 | 17 / 17 ms — 1.00x | 17 / 17 ms — 1.00x | 17 / 17 ms — 1.00x |
+| O0 | 35 / 27 ms — 1.30x | 37 / 28 ms — 1.32x | 41 / 32 ms — 1.28x |
+| O1 | 20 / 18 ms — 1.11x | 21 / 17 ms — 1.24x | 24 / 18 ms — 1.33x |
+| **O2** | 19 / 16 ms — 1.19x | 19 / 16 ms — 1.19x | 23 / 16 ms — **1.44x** |
+| O3 | 16 / 16 ms — 1.00x | 16 / 16 ms — 1.00x | 16 / 16 ms — 1.00x |
 
-### Cross-machine, `-O2`, Clang both sides
+At `-O2` Clang vectorizes `apply_unswitched` while leaving `apply_switched` scalar — the
+scalar-vs-SIMD mechanism [loop_unswitch.md](loop_unswitch.md) describes. At `-O3` it unswitches
+automatically and the gap closes to exactly 1.00x, also as that doc predicts.
 
-| mode | M5 switched | M5 unswitched | M5 | Ryzen switched | Ryzen unswitched | Ryzen |
-|---|---:|---:|---:|---:|---:|---:|
-| add | 13 ms | 4 ms | 3.25x | 24 ms | 16 ms | 1.50x |
-| mul | 8 ms | 4 ms | 2.00x | 21 ms | 17 ms | 1.24x |
-| abssum | 12 ms | 4 ms | 3.00x | 27 ms | 18 ms | 1.50x |
-
-**The mechanism reproduces exactly.** Disassembly confirms that at `-O2` Clang vectorizes
-`apply_unswitched` (24 packed instructions) while leaving `apply_switched` fully scalar — precisely
-the scalar-vs-SIMD story [loop_unswitch.md](loop_unswitch.md) describes. At `-O3` Clang performs the
-unswitching automatically and the gap closes to exactly 1.00x on all three modes, also as that doc
-predicts. Holding the compiler constant, the qualitative behavior is identical on both machines.
-
-**The magnitude difference is hardware, and it is memory bandwidth.** Both loops are bandwidth-bound
-at 3 × 32M floats = 384 MB. The unswitched loops converge to 16–18 ms here (≈24 GB/s effective
-single-thread) against M5's 4 ms (≈96 GB/s). With the ceiling roughly 4x lower, the same
-transformation yields a compressed win — 1.50x instead of 3.25x — even though the compiler is doing
-the same thing. 24 GB/s single-thread is unremarkable for LPDDR5 on a laptop SoC, where full
-platform bandwidth is much higher but not reachable from one core.
-
-This is the cleanest hardware-only comparison in the set: same compiler family, same
-transformation, same generated instruction classes, difference attributable to memory subsystem.
+Against the M5's `-O2` figures (3.25x / 2.00x / 3.00x), the mechanism matches but the magnitude does
+not, and the reason is **memory bandwidth**: both loops are bandwidth-bound over 384 MB, and the
+unswitched variants converge to 16 ms here (≈24 GB/s single-thread) against M5's 4 ms (≈96 GB/s).
+A 4x lower ceiling compresses the same transformation into a smaller win.
 
 ---
 
 ## Completing the comparison
 
-`branch_free` and `lut_branch` currently have no M5 Clang baseline. To produce one, run on the M5
-with Apple Clang — note the deliberate absence of `-fno-if-conversion`, which Clang cannot accept:
+Run on the M5 with Apple Clang, from the same commit:
 
 ```bash
 for lvl in O0 O1 O2 O3; do
   clang++ -$lvl -o bf_$lvl  branch_free.cpp
   clang++ -$lvl -o lut_$lvl lut_branch.cpp
+  clang++ -$lvl -o lu_$lvl  loop_unswitch.cpp
 done
 ```
 
-Run each binary 3 times and take the minimum, to match the protocol above.
+Run each binary **3 times and take the minimum** — a single run is not enough to separate these
+effects from noise. No `-fno-if-conversion`: it no longer appears in any build line, and Clang
+would reject it.
 
-The expected result is that both examples collapse the same way they do here — the "branchy"
-variant if-converted at `-O1` and vectorized at `-O2` — since that is Apple Clang behavior the M5
-doc already documents. If so, the useful cross-machine numbers will be the *branchless* floors
-(`arith`, `lut`) rather than any speedup ratio.
+`loop_unswitch` should be re-run too. Its existing M5 numbers are Apple Clang and still valid, but
+predate the min-of-3 protocol, so regenerating them puts both machines on equal footing.
 
 ---
 
 ## Key takeaways
 
-1. **Two of these three examples cannot be demonstrated under Clang at all.** `branch_free` and
-   `lut_branch` both depend on `-fno-if-conversion` to have a branchy baseline, and Clang has no
-   such flag. Under Clang their "branchy" versions are branch-free from `-O1` up — measured 0.93x
-   and inverted-to-0.42x respectively. They are GCC-only demonstrations and should be labeled as
-   such.
+1. **All three examples now work under Clang at every optimization level.** Replacing a fragile
+   GCC-only flag with a compiler barrier turned two broken demonstrations (measuring 0.93x and an
+   inverted 0.42x) into stable ones (10.3x and 15.2x).
 
-2. **`loop_unswitch` reproduces on Zen 5 with the same compiler family.** Clang vectorizes the
-   unswitched loop and not the switched one at `-O2` on both Apple Silicon and x86, and closes the
-   gap at `-O3` on both. The transformation's *behavior* is a Clang property and it ports cleanly.
+2. **`branch_free` shows a 12x random-vs-sorted swing on the same code** — 144 ms vs 12 ms. That
+   single comparison is the cleanest statement of the lesson in the whole set, and it was invisible
+   before the fix.
 
-3. **The one real hardware difference is memory bandwidth, ~4x.** ≈24 GB/s single-thread on this
-   Ryzen laptop part vs ≈96 GB/s on M5, which fully accounts for 1.50x vs 3.25x on a bandwidth-bound
-   kernel. No branch-prediction or ISA effect is needed to explain it.
+3. **Hand-written bitmask arithmetic is not the fastest branchless form on this hardware.** `arith`
+   (20 ms) loses to plain `?:` (14 ms) from `-O2` on. Write the ternary and let the compiler emit
+   the CMOV, unless targeting SIMD lanes, GPUs, or in-order cores.
 
-4. **Hand-written branch-free code loses to Clang's autovectorizer from `-O2`.** `arith` goes from
-   fastest (3.37x at `-O1`) to slowest (0.70x at `-O2`); the LUT goes from 4.77x to 0.33x. The
-   principle — eliminate unpredictable branches — survives; the hand-coded technique does not, once
-   the compiler is allowed to vectorize.
+4. **`loop_unswitch`'s remaining M5 gap is hardware, not compiler.** Same Clang, same
+   transformation, same instruction classes; ≈4x less single-thread memory bandwidth accounts for
+   1.44x here vs 3.00x there.
 
-5. **Check the noise floor before trusting any of these ratios.** ±30% run-to-run variance on this
-   machine is enough to manufacture or erase most of the effects being compared.
+5. **A build flag that "only affects `if`-statements" deserves verification.** `-fno-if-conversion`
+   was doing nothing at the level it was used at, and the docs built three separate conclusions on
+   top of it. Diffing the disassembly with and without takes one command.

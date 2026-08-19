@@ -59,8 +59,12 @@ four elements per instruction using 128-bit NEON registers.
 ## Build
 
 ```bash
-g++ -O2 -o loop_unswitch loop_unswitch.cpp && ./loop_unswitch
+clang++ -O2 -o loop_unswitch loop_unswitch.cpp && ./loop_unswitch
 ```
+
+(The original build line was `g++ -O2`, which on macOS is Apple Clang — so the
+M5 results below are already Clang results.  Naming the compiler explicitly
+keeps the cross-machine comparison honest.)
 
 `-O2` is required.  At `-O3` the compiler performs loop unswitching
 automatically, closing the performance gap.  The manual transformation
