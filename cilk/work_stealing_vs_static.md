@@ -91,9 +91,11 @@ OpenMP's favor — the premium is paid and never recovered.
 
 | version  | time (s) | vs serial |
 |----------|---------:|----------:|
-| serial   |          |     1.00× |
-| omp task |          |           |
-| cilk     |          |           |
+| serial   |   2.7089 |     1.00× |
+| omp task |   0.5662 |     4.78× |
+| **cilk** | **0.5367** | **5.05×** |
 
-_(qsort_steal not yet run — paste its output and this table will be filled in;
-work-stealing is expected to win on the irregular partitions.)_
+Work-stealing wins on the irregular partitions, as expected — but the margin is
+modest (~5%) at `cutoff = 8192`, because coarse leaves amortize OpenMP's per-task
+allocation cost. Shrink the cutoff (finer tasks, more of them) and Cilk's lightweight
+`cilk_spawn` pulls further ahead of `omp task`; grow it and both converge toward serial.

@@ -15,6 +15,8 @@ only thing on display.
 The two sorts above are a matched pair; see
 [work_stealing_vs_static.md](work_stealing_vs_static.md) for the write-up and results,
 and [work_stealing.html](work_stealing.html) for a diagram of how the deque scheduler works.
+[dynamic_vs_work_stealing.md](dynamic_vs_work_stealing.md) adds OpenMP's `schedule(dynamic)`
+to the picture — the run-time rebalancer that competes most directly with work-stealing.
 
 ## The whole vocabulary
 
