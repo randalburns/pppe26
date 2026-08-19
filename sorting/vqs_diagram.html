@@ -1,0 +1,465 @@
+<title>Vectorized Quicksort</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=JetBrains+Mono:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  :root{
+    --ground:#FAF9FC; --surface:#FFFFFF; --panel:#F4F2F8;
+    --ink:#1B1823; --muted:#655E73; --rule:#E3DFEA; --rule-soft:#EDEAF2;
+    --lt:#2B5FD9; --ge:#BE443D; --pivot:#7B4BC9;
+    --lt-wash:#E6EDFC; --ge-wash:#FAE9E7; --pivot-wash:#F0E9FB;
+    --display:"Archivo",ui-sans-serif,system-ui,sans-serif;
+    --body:"Source Serif 4",Georgia,"Times New Roman",serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#121019; --surface:#1C1926; --panel:#181521;
+      --ink:#EAE6F1; --muted:#9A93AA; --rule:#2F2A3C; --rule-soft:#241F30;
+      --lt:#7BA3FF; --ge:#F2796E; --pivot:#B78CFF;
+      --lt-wash:#16203A; --ge-wash:#331916; --pivot-wash:#241833;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#121019; --surface:#1C1926; --panel:#181521;
+    --ink:#EAE6F1; --muted:#9A93AA; --rule:#2F2A3C; --rule-soft:#241F30;
+    --lt:#7BA3FF; --ge:#F2796E; --pivot:#B78CFF;
+    --lt-wash:#16203A; --ge-wash:#331916; --pivot-wash:#241833;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:var(--body); font-size:18px; line-height:1.62;
+    margin:0; padding:clamp(28px,6vw,72px) clamp(18px,5vw,32px) 96px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:46px}
+  .measure{max-width:64ch}
+
+  header{display:flex; flex-direction:column; gap:15px; padding-bottom:32px; border-bottom:2px solid var(--ink)}
+  .eyebrow{font-family:var(--mono); font-size:11.5px; font-weight:500; letter-spacing:.17em; text-transform:uppercase; color:var(--muted)}
+  h1{font-family:var(--display); font-weight:700; font-size:clamp(38px,7.4vw,60px); line-height:1; letter-spacing:-.025em; margin:0; text-wrap:balance}
+  .standfirst{font-size:clamp(17px,2.3vw,20px); color:var(--muted); margin:0; max-width:58ch}
+  .cite{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin:0}
+
+  section{display:flex; flex-direction:column; gap:18px}
+  h2{font-family:var(--display); font-weight:600; font-size:clamp(22px,3.4vw,29px); line-height:1.14; letter-spacing:-.015em; margin:0; text-wrap:balance}
+  h2 .num{font-family:var(--mono); font-size:13px; font-weight:500; color:var(--muted); margin-right:11px; letter-spacing:0}
+  p{margin:0}
+  code{font-family:var(--mono); font-size:.86em; background:var(--panel); border:1px solid var(--rule-soft); border-radius:3px; padding:1px 5px}
+  .lt{color:var(--lt); font-weight:600}
+  .ge{color:var(--ge); font-weight:600}
+  .pv{color:var(--pivot); font-weight:600}
+
+  figure{margin:6px 0 0; background:var(--surface); border:1px solid var(--rule); border-radius:4px; padding:22px 20px 15px; display:flex; flex-direction:column; gap:14px; overflow-x:auto}
+  figure svg{display:block; width:100%; max-width:100%; height:auto; color:var(--ink); min-width:520px}
+  figcaption{font-family:var(--body); font-size:15px; line-height:1.55; color:var(--muted); border-top:1px solid var(--rule-soft); padding-top:12px; margin:0}
+  figcaption b{color:var(--ink); font-weight:600}
+  .keys{display:flex; flex-wrap:wrap; gap:7px 20px; font-family:var(--mono); font-size:12px; color:var(--muted)}
+  .key{display:flex; align-items:center; gap:6px}
+  .chip{width:14px; height:14px; border-radius:3px; flex:none}
+
+  table{border-collapse:collapse; width:100%; font-family:var(--mono); font-size:13.5px; font-variant-numeric:tabular-nums}
+  caption{text-align:left; font-family:var(--mono); font-size:11.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); padding-bottom:11px}
+  th,td{padding:7px 8px; text-align:right; border-bottom:1px solid var(--rule-soft)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-weight:500; color:var(--muted); font-size:11.5px; letter-spacing:.05em}
+  tbody tr:last-child td{border-bottom:none}
+  td.win{color:var(--lt); font-weight:700}
+  tr.cross{background:var(--lt-wash)}
+  .note{font-family:var(--body); font-size:15px; color:var(--muted)}
+
+  .parts{display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+  .part{background:var(--surface); padding:15px 17px; display:flex; flex-direction:column; gap:4px}
+  .part .nm{font-family:var(--mono); font-size:13px; font-weight:700}
+  .part .when{font-family:var(--mono); font-size:11px; color:var(--muted)}
+  .part .op{font-family:var(--body); font-size:14px; color:var(--muted); line-height:1.4}
+
+  footer{border-top:1px solid var(--rule); padding-top:20px; font-size:14.5px; color:var(--muted)}
+  a{color:var(--lt); text-underline-offset:3px}
+  a:focus-visible{outline:2px solid var(--lt); outline-offset:3px; border-radius:2px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Sorting &middot; SIMD &middot; Zen 5</div>
+    <h1>Vectorized Quicksort</h1>
+    <p class="standfirst">Quicksort spends nearly all its time in one loop: partitioning. Replacing that loop's scattered in-place swaps with two sequential streams is what makes a SIMD version worth building.</p>
+    <p class="cite">Bramas, arXiv:1704.08579 &middot; measured on AMD Ryzen AI 9 HX 370 (Zen 5), Highway 1.0.7, GCC 13.3</p>
+  </header>
+
+  <section>
+    <p class="measure">Classic quicksort partitions with Hoare's two-pointer scan: walk in from both ends, and whenever a pair is out of place, swap it. The comparisons are cheap, but the writes land wherever the pointers happen to be &mdash; scattered across the whole subarray.</p>
+    <p class="measure">The vectorized version keeps the same recursion and the same median-of-3 pivot. It changes only the partition, using a SIMD instruction called <b>CompressStore</b> that packs the selected lanes of a register into contiguous memory. That single substitution turns the write pattern from random to sequential.</p>
+    <p class="measure">Everything below is measured on Zen 5. The partition is portable Highway; the 16-element base case is a hand-written 2&#215;256-bit AVX2 network. At the AVX2 target the vector is <b>8 lanes</b> of int32; under AVX-512 it is 16.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">01</span>The primitive: CompressStore</h2>
+    <p class="measure">Load a block of lanes, compare all of them against a broadcast pivot in one instruction, then write each group out packed together. <code>CompressStore</code> skips the lanes the mask rejects and closes the gaps — the survivors land contiguously.</p>
+
+    <figure>
+      <svg viewBox="0 0 690 300" role="img" aria-label="An eight-lane AVX2 register holding 72, 13, 91, 34, 58, 21, 47 and 88 is compared against a broadcast pivot of 50. The four lanes below the pivot, 13, 34, 21 and 47, are packed contiguously into the left buffer. The four lanes at or above the pivot, 72, 91, 58 and 88, are packed into the right buffer.">
+        <defs>
+          <marker id="p-lt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="var(--lt)"></polygon></marker>
+          <marker id="p-ge" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="var(--ge)"></polygon></marker>
+        </defs>
+        <g font-family="JetBrains Mono, monospace">
+          <text x="98" y="30" text-anchor="middle" font-size="11" letter-spacing="1.1" fill="var(--muted)">v = LoadU(a+i)</text>
+          <text x="98" y="290" text-anchor="middle" font-size="10.5" fill="var(--muted)">8 lanes &#183; AVX2</text>
+          <g font-size="13" font-weight="500">
+            <rect x="60" y="40" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="57" text-anchor="middle" fill="var(--ink)">72</text>
+            <rect x="60" y="70" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="87" text-anchor="middle" fill="var(--ink)">13</text>
+            <rect x="60" y="100" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="117" text-anchor="middle" fill="var(--ink)">91</text>
+            <rect x="60" y="130" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="147" text-anchor="middle" fill="var(--ink)">34</text>
+            <rect x="60" y="160" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="177" text-anchor="middle" fill="var(--ink)">58</text>
+            <rect x="60" y="190" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="207" text-anchor="middle" fill="var(--ink)">21</text>
+            <rect x="60" y="220" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="237" text-anchor="middle" fill="var(--ink)">47</text>
+            <rect x="60" y="250" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="267" text-anchor="middle" fill="var(--ink)">88</text>
+          </g>
+          <line x1="168" y1="40" x2="168" y2="274" stroke="var(--pivot)" stroke-width="1.5" stroke-dasharray="4 4"></line>
+          <text x="168" y="290" text-anchor="middle" font-size="11.5" fill="var(--pivot)" font-weight="700">pivot 50</text>
+          <g font-size="12" font-weight="700">
+            <text x="212" y="57" fill="var(--ge)">&#8805;</text>
+            <text x="212" y="87" fill="var(--lt)">&lt;</text>
+            <text x="212" y="117" fill="var(--ge)">&#8805;</text>
+            <text x="212" y="147" fill="var(--lt)">&lt;</text>
+            <text x="212" y="177" fill="var(--ge)">&#8805;</text>
+            <text x="212" y="207" fill="var(--lt)">&lt;</text>
+            <text x="212" y="237" fill="var(--lt)">&lt;</text>
+            <text x="212" y="267" fill="var(--ge)">&#8805;</text>
+          </g>
+          <g fill="none" stroke-width="1.8">
+            <path d="M236 52 C 330 52 360 172 452 172" stroke="var(--ge)" marker-end="url(#p-ge)"></path>
+            <path d="M236 82 C 330 82 360 52 452 52" stroke="var(--lt)" marker-end="url(#p-lt)"></path>
+            <path d="M236 112 C 330 112 360 202 452 202" stroke="var(--ge)" marker-end="url(#p-ge)"></path>
+            <path d="M236 142 C 330 142 360 82 452 82" stroke="var(--lt)" marker-end="url(#p-lt)"></path>
+            <path d="M236 172 C 330 172 360 232 452 232" stroke="var(--ge)" marker-end="url(#p-ge)"></path>
+            <path d="M236 202 C 330 202 360 112 452 112" stroke="var(--lt)" marker-end="url(#p-lt)"></path>
+            <path d="M236 232 C 330 232 360 142 452 142" stroke="var(--lt)" marker-end="url(#p-lt)"></path>
+            <path d="M236 262 C 330 262 360 262 452 262" stroke="var(--ge)" marker-end="url(#p-ge)"></path>
+          </g>
+          <g font-size="13" font-weight="500">
+            <rect x="460" y="40" width="76" height="24" rx="3" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="498" y="57" text-anchor="middle" fill="var(--lt)">13</text>
+            <rect x="460" y="70" width="76" height="24" rx="3" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="498" y="87" text-anchor="middle" fill="var(--lt)">34</text>
+            <rect x="460" y="100" width="76" height="24" rx="3" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="498" y="117" text-anchor="middle" fill="var(--lt)">21</text>
+            <rect x="460" y="130" width="76" height="24" rx="3" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="498" y="147" text-anchor="middle" fill="var(--lt)">47</text>
+            <rect x="460" y="160" width="76" height="24" rx="3" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="498" y="177" text-anchor="middle" fill="var(--ge)">72</text>
+            <rect x="460" y="190" width="76" height="24" rx="3" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="498" y="207" text-anchor="middle" fill="var(--ge)">91</text>
+            <rect x="460" y="220" width="76" height="24" rx="3" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="498" y="237" text-anchor="middle" fill="var(--ge)">58</text>
+            <rect x="460" y="250" width="76" height="24" rx="3" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="498" y="267" text-anchor="middle" fill="var(--ge)">88</text>
+          </g>
+          <g font-size="11">
+            <text x="548" y="94" fill="var(--lt)" font-weight="700">left_buf</text>
+            <text x="548" y="110" fill="var(--muted)">lc += 4</text>
+            <text x="548" y="214" fill="var(--ge)" font-weight="700">right_buf</text>
+            <text x="548" y="230" fill="var(--muted)">rc += 4</text>
+          </g>
+        </g>
+      </svg>
+      <figcaption>One block, one pass. The comparison against the pivot happens for all lanes at once; <b>CompressStore writes only the accepted lanes, contiguously</b>, and returns how many it wrote. Under AVX2 Highway synthesises it; under AVX-512 it becomes a single <code>vpcompressd</code> over 16 lanes &mdash; which, measured here, turns out to be <i>slower</i>. See the results below.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span>One partition pass</h2>
+    <p class="measure">The whole subarray streams through that block loop. Two counters, <code>lc</code> and <code>rc</code>, track how far each scratch buffer has filled. A short scalar loop mops up the elements that do not fill a whole vector, then both buffers are copied back over the original range.</p>
+
+    <figure>
+      <svg viewBox="0 0 700 384" role="img" aria-label="A twelve element array is partitioned around pivot 50. One full eight-lane block and a three-element scalar tail feed a left buffer holding 13, 34, 21, 47, 6, 29 and a right buffer holding 72, 91, 58, 88, 65. Both buffers are copied back, the pivot is swapped into position 6, and the array splits into a left recursion range and a right recursion range.">
+        <defs>
+          <marker id="q-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="currentColor"></polygon></marker>
+          <marker id="q-lt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="var(--lt)"></polygon></marker>
+          <marker id="q-ge" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="var(--ge)"></polygon></marker>
+        </defs>
+        <g font-family="JetBrains Mono, monospace" font-size="12.5">
+
+          <g stroke="var(--rule)" stroke-width="1">
+            <path d="M24 42 L24 34 L400 34 L400 42" fill="none"></path>
+            <path d="M408 42 L408 34 L546 34 L546 42" fill="none"></path>
+          </g>
+          <g font-size="10.5" fill="var(--muted)" text-anchor="middle">
+            <text x="212" y="28">one vector block &#183; 8 lanes</text>
+            <text x="477" y="28">tail &#183; 3 left &#8594; scalar</text>
+          </g>
+
+          <g font-weight="500">
+            <rect x="24"  y="48" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="45"  y="69" text-anchor="middle" fill="var(--ge)">72</text>
+            <rect x="70"  y="48" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="91"  y="69" text-anchor="middle" fill="var(--lt)">13</text>
+            <rect x="116" y="48" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="137" y="69" text-anchor="middle" fill="var(--ge)">91</text>
+            <rect x="162" y="48" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="183" y="69" text-anchor="middle" fill="var(--lt)">34</text>
+            <rect x="216" y="48" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="237" y="69" text-anchor="middle" fill="var(--ge)">58</text>
+            <rect x="262" y="48" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="283" y="69" text-anchor="middle" fill="var(--lt)">21</text>
+            <rect x="308" y="48" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="329" y="69" text-anchor="middle" fill="var(--lt)">47</text>
+            <rect x="354" y="48" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="375" y="69" text-anchor="middle" fill="var(--ge)">88</text>
+            <rect x="408" y="48" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="429" y="69" text-anchor="middle" fill="var(--lt)">6</text>
+            <rect x="454" y="48" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="475" y="69" text-anchor="middle" fill="var(--ge)">65</text>
+            <rect x="500" y="48" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="521" y="69" text-anchor="middle" fill="var(--lt)">29</text>
+            <rect x="562" y="48" width="42" height="32" rx="2" fill="var(--pivot-wash)" stroke="var(--pivot)" stroke-width="1.5"></rect><text x="583" y="69" text-anchor="middle" fill="var(--pivot)" font-weight="700">50</text>
+          </g>
+          <text x="616" y="69" font-size="11" fill="var(--pivot)">pivot</text>
+          <text x="616" y="83" font-size="10" fill="var(--muted)">a[hi]</text>
+
+          <path d="M180 92 C 180 118 130 122 108 138" fill="none" stroke="var(--lt)" stroke-width="2" marker-end="url(#q-lt)"></path>
+          <path d="M380 92 C 380 118 430 122 452 138" fill="none" stroke="var(--ge)" stroke-width="2" marker-end="url(#q-ge)"></path>
+
+          <g font-weight="500">
+            <text x="24" y="160" font-size="11" fill="var(--lt)" font-weight="700">left_buf</text>
+            <rect x="96"  y="146" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="117" y="167" text-anchor="middle" fill="var(--lt)">13</text>
+            <rect x="142" y="146" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="163" y="167" text-anchor="middle" fill="var(--lt)">34</text>
+            <rect x="188" y="146" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="209" y="167" text-anchor="middle" fill="var(--lt)">21</text>
+            <rect x="234" y="146" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="255" y="167" text-anchor="middle" fill="var(--lt)">47</text>
+            <rect x="280" y="146" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="301" y="167" text-anchor="middle" fill="var(--lt)">6</text>
+            <rect x="326" y="146" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="347" y="167" text-anchor="middle" fill="var(--lt)">29</text>
+            <text x="378" y="167" font-size="11" fill="var(--muted)">lc = 6</text>
+
+            <text x="24" y="216" font-size="11" fill="var(--ge)" font-weight="700">right_buf</text>
+            <rect x="440" y="202" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="461" y="223" text-anchor="middle" fill="var(--ge)">72</text>
+            <rect x="486" y="202" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="507" y="223" text-anchor="middle" fill="var(--ge)">91</text>
+            <rect x="532" y="202" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="553" y="223" text-anchor="middle" fill="var(--ge)">58</text>
+            <rect x="578" y="202" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="599" y="223" text-anchor="middle" fill="var(--ge)">88</text>
+            <rect x="624" y="202" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="645" y="223" text-anchor="middle" fill="var(--ge)">65</text>
+            <text x="392" y="223" font-size="11" fill="var(--muted)">rc = 5</text>
+          </g>
+
+          <g color="var(--muted)">
+            <path d="M117 190 L117 268" fill="none" stroke="currentColor" stroke-width="1.5" stroke-opacity=".55" marker-end="url(#q-n)"></path>
+            <path d="M461 246 C 461 262 300 250 292 268" fill="none" stroke="currentColor" stroke-width="1.5" stroke-opacity=".55" marker-end="url(#q-n)"></path>
+          </g>
+          <text x="132" y="258" font-size="10.5" fill="var(--muted)">memcpy</text>
+          <text x="476" y="262" font-size="10.5" fill="var(--muted)">memcpy</text>
+
+          <g font-weight="500">
+            <rect x="24"  y="276" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="45"  y="297" text-anchor="middle" fill="var(--lt)">13</text>
+            <rect x="70"  y="276" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="91"  y="297" text-anchor="middle" fill="var(--lt)">34</text>
+            <rect x="116" y="276" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="137" y="297" text-anchor="middle" fill="var(--lt)">21</text>
+            <rect x="162" y="276" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="183" y="297" text-anchor="middle" fill="var(--lt)">47</text>
+            <rect x="208" y="276" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="229" y="297" text-anchor="middle" fill="var(--lt)">6</text>
+            <rect x="254" y="276" width="42" height="32" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="275" y="297" text-anchor="middle" fill="var(--lt)">29</text>
+            <rect x="300" y="276" width="42" height="32" rx="2" fill="var(--pivot-wash)" stroke="var(--pivot)" stroke-width="1.5"></rect><text x="321" y="297" text-anchor="middle" fill="var(--pivot)" font-weight="700">50</text>
+            <rect x="346" y="276" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="367" y="297" text-anchor="middle" fill="var(--ge)">91</text>
+            <rect x="392" y="276" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="413" y="297" text-anchor="middle" fill="var(--ge)">58</text>
+            <rect x="438" y="276" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="459" y="297" text-anchor="middle" fill="var(--ge)">88</text>
+            <rect x="484" y="276" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="505" y="297" text-anchor="middle" fill="var(--ge)">65</text>
+            <rect x="530" y="276" width="42" height="32" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="551" y="297" text-anchor="middle" fill="var(--ge)">72</text>
+          </g>
+
+          <path d="M24 322 L24 332 L296 332 L296 322" fill="none" stroke="var(--lt)" stroke-width="1.5" stroke-opacity=".8"></path>
+          <path d="M346 322 L346 332 L572 332 L572 322" fill="none" stroke="var(--ge)" stroke-width="1.5" stroke-opacity=".8"></path>
+          <text x="160" y="352" text-anchor="middle" font-size="11.5" fill="var(--lt)" font-weight="700">recurse [lo, p-1]</text>
+          <text x="459" y="352" text-anchor="middle" font-size="11.5" fill="var(--ge)" font-weight="700">recurse [p+1, hi]</text>
+          <text x="321" y="352" text-anchor="middle" font-size="11" fill="var(--pivot)" font-weight="700">p</text>
+          <text x="321" y="368" text-anchor="middle" font-size="10" fill="var(--muted)">final</text>
+
+        </g>
+      </svg>
+      <figcaption>The pivot never enters the block loop — it sits at <code>a[hi]</code> throughout and is swapped into its final slot at the end. Because everything to the right of position <b>p</b> is already <span class="ge">&#8805; pivot</span>, that one swap costs nothing and shifts nothing.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span>Why it wins: the write pattern</h2>
+    <p class="measure">Both partitions read every element once. The difference is entirely in where they <em>write</em>. Hoare writes in place, at two pointers that wander toward each other; CompressStore writes forward into two buffers and never revisits an address.</p>
+
+    <figure>
+      <svg viewBox="0 0 700 300" role="img" aria-label="A comparison of two partition strategies. Hoare's partition swaps elements in place between two converging pointers, producing writes scattered across the whole array. The CompressStore partition reads the array once in order and appends to two separate buffers, producing only sequential writes.">
+        <defs>
+          <marker id="c-x" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="var(--ge)"></polygon></marker>
+          <marker id="c-s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="var(--lt)"></polygon></marker>
+        </defs>
+        <g font-family="JetBrains Mono, monospace" font-size="12">
+
+          <text x="20" y="26" font-size="12" font-weight="700" fill="var(--ge)">HOARE &#183; in place</text>
+          <text x="20" y="44" font-size="11" fill="var(--muted)">two pointers converge, swapping across the array</text>
+          <g stroke="var(--rule)" fill="var(--panel)">
+            <rect x="20" y="60" width="300" height="34" rx="2"></rect>
+          </g>
+          <g stroke="var(--rule)" stroke-width="1">
+            <line x1="50" y1="60" x2="50" y2="94"></line><line x1="80" y1="60" x2="80" y2="94"></line>
+            <line x1="110" y1="60" x2="110" y2="94"></line><line x1="140" y1="60" x2="140" y2="94"></line>
+            <line x1="170" y1="60" x2="170" y2="94"></line><line x1="200" y1="60" x2="200" y2="94"></line>
+            <line x1="230" y1="60" x2="230" y2="94"></line><line x1="260" y1="60" x2="260" y2="94"></line>
+            <line x1="290" y1="60" x2="290" y2="94"></line>
+          </g>
+          <g fill="none" stroke="var(--ge)" stroke-width="1.8">
+            <path d="M35 60 C 60 16 260 16 275 56" marker-end="url(#c-x)"></path>
+            <path d="M95 94 C 120 148 215 148 245 98" marker-end="url(#c-x)"></path>
+            <path d="M125 60 C 145 26 185 26 200 56" marker-end="url(#c-x)"></path>
+          </g>
+          <g fill="var(--ge)">
+            <circle cx="35" cy="77" r="3.5"></circle><circle cx="275" cy="77" r="3.5"></circle>
+            <circle cx="95" cy="77" r="3.5"></circle><circle cx="245" cy="77" r="3.5"></circle>
+            <circle cx="125" cy="77" r="3.5"></circle><circle cx="200" cy="77" r="3.5"></circle>
+          </g>
+          <text x="35" y="176" font-size="11" fill="var(--muted)">i &#8594;</text>
+          <text x="285" y="176" font-size="11" fill="var(--muted)">&#8592; j</text>
+          <text x="20" y="200" font-size="11.5" fill="var(--ge)" font-weight="700">writes scatter across the range</text>
+          <text x="20" y="218" font-size="11" fill="var(--muted)">every swap dirties a new cache line;</text>
+          <text x="20" y="234" font-size="11" fill="var(--muted)">past L2 those evictions dominate</text>
+
+          <line x1="350" y1="16" x2="350" y2="260" stroke="var(--rule)" stroke-width="1"></line>
+
+          <text x="380" y="26" font-size="12" font-weight="700" fill="var(--lt)">COMPRESSSTORE &#183; streamed</text>
+          <text x="380" y="44" font-size="11" fill="var(--muted)">read once forward, append to two buffers</text>
+          <g stroke="var(--rule)" fill="var(--panel)">
+            <rect x="380" y="60" width="290" height="34" rx="2"></rect>
+          </g>
+          <g stroke="var(--rule)" stroke-width="1">
+            <line x1="410" y1="60" x2="410" y2="94"></line><line x1="440" y1="60" x2="440" y2="94"></line>
+            <line x1="470" y1="60" x2="470" y2="94"></line><line x1="500" y1="60" x2="500" y2="94"></line>
+            <line x1="530" y1="60" x2="530" y2="94"></line><line x1="560" y1="60" x2="560" y2="94"></line>
+            <line x1="590" y1="60" x2="590" y2="94"></line><line x1="620" y1="60" x2="620" y2="94"></line>
+            <line x1="650" y1="60" x2="650" y2="94"></line>
+          </g>
+          <path d="M380 50 L664 50" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-opacity=".6" marker-end="url(#c-s)"></path>
+          <text x="522" y="42" text-anchor="middle" font-size="10.5" fill="var(--muted)">sequential read</text>
+
+          <g fill="none" stroke="var(--lt)" stroke-width="1.8">
+            <path d="M425 100 L425 128" marker-end="url(#c-s)"></path>
+            <path d="M485 100 L485 128" marker-end="url(#c-s)"></path>
+            <path d="M545 100 L545 186" marker-end="url(#c-s)"></path>
+            <path d="M605 100 L605 186" marker-end="url(#c-s)"></path>
+          </g>
+          <rect x="380" y="134" width="290" height="28" rx="2" fill="var(--lt-wash)" stroke="var(--lt)"></rect>
+          <text x="392" y="152" font-size="11" fill="var(--lt)" font-weight="700">left_buf</text>
+          <path d="M470 148 L560 148" fill="none" stroke="var(--lt)" stroke-width="1.5" stroke-opacity=".55" marker-end="url(#c-s)"></path>
+          <rect x="380" y="192" width="290" height="28" rx="2" fill="var(--ge-wash)" stroke="var(--ge)"></rect>
+          <text x="392" y="210" font-size="11" fill="var(--ge)" font-weight="700">right_buf</text>
+          <path d="M478 206 L560 206" fill="none" stroke="var(--ge)" stroke-width="1.5" stroke-opacity=".55" marker-end="url(#c-x)"></path>
+          <text x="380" y="244" font-size="11.5" fill="var(--lt)" font-weight="700">every write is sequential</text>
+          <text x="380" y="262" font-size="11" fill="var(--muted)">prefetcher handles every stream; no aliasing</text>
+        </g>
+      </svg>
+      <div class="keys">
+        <span class="key"><span class="chip" style="background:var(--lt-wash);border:1px solid var(--lt)"></span>below pivot</span>
+        <span class="key"><span class="chip" style="background:var(--ge-wash);border:1px solid var(--ge)"></span>at or above pivot</span>
+        <span class="key"><span class="chip" style="background:var(--pivot-wash);border:1px solid var(--pivot)"></span>pivot</span>
+      </div>
+      <figcaption>The trade is real, not free: CompressStore touches <b>more</b> total memory — n sequential writes into scratch, then n more copying back, against Hoare's in-place swaps. It wins because sequential traffic is far cheaper per byte than scattered dirty writes once the working set outgrows cache.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span>Where the recursion stops</h2>
+    <p class="measure">Partitioning is only worth it while the subarray is large. Below 16 elements the vector loop cannot fill even one register, so the recursion hands off to a branchless sorting network — or, smaller still, to plain insertion sort.</p>
+
+    <figure>
+      <svg viewBox="0 0 680 320" role="img" aria-label="A recursion tree. A large subarray is partitioned by simd_partition into a left and a right subarray around the pivot. Those are partitioned again. Subarrays of exactly 16 elements dispatch to the branchless bitonic16 network, and subarrays smaller than 16 dispatch to insertion sort.">
+        <defs>
+          <marker id="t-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="currentColor"></polygon></marker>
+        </defs>
+        <g font-family="JetBrains Mono, monospace" font-size="11.5">
+
+          <rect x="196" y="26" width="288" height="36" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect>
+          <text x="340" y="43" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">simd_qs_core &#183; n &gt; 16</text>
+          <text x="340" y="56" text-anchor="middle" font-size="10.5" fill="var(--muted)">median-of-3, then simd_partition</text>
+
+          <g color="var(--muted)" stroke="currentColor" stroke-width="1.5" fill="none" stroke-opacity=".65">
+            <path d="M270 66 L188 96" marker-end="url(#t-a)"></path>
+            <path d="M410 66 L492 96" marker-end="url(#t-a)"></path>
+          </g>
+          <rect x="316" y="70" width="48" height="20" rx="2" fill="var(--pivot-wash)" stroke="var(--pivot)"></rect>
+          <text x="340" y="84" text-anchor="middle" font-size="10" fill="var(--pivot)" font-weight="700">pivot</text>
+
+          <rect x="80"  y="102" width="216" height="34" rx="3" fill="var(--lt-wash)" stroke="var(--lt)"></rect>
+          <text x="188" y="118" text-anchor="middle" font-size="11.5" fill="var(--lt)" font-weight="700">left &#183; all &lt; pivot</text>
+          <text x="188" y="130" text-anchor="middle" font-size="10" fill="var(--muted)">still &gt; 16 &#8594; partition again</text>
+
+          <rect x="384" y="102" width="216" height="34" rx="3" fill="var(--ge-wash)" stroke="var(--ge)"></rect>
+          <text x="492" y="118" text-anchor="middle" font-size="11.5" fill="var(--ge)" font-weight="700">right &#183; all &#8805; pivot</text>
+          <text x="492" y="130" text-anchor="middle" font-size="10" fill="var(--muted)">still &gt; 16 &#8594; partition again</text>
+
+          <g color="var(--muted)" stroke="currentColor" stroke-width="1.5" fill="none" stroke-opacity=".65">
+            <path d="M140 140 L104 174" marker-end="url(#t-a)"></path>
+            <path d="M236 140 L272 174" marker-end="url(#t-a)"></path>
+            <path d="M444 140 L408 174" marker-end="url(#t-a)"></path>
+            <path d="M540 140 L576 174" marker-end="url(#t-a)"></path>
+          </g>
+
+          <rect x="24"  y="180" width="160" height="46" rx="3" fill="var(--surface)" stroke="var(--rule)"></rect>
+          <text x="104" y="198" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">n = 16</text>
+          <text x="104" y="212" text-anchor="middle" font-size="10.5" fill="var(--muted)">bitonic16 &#183; AVX2</text>
+          <text x="104" y="222" text-anchor="middle" font-size="9.5" fill="var(--muted)">2x256b, 14 ns</text>
+
+          <rect x="196" y="180" width="160" height="46" rx="3" fill="var(--surface)" stroke="var(--rule)"></rect>
+          <text x="276" y="198" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">n &lt; 16</text>
+          <text x="276" y="212" text-anchor="middle" font-size="10.5" fill="var(--muted)">insertion_sort</text>
+          <text x="276" y="222" text-anchor="middle" font-size="9.5" fill="var(--muted)">scalar</text>
+
+          <rect x="332" y="180" width="160" height="46" rx="3" fill="var(--surface)" stroke="var(--rule)"></rect>
+          <text x="412" y="198" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">n = 16</text>
+          <text x="412" y="212" text-anchor="middle" font-size="10.5" fill="var(--muted)">bitonic16 &#183; AVX2</text>
+          <text x="412" y="222" text-anchor="middle" font-size="9.5" fill="var(--muted)">2x256b, 14 ns</text>
+
+          <rect x="504" y="180" width="152" height="46" rx="3" fill="var(--panel)" stroke="var(--rule)" stroke-dasharray="4 3"></rect>
+          <text x="580" y="204" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--muted)">n &gt; 16</text>
+          <text x="580" y="218" text-anchor="middle" font-size="10.5" fill="var(--muted)">deeper recursion &#8230;</text>
+
+          <line x1="24" y1="252" x2="656" y2="252" stroke="var(--rule)"></line>
+          <text x="24" y="274" font-size="11" fill="var(--muted)">Scratch buffers: 2n ints, allocated <tspan font-weight="700" fill="var(--ink)">once</tspan> at the entry point and</text>
+          <text x="24" y="290" font-size="11" fill="var(--muted)">threaded through every recursive call.</text>
+          <text x="356" y="274" font-size="11" fill="var(--muted)">For n &#8804; 16 the entry point skips</text>
+          <text x="356" y="290" font-size="11" fill="var(--muted)">allocation and calls the base case directly.</text>
+        </g>
+      </svg>
+      <figcaption>Two SIMD dialects, chosen per job. The partition stays <b>portable Highway</b> &mdash; it is the dominant cost, and Highway gives up nothing there. The base case is hand-written AVX2 for one reason: <b>width</b>. The network's structure pins Highway to <code>FixedTag&lt;int32_t,4&gt;</code> and 128-bit vectors, while 2&#215;256-bit reaches 14 ns against 22. It is not about blend lowering &mdash; at 128 bits, clang compiles Highway to exactly the same 22 ns as the hand-written intrinsics.</figcaption>
+    </figure>
+
+    <div class="parts">
+      <div class="part"><span class="nm">simd_qs_core</span><span class="when">always</span><span class="op">median-of-3 pivot, then recurse</span></div>
+      <div class="part"><span class="nm">simd_partition</span><span class="when">n &gt; 16</span><span class="op">CompressStore scatter, 8 lanes</span></div>
+      <div class="part"><span class="nm">bitonic16</span><span class="when">n == 16</span><span class="op">AVX2 2&#215;256-bit sorting network</span></div>
+      <div class="part"><span class="nm">insertion_sort</span><span class="when">n &lt; 16</span><span class="op">scalar fallback</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What it buys on Zen 5</h2>
+    <table>
+      <caption>Ryzen AI 9 HX 370 &middot; GCC 13.3, AVX2 target &middot; random int32, best of 7</caption>
+      <thead><tr><th>n</th><th>vqs</th><th>std::sort</th><th>speedup</th><th>ns/(n log&#8322; n)</th></tr></thead>
+      <tbody>
+        <tr><td>512</td><td>10.7 &#181;s</td><td>23.4 &#181;s</td><td class="win">2.17&#215;</td><td>2.33</td></tr>
+        <tr><td>1 024</td><td>21.7 &#181;s</td><td>53.0 &#181;s</td><td class="win">2.44&#215;</td><td>2.12</td></tr>
+        <tr><td>4 096</td><td>90.5 &#181;s</td><td>260.3 &#181;s</td><td class="win">2.87&#215;</td><td>1.84</td></tr>
+        <tr><td>8 192</td><td>179.6 &#181;s</td><td>565.0 &#181;s</td><td class="win">3.15&#215;</td><td>1.69</td></tr>
+        <tr><td>65 536</td><td>1.22 ms</td><td>3.94 ms</td><td class="win">3.24&#215;</td><td>1.16</td></tr>
+        <tr><td>262 144</td><td>5.14 ms</td><td>17.74 ms</td><td class="win">3.45&#215;</td><td>1.09</td></tr>
+        <tr><td>1 048 576</td><td>22.1 ms</td><td>78.2 ms</td><td class="win">3.54&#215;</td><td>1.05</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Verified independently at n&#8201;=&#8201;1&#8201;048&#8201;576 and at a non-power-of-two n&#8201;=&#8201;1&#8201;000&#8201;003: both sort correctly, both measure 3.6&#215;. Rows below n&#8201;=&#8201;512 are omitted &mdash; there the per-call scratch allocation, two <code>vector&lt;int&gt;</code> of size n, dominates everything else.</p>
+    <p class="measure">The win holds across the whole range and grows with n, from 2.2&#215; at 512 to <b>3.5&#215; at a million</b>. There is no crossover to hunt for: the vectorized partition is ahead everywhere the sort itself is the dominant cost.</p>
+
+    <h2>Two things the port turned up</h2>
+    <p class="measure"><b>AVX-512 is slower than AVX2 here.</b> Zen 5 has <code>vpcompressd</code>, the single instruction the paper was written around, and Highway selects it at <code>-march=native</code> with 16 lanes instead of 8. It loses:</p>
+    <table>
+      <caption>n = 1 048 576, vqs only</caption>
+      <thead><tr><th>build</th><th>target</th><th>lanes</th><th>time</th></tr></thead>
+      <tbody>
+        <tr class="cross"><td>GCC</td><td>AVX2</td><td>8</td><td>21.7 ms</td></tr>
+        <tr><td>GCC</td><td>AVX3_DL</td><td>16</td><td>23.1 ms</td></tr>
+        <tr class="cross"><td>clang</td><td>AVX2</td><td>8</td><td>21.6 ms</td></tr>
+        <tr><td>clang</td><td>AVX3_DL</td><td>16</td><td>23.4 ms</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Both compilers agree, at about 7%. Wider vectors mean fewer, larger blocks and a longer scalar tail, and AMD's 512-bit compress is not twice the throughput of the 256-bit path. The instruction the algorithm was designed for is available and is the wrong choice on this machine.</p>
+
+    <p class="measure"><b>The obvious benchmark harness flatters <code>std::sort</code>.</b> Timing <code>copy(src &#8594; buf); sort(buf)</code> in a loop over the <i>same</i> source array makes every data-dependent branch perfectly predictable after warm-up, and below about n&#8201;=&#8201;4096 the entire branch history fits the predictor:</p>
+    <table>
+      <caption>std::sort at n = 4096, same machine, same build</caption>
+      <thead><tr><th>harness</th><th>measured</th><th>ns/(n log&#8322; n)</th></tr></thead>
+      <tbody>
+        <tr><td>re-sorting one fixed array</td><td>28 &#181;s</td><td>0.57</td></tr>
+        <tr class="cross"><td>independent buffers</td><td>260 &#181;s</td><td>5.29</td></tr>
+      </tbody>
+    </table>
+    <p class="note">A 9&#215; error, and it decays as n grows &mdash; which produced a fake discontinuity, <code>std::sort</code> appearing to jump from 27&#8201;&#181;s at n&#8201;=&#8201;4096 to 512&#8201;&#181;s at n&#8201;=&#8201;8192 for twice the data. Comparing a branchless SIMD sort against a branchy comparison sort on that harness is not a fair test, and it is the same warm-predictor artifact that shows up in the scalar rows of the bitonic benchmarks. The table above uses pre-built independent buffers, refilled outside the timed region.</p>
+  </section>
+
+  <footer>Diagrams follow <code>vqs_highway_x86.cpp</code>; the partition trace is a complete run of one <code>simd_partition</code> call at 8 lanes, the AVX2 vector width for int32, and was checked against the implementation. Timings are pinned to one core with <code>taskset</code>.</footer>
+
+</div>

@@ -259,3 +259,4 @@ are best-case numbers.
 | `sort_compare_n16_x86.cpp` | x86 port: scalar sorts + AVX2 128b + AVX2 256b + Highway |
 | `Makefile` | Builds all four compiler/target combinations, `make run` to reproduce |
 | `sort_compare_n16.cpp` | Original ARM NEON version (M5) |
+| `bitonic_diagram.html` | Diagram: the bitonic network explained from first principles |
