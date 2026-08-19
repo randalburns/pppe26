@@ -78,8 +78,6 @@ Minimum across 3 invocations, each an internal best-of-5.
 
 Measured misprediction overhead: 111 ms (expected: 94 ms).
 
-See [clang_ryzen.md](clang_ryzen.md) for the full `-O0`–`-O3` sweep and the Ryzen comparison.
-
 ---
 
 ## When a LUT makes sense

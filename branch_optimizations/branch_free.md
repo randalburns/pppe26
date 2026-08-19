@@ -135,8 +135,6 @@ Minimum across 3 invocations, each an internal best-of-5.
 | ternary (CSEL) | 5 ms | 5 ms | **24.20x** |
 | arith (bitmask) | 5 ms | 5 ms | **24.20x** |
 
-See [clang_ryzen.md](clang_ryzen.md) for the full `-O0`–`-O3` sweep and the Ryzen comparison.
-
 ---
 
 ## Analysis

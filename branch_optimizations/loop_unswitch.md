@@ -87,8 +87,6 @@ All three unswitched loops converge to 3 ms: memory bandwidth limited
 (384 MB / 3 ms ≈ 128 GB/s).  The switched loops are compute-limited
 by their scalar throughput.
 
-See [clang_ryzen.md](clang_ryzen.md) for the full `-O0`–`-O3` sweep and the Ryzen comparison.
-
 ---
 
 ## Key takeaways
