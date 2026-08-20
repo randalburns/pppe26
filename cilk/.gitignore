@@ -4,3 +4,4 @@ vector_add
 sum_reducer
 qsort_steal
 mergesort_balanced
+sparse_col_sum

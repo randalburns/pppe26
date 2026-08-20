@@ -68,30 +68,19 @@ for adaptivity it never uses, and it will not beat `static` here (measured: `omp
 0.476 s vs `cilk` 0.526 s on the M5; a `dynamic` pass lands at or behind `static`).
 On balanced work, *every* runtime rebalancer is a tax.
 
-**Flat but irregular work — [../openmp/sparse_col_sum/spare_col_sum.c](../openmp/sparse_col_sum/spare_col_sum.c).**
+**Flat but irregular work — [sparse_col_sum.c](sparse_col_sum.c).**
 This is the case that actually separates dynamic from work-stealing. It counts
 non-zeros per column of a CSR matrix whose first rows are dense and the rest sparse —
 severe imbalance, but a *flat* loop, so all three schedulers apply. It already
 benchmarks `omp static`, `omp dynamic(1)`, and `cilk grainsize(1)` head to head.
+Full results and per-version analysis are in [sparse_col_sum.md](sparse_col_sum.md).
 
-Apple M5 · 8 workers/threads · a 20000×10000 matrix with 4000 dense rows (10000 nnz
-each) clustered at the front and 16000 sparse rows (10 nnz), ~40M non-zeros · median
-of 4 trials (`./spare_col_sum 20000 10000 4000 10000 10`):
-
-| version | time (s) | speedup | notes |
-|---------|---------:|--------:|-------|
-| serial | 0.0097 | 1.00× | |
-| omp static | 0.0056 | **1.73×** | threads 0–1 get all the dense rows → the rest stall at the barrier |
-| omp dynamic(1) | 0.0023 | **4.22×** | rebalances via the shared counter |
-| **cilk** | 0.0021 | **4.62×** | rebalances via stealing |
-
-The story is unmistakable. `static` gets only **1.7× on 8 threads** — a handful of
-threads inherit all the dense rows and everyone else idles. Both `dynamic(1)` and `cilk`
-recover a real ~4× because both rebalance at run time, and they land **within ~10% of
-each other** — *this is the case where dynamic scheduling and work-stealing are genuinely
-comparable.* Work-stealing keeps a slight edge (locality and lower coordination cost),
-and that edge widens as you add cores or shrink the per-item work so the shared counter
-starts to bottleneck; at this scale, dynamic scheduling is a completely reasonable choice.
+The short version: `static` is worst (imbalance). `dynamic(1)` and `cilk` are both far
+better because both rebalance — **this is the case where dynamic scheduling and
+work-stealing are genuinely comparable.** With chunk size 1 on a fairly coarse per-row
+cost, dynamic's central-queue contention is modest and it competes closely; work-stealing's
+edge is locality and lower coordination cost, and it widens as you add cores or shrink the
+per-item work.
 
 **Recursive irregular work — [qsort_steal.c](qsort_steal.c).** Here `schedule(dynamic)`
 is simply **not on the menu** — there is no loop to schedule, the parallelism is the

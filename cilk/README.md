@@ -1,58 +1,68 @@
-# Cilk parallelization primitives
+# Cilk examples — a guided tour
 
-Minimal, one-primitive-per-file examples for the [OpenCilk](https://www.opencilk.org)
-extensions to C. Each file is short and heavily commented so the primitive is the
-only thing on display.
+A short course in [OpenCilk](https://www.opencilk.org): the parallel primitives,
+the cost model for reasoning about them, and the work-stealing scheduler that runs
+them. Work through the three stages in order — each builds on the last.
 
-| File | Primitive | What it shows |
-|------|-----------|---------------|
-| [fib.c](fib.c) | `cilk_spawn` / `cilk_sync` | Fork two independent recursive calls, then join. The scheduler *may* run them in parallel. See the [spawn–join graph](fib_dag.html). |
-| [vector_add.c](vector_add.c) | `cilk_for` | Parallel loop over independent iterations; O(log N) span via a spawn tree. |
-| [sum_reducer.c](sum_reducer.c) | `cilk_reducer` | Lock-free, deterministic reduction (`sum += a[i]`) inside a `cilk_for`. |
-| [qsort_steal.c](qsort_steal.c) | `cilk_spawn` vs `omp task` | Parallel quicksort — recursive, *irregular* work where Cilk's work-stealing beats OpenMP tasks. |
-| [mergesort_balanced.c](mergesort_balanced.c) | `cilk_for` vs `omp for schedule(static)` | Bottom-up merge sort — *regular, balanced* work where OpenMP's static scheduling beats Cilk. |
-
-The two sorts above are a matched pair; see
-[work_stealing_vs_static.md](work_stealing_vs_static.md) for the write-up and results,
-and [work_stealing.html](work_stealing.html) for a diagram of how the deque scheduler works.
-[dynamic_vs_work_stealing.md](dynamic_vs_work_stealing.md) adds OpenMP's `schedule(dynamic)`
-to the picture — the run-time rebalancer that competes most directly with work-stealing.
-
-## The whole vocabulary
-
-There are really only three things to learn:
-
-- **`cilk_spawn f()`** — the caller may keep going in parallel with `f()`.
-- **`cilk_sync`** — wait for all spawns made in this function (implicit at function end).
-- **`cilk_for`** — sugar for a balanced tree of spawns over a loop's index range.
-
-`cilk_reducer` is the standard way to update a shared accumulator from parallel
-strands without a race or a lock.
-
-## Build & run
-
-Requires the OpenCilk compiler. The Makefile assumes it lives at `~/opencilk/bin/clang`.
+Everything builds with one Makefile (needs `~/opencilk/bin/clang`; the two sort
+benchmarks also need libomp):
 
 ```sh
-make            # build all four
-./fib 40
-./vector_add
-./sum_reducer
-CILK_NWORKERS=8 OMP_NUM_THREADS=8 ./qsort_steal   # Cilk vs OpenMP, matched workers
+make
 ```
 
-`qsort_steal` additionally needs libomp (`brew install libomp`); the Makefile
-points at `/opt/homebrew/opt/libomp`.
+---
 
-Control the worker count with the environment variable:
+## 1 · The primitives — start here
 
-```sh
-CILK_NWORKERS=1 ./fib 40      # serial
-CILK_NWORKERS=8 ./fib 40      # 8 workers
-```
+The whole vocabulary is three keywords plus a reducer. One tiny, heavily-commented
+program each.
 
-## See also
+| Step | Open | What it teaches |
+|------|------|-----------------|
+| Read | [cilk_primitives.md](cilk_primitives.md) | the overview and the whole vocabulary |
+| Run  | [fib.c](fib.c) | `cilk_spawn` / `cilk_sync` — fork two calls, then join |
+| Run  | [vector_add.c](vector_add.c) | `cilk_for` — a parallel loop |
+| Run  | [sum_reducer.c](sum_reducer.c) | `cilk_reducer` — a lock-free reduction |
+| View | [fib_dag.html](fib_dag.html) | the `fib(4)` spawn–join graph the scheduler sees |
 
-[../openmp/cilk_prefix_sum.c](../openmp/cilk_prefix_sum.c) — a fuller example using
-`cilk_for` for a three-pass parallel prefix sum, including a work-stealing-aware
-software barrier.
+---
+
+## 2 · Work and span — the cost model
+
+Before measuring anything, learn to reason about how fast a computation *can* run.
+Two numbers — total work and the critical-path span — bound every parallel program.
+
+| Step | Open | What it teaches |
+|------|------|-----------------|
+| Read | [work_span.md](work_span.md) | `T₁`, `T∞`, parallelism, and `T_P ≈ T₁/P + T∞` |
+| View | [fib_dag.html](fib_dag.html) | the "Work vs. span" panel counts `T₁` and `T∞` on the DAG |
+
+---
+
+## 3 · Work stealing — the scheduler
+
+How Cilk turns available parallelism into real speedup, and when its work-stealing
+scheduler wins or loses against OpenMP's static and dynamic scheduling.
+
+| Step | Open | What it teaches |
+|------|------|-----------------|
+| View | [work_stealing.html](work_stealing.html) | the deque mechanism: owners pop the bottom, thieves steal the top |
+| Read | [work_stealing_vs_static.md](work_stealing_vs_static.md) | stealing vs. static, with measured results |
+| Run  | [qsort_steal.c](qsort_steal.c) | *irregular* recursive work — stealing wins (`cilk_spawn` vs `omp task`) |
+| Run  | [mergesort_balanced.c](mergesort_balanced.c) | *regular* balanced work — static wins (`cilk_for` vs `omp for`) |
+| Read | [dynamic_vs_work_stealing.md](dynamic_vs_work_stealing.md) | where OpenMP `schedule(dynamic)` competes with stealing |
+| Run  | [sparse_col_sum.c](sparse_col_sum.c) | *irregular* flat loop — static vs `dynamic` vs `cilk` side by side |
+| Read | [sparse_col_sum.md](sparse_col_sum.md) | the three-way results and per-version analysis |
+
+---
+
+## Files at a glance
+
+**Primitives** — `fib.c`, `vector_add.c`, `sum_reducer.c`
+**Scheduler benchmarks** — `qsort_steal.c`, `mergesort_balanced.c`, `sparse_col_sum.c`
+**Write-ups** — `cilk_primitives.md`, `work_span.md`, `work_stealing_vs_static.md`, `dynamic_vs_work_stealing.md`, `sparse_col_sum.md`
+**Figures** — `fib_dag.html`, `work_stealing.html` (standalone pages — open in any browser)
+
+See also [../openmp/cilk_prefix_sum.c](../openmp/cilk_prefix_sum.c) for a larger
+`cilk_for` example.
