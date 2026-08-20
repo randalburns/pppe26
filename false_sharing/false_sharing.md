@@ -1,4 +1,4 @@
-**RB**
+
 
 Run in this directory. The Makefile builds all four optimization
 levels (`fs_O0` .. `fs_O3`); `-O0` makes every case slow and

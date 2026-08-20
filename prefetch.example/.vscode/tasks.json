@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-O2",
+                "-fno-tree-vectorize",
+                "-std=c++20",
+                "-o", "${workspaceFolder}/prefetch.example",
+                "${workspaceFolder}/prefetch.example.cpp"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$gcc"
+        }
+    ]
+}
