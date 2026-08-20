@@ -1,0 +1,3 @@
+test,value,unit
+random_4k_read_latency,45.8,us
+sequential_read_bandwidth,2.95,GB/s
