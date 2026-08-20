@@ -79,3 +79,27 @@ sorting/sort_compare_large
 sorting/sort_compare_n16
 sorting/std_sort
 sorting/vqs_highway
+
+# ILP build artifacts
+ILP/ooo_O*
+ILP/sep_O*
+ILP/spec_O*
+
+# false_sharing build artifacts
+false_sharing/fs_O*
+
+# strength.reduction build artifacts
+strength.reduction/sr_O*
+
+# vectorization build artifacts
+vectorization/find_first
+
+# prefetch.example build artifacts
+prefetch.example/prefetch.example
+prefetch.example/prefetch.example.clang
+
+# sorting x86 build artifacts (sources for some of these are no longer in the repo)
+sorting/n16_*
+sorting/sort_compare_n16_x86
+sorting/sort_survey_x86*
+sorting/vqs_x86_*
