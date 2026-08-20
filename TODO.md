@@ -1,8 +1,3 @@
-## Different on Ryzen than M5
-  * vectorization 
-  * sorting -- highway has native performance (do it on Ryzen)
-  * sharing CCX zones NUMA?
-
 ## RB Thoughts
 
 There are really only 2 computations in all of CS.
