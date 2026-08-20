@@ -1,7 +1,18 @@
+/*
+ * pipeline.tempvar.cpp
+ *
+ * Splitting a single stalled dependency chain into a load phase and a
+ * compute phase, each internally independent, so the CPU can overlap all
+ * four elements of an unrolled iteration instead of serializing them.
+ *
+ * Compile and benchmark:
+ *   clang++ -std=c++17 -O2 -o pipeline.tempvar pipeline.tempvar.cpp && ./pipeline.tempvar
+ */
+
 #include <iostream>
 #include <chrono>
 #include <vector>
-#include <iomanip>/d
+#include <iomanip>
 
 using namespace std;
 using namespace std::chrono;
