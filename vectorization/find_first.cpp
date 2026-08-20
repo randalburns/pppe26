@@ -29,7 +29,10 @@
 // version for every possible input: same index, same -1 when absent.  Nothing is
 // assumed about n, about the values, or about how many matches there are.
 
+#if defined(__x86_64__) || defined(__i386__)
+#define HAVE_SIMD_INTRINSICS 1
 #include <immintrin.h>
+#endif
 
 #include <chrono>
 #include <cstdint>
@@ -52,6 +55,7 @@ long find_scalar(const int64_t* data, long n, int64_t target) {
   return -1;
 }
 
+#ifdef HAVE_SIMD_INTRINSICS
 // Hand-written AVX2.  A 256-bit register holds four int64s.
 long find_simd(const int64_t* data, long n, int64_t target) {
   const __m256i wanted = _mm256_set1_epi64x(target);
@@ -76,6 +80,7 @@ long find_simd(const int64_t* data, long n, int64_t target) {
   }
   return -1;
 }
+#endif
 
 #ifdef HAVE_HIGHWAY
 // Portable SIMD.  hn::Find is the same algorithm as find_simd above -- whole
@@ -124,11 +129,18 @@ int main() {
 #ifdef HAVE_HIGHWAY
   printf("highway target: %s, %zu lanes per vector\n\n",
          hwy::TargetName(HWY_TARGET), hn::Lanes(hn::ScalableTag<int64_t>()));
-  printf("  %-10s %10s %10s %10s %9s %9s\n", "match at", "scalar", "simd",
-         "highway", "simd", "highway");
 #else
   printf("(built without highway)\n\n");
+#endif
+#if defined(HAVE_SIMD_INTRINSICS) && defined(HAVE_HIGHWAY)
+  printf("  %-10s %10s %10s %10s %9s %9s\n", "match at", "scalar", "simd",
+         "highway", "simd", "highway");
+#elif defined(HAVE_SIMD_INTRINSICS)
   printf("  %-10s %10s %10s %9s\n", "match at", "scalar", "simd", "simd");
+#elif defined(HAVE_HIGHWAY)
+  printf("  %-10s %10s %10s %9s\n", "match at", "scalar", "highway", "highway");
+#else
+  printf("  %-10s %10s\n", "match at", "scalar");
 #endif
 
   const long positions[] = {0, 16, 256, 4096, 8191, -1};  // -1 == no match
@@ -139,11 +151,13 @@ int main() {
 
     // All versions must agree on every case, present or absent.
     long a = find_scalar(probe.data(), n, target);
+#ifdef HAVE_SIMD_INTRINSICS
     long b = find_simd(probe.data(), n, target);
     if (a != b) {
       printf("  MISMATCH: scalar %ld, simd %ld\n", a, b);
       return 1;
     }
+#endif
 #ifdef HAVE_HIGHWAY
     long c = find_highway(probe.data(), n, target);
     if (a != c) {
@@ -153,18 +167,26 @@ int main() {
 #endif
 
     double s = time_it(find_scalar, probe.data(), n, target, reps);
+#ifdef HAVE_SIMD_INTRINSICS
     double v = time_it(find_simd, probe.data(), n, target, reps);
+#endif
+#ifdef HAVE_HIGHWAY
+    double h = time_it(find_highway, probe.data(), n, target, reps);
+#endif
 
     char label[24];
     if (p < 0) snprintf(label, sizeof label, "none");
     else snprintf(label, sizeof label, "%ld", p);
 
-#ifdef HAVE_HIGHWAY
-    double h = time_it(find_highway, probe.data(), n, target, reps);
+#if defined(HAVE_SIMD_INTRINSICS) && defined(HAVE_HIGHWAY)
     printf("  %-10s %9.1f %9.1f %9.1f %8.2fx %8.2fx\n", label, s, v, h, s / v,
            s / h);
-#else
+#elif defined(HAVE_SIMD_INTRINSICS)
     printf("  %-10s %9.1f %9.1f %8.2fx\n", label, s, v, s / v);
+#elif defined(HAVE_HIGHWAY)
+    printf("  %-10s %9.1f %9.1f %8.2fx\n", label, s, h, s / h);
+#else
+    printf("  %-10s %9.1f\n", label, s);
 #endif
   }
   return 0;
