@@ -59,3 +59,10 @@ memory_hierarchy/storage_latency
 memory_hierarchy/spin_cost
 memory_hierarchy/set_conflict
 memory_hierarchy/tlb_walk
+
+# virtual_memory build artifacts (the .csv/.txt measurements ARE tracked)
+virtual_memory/address_space
+virtual_memory/lazy_alloc
+virtual_memory/fault_cost
+virtual_memory/cow_fork
+virtual_memory/same_address
