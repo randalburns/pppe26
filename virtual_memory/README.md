@@ -15,8 +15,14 @@ pagemap}` and take fault counts from `getrusage`.
 
 ## Start here
 
-[vm_reality.html](vm_reality.html) — the write-up, with diagrams. Standalone; double-click
-it. Or run the programs yourself:
+Two pages, both standalone — double-click either.
+
+| | |
+|---|---|
+| [vm_intro.html](vm_intro.html) | **Three Illusions** — a gentle introduction. What virtual memory, `malloc` and `fork` actually do, from first principles, with no measurements. Start here if the ideas are new. |
+| [vm_reality.html](vm_reality.html) | **The Address Is Not The Memory** — the same mechanisms measured on this machine, with the numbers. |
+
+Or run the programs yourself:
 
 ```
 make            # build all five
