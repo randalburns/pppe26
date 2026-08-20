@@ -678,37 +678,84 @@
   <!-- ============================= RESULTS ============================= -->
   <section>
     <h2><span class="step">04</span> What it's worth</h2>
-    <p>8192 <code>int64</code> values, L1-resident, on a Ryzen&nbsp;AI&nbsp;9&nbsp;HX&nbsp;370
-      (Zen&nbsp;5) with clang&nbsp;18 at <code>-O3</code>. Median of seven pinned runs, in
-      nanoseconds per call.</p>
+    <p>Same source, two chips: 8192 <code>int64</code> values, L1-resident, <code>clang -O3</code>,
+      median of several pinned runs, in nanoseconds per call. Highway selects
+      <code>AVX2, 4 lanes per vector</code> on the Ryzen and <code>NEON, 2 lanes per vector</code> on
+      the M5 &mdash; both chips now run a hand-written <code>find_simd</code> too, AVX2 on one, NEON
+      on the other.</p>
 
     <div class="tbl-wrap">
       <table>
         <thead>
           <tr>
-            <th scope="col">First match at</th>
+            <th scope="col" rowspan="2">First match at</th>
+            <th scope="col" colspan="3">Zen 5 (AVX2)</th>
+            <th scope="col" colspan="3">Apple M5 (NEON)</th>
+          </tr>
+          <tr>
             <th scope="col">Scalar</th>
-            <th scope="col">Intrinsics</th>
+            <th scope="col">Simd</th>
             <th scope="col">Highway</th>
-            <th scope="col">Speedup</th>
+            <th scope="col">Scalar</th>
+            <th scope="col">Simd</th>
+            <th scope="col">Highway</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>0</td><td>0.5</td><td>0.9</td><td>1.0</td><td class="lose">0.56&times;</td></tr>
-          <tr><td>16</td><td>6.8</td><td>1.8</td><td>1.8</td><td class="win">3.78&times;</td></tr>
-          <tr><td>256</td><td>60.6</td><td>25.3</td><td>26.6</td><td class="win">2.40&times;</td></tr>
-          <tr><td>4096</td><td>909.1</td><td>329.9</td><td>312.6</td><td class="win">2.76&times;</td></tr>
-          <tr><td>8191</td><td>1596.1</td><td>773.9</td><td>698.5</td><td class="win">2.06&times;</td></tr>
-          <tr><td>no match</td><td>1318.8</td><td>666.0</td><td>651.1</td><td class="win">1.98&times;</td></tr>
+          <tr><td>0</td><td>0.5</td><td>0.9</td><td>1.0</td><td>0.2</td><td>0.3</td><td>0.5</td></tr>
+          <tr><td>16</td><td>6.8</td><td>1.8</td><td>1.8</td><td>4.5</td><td>3.0</td><td>2.4</td></tr>
+          <tr><td>256</td><td>60.6</td><td>25.3</td><td>26.6</td><td>66.0</td><td>42.7</td><td>41.7</td></tr>
+          <tr><td>4096</td><td>909.1</td><td>329.9</td><td>312.6</td><td>931.9</td><td>639.4</td><td>536.9</td></tr>
+          <tr><td>8191</td><td>1596.1</td><td>773.9</td><td>698.5</td><td>1856.9</td><td>1241.2</td><td>1043.2</td></tr>
+          <tr><td>no match</td><td>1318.8</td><td>666.0</td><td>651.1</td><td>1855.9</td><td>1244.5</td><td>1076.1</td></tr>
         </tbody>
       </table>
     </div>
 
-    <p>The crossover is about a dozen elements. With the match at index&nbsp;0 the scalar version
-      wins outright — it compares once and returns, while the vector version still loads and tests a
-      whole register. Past that it is 2–3.8&times;, and Google Highway's portable
-      <code>hn::Find</code> matches the hand-written AVX2 within noise, because it compiles to the
-      same four instructions.</p>
+    <div class="tbl-wrap" style="margin-top:10px">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col" rowspan="2">First match at</th>
+            <th scope="col" colspan="2">Zen speedup</th>
+            <th scope="col" colspan="2">M5 speedup</th>
+          </tr>
+          <tr>
+            <th scope="col">Simd</th>
+            <th scope="col">Highway</th>
+            <th scope="col">Simd</th>
+            <th scope="col">Highway</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0</td><td class="lose">0.56&times;</td><td class="lose">0.50&times;</td><td class="lose">0.67&times;</td><td class="lose">0.40&times;</td></tr>
+          <tr><td>16</td><td class="win">3.78&times;</td><td class="win">3.78&times;</td><td class="win">1.50&times;</td><td class="win">1.88&times;</td></tr>
+          <tr><td>256</td><td class="win">2.40&times;</td><td class="win">2.28&times;</td><td class="win">1.55&times;</td><td class="win">1.58&times;</td></tr>
+          <tr><td>4096</td><td class="win">2.76&times;</td><td class="win">2.91&times;</td><td class="win">1.46&times;</td><td class="win">1.74&times;</td></tr>
+          <tr><td>8191</td><td class="win">2.06&times;</td><td class="win">2.29&times;</td><td class="win">1.50&times;</td><td class="win">1.78&times;</td></tr>
+          <tr><td>no match</td><td class="win">1.98&times;</td><td class="win">2.03&times;</td><td class="win">1.49&times;</td><td class="win">1.72&times;</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>With the match at index&nbsp;0 both scalar versions win outright, on either chip &mdash; the
+      scalar loop compares once and returns, while the vector version still loads and tests a whole
+      register before it can check anything. Past that, the two chips tell the same story at
+      different scales: AVX2's four <code>int64</code> lanes pull 2.0&ndash;3.8&times; out of this
+      loop; NEON's two lanes, half the register width, pull 1.5&ndash;1.9&times;, roughly half the
+      ceiling. Scalar performance is close on both chips &mdash; this loop isn't starved for
+      single-element compares either way &mdash; so the gap is entirely in what one vector
+      instruction buys, not in the chips themselves.</p>
+
+    <p>The chips split on one thing, though: on Zen, hand-written and Highway tie at every row
+      &mdash; they compile to the same instructions. On the M5, Highway <i>beats</i> the hand-written
+      version past index&nbsp;0, by 5&ndash;19%. AVX2 has <code>movemask</code>, so both versions turn
+      a lane match into one bitmask and one <code>ctz</code>. NEON has nothing equivalent, so
+      <code>find_simd</code> falls back to checking its two lanes with a branch each; Highway's NEON
+      <code>FindFirstTrue</code> instead packs the comparison into 4-bit nibbles and finds the lane
+      with a single trailing-zero count &mdash; no data-dependent branch per lane. The straightforward
+      port loses to the library here, for the mirror-image reason it usually ties it on x86: x86 has
+      an instruction the naive approach can use directly, and NEON does not.</p>
 
     <p>What makes this example unusual is what the fast version does <i>not</i> assume. It returns
       the same index, and the same <code>-1</code>, as the scalar loop for every possible input —

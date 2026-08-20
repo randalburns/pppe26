@@ -24,12 +24,21 @@
 // pure scalar code -- one element per iteration, no vector instructions.
 //
 // Doing it by hand is legal because we only ever load elements that are inside
-// the array.  We check four at a time and stop at the first vector containing a
-// match, then work out which lane it was.  The answer is identical to the scalar
-// version for every possible input: same index, same -1 when absent.  Nothing is
-// assumed about n, about the values, or about how many matches there are.
+// the array.  We check a vector's worth at a time -- four int64 on AVX2, two on
+// NEON -- and stop at the first vector containing a match, then work out which
+// lane it was.  The answer is identical to the scalar version for every possible
+// input: same index, same -1 when absent.  Nothing is assumed about n, about the
+// values, or about how many matches there are.
 
+#if defined(__x86_64__) || defined(__i386__)
+#define HAVE_SIMD_INTRINSICS 1
+#define SIMD_ARCH_X86 1
 #include <immintrin.h>
+#elif defined(__aarch64__) || defined(__arm__)
+#define HAVE_SIMD_INTRINSICS 1
+#define SIMD_ARCH_NEON 1
+#include <arm_neon.h>
+#endif
 
 #include <chrono>
 #include <cstdint>
@@ -52,6 +61,7 @@ long find_scalar(const int64_t* data, long n, int64_t target) {
   return -1;
 }
 
+#ifdef SIMD_ARCH_X86
 // Hand-written AVX2.  A 256-bit register holds four int64s.
 long find_simd(const int64_t* data, long n, int64_t target) {
   const __m256i wanted = _mm256_set1_epi64x(target);
@@ -76,6 +86,29 @@ long find_simd(const int64_t* data, long n, int64_t target) {
   }
   return -1;
 }
+#elif defined(SIMD_ARCH_NEON)
+// Hand-written NEON.  A 128-bit register holds two int64s.
+long find_simd(const int64_t* data, long n, int64_t target) {
+  const int64x2_t wanted = vdupq_n_s64(target);
+  long i = 0;
+
+  // i + 2 <= n guarantees this load stays inside the array.
+  for (; i + 2 <= n; i += 2) {
+    int64x2_t v = vld1q_s64(data + i);
+    uint64x2_t eq = vceqq_s64(v, wanted);  // each lane: all-1s if equal, else 0
+
+    // Only two lanes -- no cross-lane movemask needed, just check each.
+    if (vgetq_lane_u64(eq, 0)) return i;
+    if (vgetq_lane_u64(eq, 1)) return i + 1;
+  }
+
+  // Fewer than two elements left over.
+  for (; i < n; i++) {
+    if (data[i] == target) return i;
+  }
+  return -1;
+}
+#endif
 
 #ifdef HAVE_HIGHWAY
 // Portable SIMD.  hn::Find is the same algorithm as find_simd above -- whole
@@ -124,11 +157,18 @@ int main() {
 #ifdef HAVE_HIGHWAY
   printf("highway target: %s, %zu lanes per vector\n\n",
          hwy::TargetName(HWY_TARGET), hn::Lanes(hn::ScalableTag<int64_t>()));
-  printf("  %-10s %10s %10s %10s %9s %9s\n", "match at", "scalar", "simd",
-         "highway", "simd", "highway");
 #else
   printf("(built without highway)\n\n");
+#endif
+#if defined(HAVE_SIMD_INTRINSICS) && defined(HAVE_HIGHWAY)
+  printf("  %-10s %10s %10s %10s %9s %9s\n", "match at", "scalar", "simd",
+         "highway", "simd", "highway");
+#elif defined(HAVE_SIMD_INTRINSICS)
   printf("  %-10s %10s %10s %9s\n", "match at", "scalar", "simd", "simd");
+#elif defined(HAVE_HIGHWAY)
+  printf("  %-10s %10s %10s %9s\n", "match at", "scalar", "highway", "highway");
+#else
+  printf("  %-10s %10s\n", "match at", "scalar");
 #endif
 
   const long positions[] = {0, 16, 256, 4096, 8191, -1};  // -1 == no match
@@ -139,11 +179,13 @@ int main() {
 
     // All versions must agree on every case, present or absent.
     long a = find_scalar(probe.data(), n, target);
+#ifdef HAVE_SIMD_INTRINSICS
     long b = find_simd(probe.data(), n, target);
     if (a != b) {
       printf("  MISMATCH: scalar %ld, simd %ld\n", a, b);
       return 1;
     }
+#endif
 #ifdef HAVE_HIGHWAY
     long c = find_highway(probe.data(), n, target);
     if (a != c) {
@@ -153,18 +195,26 @@ int main() {
 #endif
 
     double s = time_it(find_scalar, probe.data(), n, target, reps);
+#ifdef HAVE_SIMD_INTRINSICS
     double v = time_it(find_simd, probe.data(), n, target, reps);
+#endif
+#ifdef HAVE_HIGHWAY
+    double h = time_it(find_highway, probe.data(), n, target, reps);
+#endif
 
     char label[24];
     if (p < 0) snprintf(label, sizeof label, "none");
     else snprintf(label, sizeof label, "%ld", p);
 
-#ifdef HAVE_HIGHWAY
-    double h = time_it(find_highway, probe.data(), n, target, reps);
+#if defined(HAVE_SIMD_INTRINSICS) && defined(HAVE_HIGHWAY)
     printf("  %-10s %9.1f %9.1f %9.1f %8.2fx %8.2fx\n", label, s, v, h, s / v,
            s / h);
-#else
+#elif defined(HAVE_SIMD_INTRINSICS)
     printf("  %-10s %9.1f %9.1f %8.2fx\n", label, s, v, s / v);
+#elif defined(HAVE_HIGHWAY)
+    printf("  %-10s %9.1f %9.1f %8.2fx\n", label, s, h, s / h);
+#else
+    printf("  %-10s %9.1f\n", label, s);
 #endif
   }
   return 0;
