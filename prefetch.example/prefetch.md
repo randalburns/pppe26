@@ -1,3 +1,6 @@
+## RB 
+Prefetching doesn't really work on either platform.
+
 ## Prefetch
 
 With simple examples, there is no benefit. HW already does a perfect job prefetching. Have to do something kind of contrived to break the HW prefetcher.
