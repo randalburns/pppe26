@@ -1,4 +1,4 @@
-# Loop optimizations — a guided tour
+# Loop optimizations
 
 Five classic loop transformations, each isolated in its own example so the
 win (or the surprising non-win) is unambiguous. Measured on Apple M-series /
@@ -6,6 +6,91 @@ Apple Clang; see each write-up for build flags and exact numbers.
 
 Each example is a single source file; build with `g++ <flags> -o <name>
 <name>.cpp` and run it directly — no shared Makefile.
+
+---
+
+## Why loops
+
+Most of the time a real program spends is spent inside a small number of
+loops — the ones that touch every element of an array, walk a matrix, or
+accumulate a sum. A program might run thousands of distinct lines of code
+over its lifetime, but a handful of loop bodies account for nearly all the
+actual work, because each one executes not once but thousands, millions, or
+billions of times. Shave one cache miss or one wasted instruction off a
+single iteration of a loop that runs a million times, and you've removed a
+million cache misses or a million wasted instructions. That leverage — fix
+it once, benefit every iteration — is why loops get disproportionate
+attention compared to code that only runs once.
+
+It's also *why loops are unusually amenable to a fixed toolkit*. A loop body
+is the same operation applied to different data, iteration after iteration,
+so a handful of general-purpose rewrites — reorder the iterations, split the
+loop, merge two loops, do several iterations at once — tend to work across
+completely unrelated problems: image filters, matrix multiplication,
+running sums, string search. That's what this directory is: five such
+rewrites, each demonstrated on the example where its effect is clearest.
+
+Importantly, none of the five change *what* the loop computes — only how the
+work inside it is arranged, so the compiler, the cache, and the CPU's
+execution units spend less time waiting and more time working. Whether a
+given rearrangement is even allowed — whether it's still guaranteed to
+compute the same thing — comes down to one question, covered next.
+
+---
+
+## Loop independence — what makes a transformation legal
+
+Every rewrite below reorders, splits, merges, regroups, or overlaps loop
+iterations. That's only a valid rewrite — same answer, different code — if
+the iterations are **independent**: iteration `i`'s computation doesn't
+depend on any other iteration's result, and doesn't feed into one either.
+Equivalently, there's no *loop-carried dependency* — no value written in one
+iteration that a different iteration reads.
+
+That's what each transformation actually needs independence for:
+
+* **Fission** splits one loop into several — legal when nothing in the body
+  spans the split point.
+* **Fusion** merges two loops into one — legal when neither loop's iteration
+  needs output the other loop hasn't produced yet at the point they'd now
+  run interleaved.
+* **Interchange** swaps which index is outer and which is inner — legal when
+  neither index's loop feeds into the other's computation.
+* **Tiling** reorders iterations into blocks — the same requirement as
+  interchange, at a coarser grouping.
+* **Unrolling** runs several iterations per pass through the loop-control
+  code — legal for the same reason interchange is: overlapping iterations
+  changes nothing if they don't depend on each other.
+
+A loop where iteration `i` genuinely needs iteration `i-1`'s result — a
+running sum, a recurrence, an accumulator — *is* loop-carried, and none of
+these rewrites are free there. [../ILP/out_of_order.md](../ILP/out_of_order.md)
+and [../ILP/sep_dependent.md](../ILP/sep_dependent.md) measure what a
+loop-carried dependency costs on real hardware, and how breaking one apart
+(multiple accumulators) or hiding it (interleaving independent work)
+recovers performance without changing the loop's dependency structure.
+
+**Independent isn't automatically "safe to reorder bit-for-bit," though.**
+[loop_fusion.md](loop_fusion.md)'s mean/variance example makes the case: the
+two-pass and fused versions both sum the same values in the same left-to-right
+order — genuinely independent per-element work, combined by one reduction —
+so fusing them doesn't touch the arithmetic. But floating-point addition
+isn't associative, so the compiler won't auto-vectorize either version's
+reduction without `-ffast-math`: packing several additions into one SIMD
+instruction changes the order partial sums combine in, which can change the
+last bit of the result. Welford's algorithm, by contrast, maintains a running
+mean and variance that genuinely *is* loop-carried — each iteration needs the
+previous iteration's mean — so it can't be reordered at all, and pays for
+that with a serial dependency chain despite doing the fusion "for free" in a
+single pass.
+
+So there are really two questions hiding inside "independent": can this loop
+be reordered at all (the dependency-graph question — what makes a
+transformation legal), and does reordering it change the answer (the
+floating-point-associativity question — why even a legal reordering needs a
+flag like `-ffast-math` to happen automatically). Every example below has
+settled the first question already; only loop fusion's FP reduction runs
+into the second.
 
 ---
 
