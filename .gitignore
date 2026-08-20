@@ -48,3 +48,21 @@ branch_optimizations/lut_branch_*
 branch_optimizations/loop_unswitch_*
 !branch_optimizations/*.md
 !branch_optimizations/*.cpp
+
+# memory_hierarchy build artifacts (the .csv measurements ARE tracked)
+memory_hierarchy/cache_latency
+memory_hierarchy/stride_bandwidth
+memory_hierarchy/core_to_core
+memory_hierarchy/row_column
+memory_hierarchy/bandwidth_scaling
+memory_hierarchy/storage_latency
+memory_hierarchy/spin_cost
+memory_hierarchy/set_conflict
+memory_hierarchy/tlb_walk
+
+# virtual_memory build artifacts (the .csv/.txt measurements ARE tracked)
+virtual_memory/address_space
+virtual_memory/lazy_alloc
+virtual_memory/fault_cost
+virtual_memory/cow_fork
+virtual_memory/same_address

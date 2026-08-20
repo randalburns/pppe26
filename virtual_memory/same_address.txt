@@ -1,0 +1,12 @@
+both processes map the very same virtual address: 0x600000000000
+
+private + anonymous  ->  each process gets its own frame
+  A writes  "written by process A"  at 0x600000000000
+  B reads   "written by process B"  at 0x600000000000
+
+shared + file-backed  ->  both processes get the same frame
+  A writes  "written by process A"  at 0x600000000000
+  B reads   "written by process A"  at 0x600000000000
+
+Same number, opposite outcomes. The address is not the memory;
+the page table entry behind it is.

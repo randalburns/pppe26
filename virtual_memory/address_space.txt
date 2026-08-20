@@ -1,0 +1,36 @@
+KIND                       PERMS        SIZE  BACKING
+------------------------------------------------------------------------------
+heap                       rw-p        132 K  [heap]
+anonymous                  rw-p      65540 K  -
+code (file-backed)         r-xp       1568 K  /usr/lib/x86_64-linux-gnu/libc.so.6
+kernel-provided            r--p         16 K  [vvar]
+read-only (file-backed)    r--p          8 K  [vvar_vclock]
+kernel-provided            r-xp          8 K  [vdso]
+stack                      rw-p        136 K  [stack]
+kernel-provided            --xp          4 K  [vsyscall]
+
+==============================================================================
+regions mapped            25
+  executable                   1.7 MB
+  writable                    64.4 MB
+  code (file-backed)          1.7 MB
+  read-only (file-backed)      0.6 MB
+  data (file-backed)          0.0 MB
+  heap                        0.1 MB
+  stack                       0.1 MB
+  anonymous                  64.1 MB
+  kernel-provided             0.0 MB
+
+virtual size  (VmSize)        66.6 MB   what the process can address
+resident      (VmRSS)          2.7 MB   what it costs in DRAM
+page tables   (VmPTE)          0.1 MB   the cost of the translation itself
+resident / virtual             4.1 %
+
+user address space          131072 GB   (2^47 bytes)
+fraction mapped           0.000050 %
+
+this run's addresses (they move every run -- ASLR):
+  code   (main)           0x0000638f9d613240
+  heap   (malloc)         0x000070fadf7ff010
+  stack  (local)          0x00007fff4faff1ac
+  libc   (printf)         0x000070fae3860100

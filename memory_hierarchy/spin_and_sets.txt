@@ -1,0 +1,25 @@
+cpu0, core clock: 5.09 GHz
+
+PAUSE alone                12.77 ns    65.0 cycles
+poll, no PAUSE              0.21 ns     1.0 cycles
+poll + PAUSE (as used)     12.87 ns    65.5 cycles   <- polling quantum
+store + reload (1 thread)   0.20 ns     1.0 cycles
+
+A waiter using this loop sees a change on average half a quantum late,
+and at worst a full quantum: 6.4 - 12.9 ns before any coherence traffic.
+
+cpu5, core clock: 3.25 GHz
+
+PAUSE alone                19.99 ns    65.0 cycles
+poll, no PAUSE              0.31 ns     1.0 cycles
+poll + PAUSE (as used)     20.13 ns    65.4 cycles   <- polling quantum
+store + reload (1 thread)   0.31 ns     1.0 cycles
+
+   lda  row bytes    lines  set adv  sets used   ns/elem
+  1024       8192   128.00      int          1     9.787
+  1152       9216   144.00      int          4     6.059
+  1088       8704   136.00      int          8     3.226
+  1056       8448   132.00      int         16     0.590
+  1040       8320   130.00      int         32     0.584
+  1032       8256   129.00      int         64     0.593
+  1025       8200   128.12     frac 64 (drifts)     0.359

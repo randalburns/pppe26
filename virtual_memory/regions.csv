@@ -1,0 +1,26 @@
+kind,perms,size_kb,path
+read-only (file-backed),r--p,4,/home/randal/active/pppe26/virtual_memory/address_space
+code (file-backed),r-xp,4,/home/randal/active/pppe26/virtual_memory/address_space
+read-only (file-backed),r--p,4,/home/randal/active/pppe26/virtual_memory/address_space
+read-only (file-backed),r--p,4,/home/randal/active/pppe26/virtual_memory/address_space
+data (file-backed),rw-p,4,/home/randal/active/pppe26/virtual_memory/address_space
+heap,rw-p,132,[heap]
+anonymous,rw-p,65540,-
+read-only (file-backed),r--p,160,/usr/lib/x86_64-linux-gnu/libc.so.6
+code (file-backed),r-xp,1568,/usr/lib/x86_64-linux-gnu/libc.so.6
+read-only (file-backed),r--p,316,/usr/lib/x86_64-linux-gnu/libc.so.6
+read-only (file-backed),r--p,16,/usr/lib/x86_64-linux-gnu/libc.so.6
+data (file-backed),rw-p,8,/usr/lib/x86_64-linux-gnu/libc.so.6
+anonymous,rw-p,52,-
+anonymous,rw-p,12,-
+anonymous,rw-p,8,-
+kernel-provided,r--p,16,[vvar]
+read-only (file-backed),r--p,8,[vvar_vclock]
+kernel-provided,r-xp,8,[vdso]
+read-only (file-backed),r--p,4,/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+code (file-backed),r-xp,172,/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+read-only (file-backed),r--p,40,/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+read-only (file-backed),r--p,8,/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+data (file-backed),rw-p,8,/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+stack,rw-p,136,[stack]
+kernel-provided,--xp,4,[vsyscall]

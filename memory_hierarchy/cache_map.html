@@ -1,0 +1,1123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Strix Point Cache Map -- generated for the pppe26 repo; opens standalone in any browser,
+     no server and no external assets beyond the web fonts, which fall back
+     to system faces offline. -->
+<title>Strix Point Cache Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+/* the hosted version of this page got a reset from its runtime; standalone,
+   it brings its own */
+html{-webkit-text-size-adjust:100%}
+figure,blockquote,dl,dd{margin:0}
+ul,ol{margin:0}
+img,svg{max-width:100%}
+
+:root{
+  --bg:#EEF1F5;
+  --surface:#FFFFFF;
+  --sunken:#E3E8EE;
+  --ink:#141B24;
+  --ink-2:#4E5A6B;
+  --ink-3:#7C889A;
+  --rule:#C6D0DB;
+  --grid:#D8E0E8;
+  --zen5:#A85C15;
+  --zen5-soft:#F2E3D2;
+  --zen5c:#166F69;
+  --zen5c-soft:#D7E9E7;
+  --cost:#9E2C4A;
+  --cost-soft:#F3DAE1;
+  --shadow:0 1px 2px rgba(20,27,36,.06), 0 8px 24px rgba(20,27,36,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1218;
+    --surface:#151D26;
+    --sunken:#101820;
+    --ink:#E7EDF4;
+    --ink-2:#9FAEC0;
+    --ink-3:#6E7E92;
+    --rule:#2B3743;
+    --grid:#222D38;
+    --zen5:#E0A05C;
+    --zen5-soft:#2A2018;
+    --zen5c:#4FBFB7;
+    --zen5c-soft:#12262A;
+    --cost:#E9758F;
+    --cost-soft:#2B1720;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1218;
+  --surface:#151D26;
+  --sunken:#101820;
+  --ink:#E7EDF4;
+  --ink-2:#9FAEC0;
+  --ink-3:#6E7E92;
+  --rule:#2B3743;
+  --grid:#222D38;
+  --zen5:#E0A05C;
+  --zen5-soft:#2A2018;
+  --zen5c:#4FBFB7;
+  --zen5c-soft:#12262A;
+  --cost:#E9758F;
+  --cost-soft:#2B1720;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{
+  max-width:1180px;
+  margin:0 auto;
+  padding:56px 28px 88px;
+  display:flex;
+  flex-direction:column;
+  gap:56px;
+}
+
+/* ---------- masthead ---------- */
+.masthead{display:flex;flex-direction:column;gap:18px}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);margin:0;
+}
+h1{
+  font-family:Archivo,ui-sans-serif,system-ui,sans-serif;
+  font-weight:700;font-size:clamp(2.1rem,5vw,3.3rem);
+  line-height:1.04;letter-spacing:-.025em;margin:0;text-wrap:balance;
+}
+.standfirst{
+  margin:0;max-width:62ch;font-size:1.075rem;color:var(--ink-2);
+}
+.machine{
+  display:flex;flex-wrap:wrap;gap:0 26px;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  padding:14px 0;margin-top:6px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:12.5px;color:var(--ink-2);
+}
+.machine b{color:var(--ink);font-weight:500}
+
+/* ---------- sections ---------- */
+section{display:flex;flex-direction:column;gap:20px}
+h2{
+  font-family:Archivo,ui-sans-serif,system-ui,sans-serif;
+  font-weight:600;font-size:1.55rem;letter-spacing:-.015em;
+  margin:0;text-wrap:balance;
+}
+h2 .num{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.72em;color:var(--ink-3);font-weight:400;margin-right:.7em;
+}
+p{margin:0;max-width:68ch}
+p + p{margin-top:.9em}
+strong{font-weight:600}
+.lede{color:var(--ink-2)}
+
+/* ---------- figures ---------- */
+figure{
+  margin:0;background:var(--surface);border:1px solid var(--rule);
+  border-radius:3px;box-shadow:var(--shadow);
+  padding:26px 26px 20px;
+  display:flex;flex-direction:column;gap:16px;
+}
+.canvas{overflow-x:auto;overflow-y:hidden}
+figure svg{display:block;width:100%;min-width:720px;height:auto}
+figcaption{
+  font-size:13.5px;color:var(--ink-2);max-width:78ch;
+  border-top:1px solid var(--grid);padding-top:14px;
+}
+figcaption b{color:var(--ink);font-weight:600}
+
+/* svg paint, driven by the same tokens as the page */
+.sv-ink{fill:var(--ink)}
+.sv-dim{fill:var(--ink-2)}
+.sv-faint{fill:var(--ink-3)}
+.sv-z5{fill:var(--zen5)}
+.sv-z5c{fill:var(--zen5c)}
+.sv-cost{fill:var(--cost)}
+.fill-surface{fill:var(--surface)}
+.fill-sunken{fill:var(--sunken)}
+.fill-z5{fill:var(--zen5-soft)}
+.fill-z5c{fill:var(--zen5c-soft)}
+.fill-cost{fill:var(--cost-soft)}
+.fill-none{fill:none}
+.st-rule{stroke:var(--rule);fill:none}
+.st-grid{stroke:var(--grid);fill:none}
+.st-ink{stroke:var(--ink);fill:none}
+.st-dim{stroke:var(--ink-2);fill:none}
+.st-z5{stroke:var(--zen5);fill:none}
+.st-z5c{stroke:var(--zen5c);fill:none}
+.st-cost{stroke:var(--cost);fill:none}
+.lbl{font-family:"IBM Plex Sans",sans-serif;font-size:11px}
+.lbl-sm{font-family:"IBM Plex Sans",sans-serif;font-size:9.5px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px}
+.mono-sm{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9px}
+.mono-lg{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:20px;font-weight:500}
+.cap{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.w500{font-weight:500}
+.w600{font-weight:600}
+
+/* ---------- consequence cards ---------- */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;
+}
+.card{
+  background:var(--surface);border:1px solid var(--rule);border-radius:3px;
+  padding:18px 18px 16px;display:flex;flex-direction:column;gap:7px;
+}
+.card .figure{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:1.7rem;font-weight:600;line-height:1;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+.card h3{
+  font-family:"IBM Plex Sans",sans-serif;font-size:.95rem;font-weight:600;margin:0;
+}
+.card p{font-size:13.5px;color:var(--ink-2);margin:0}
+code{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.9em;
+  background:var(--sunken);padding:1px 5px;border-radius:2px;color:var(--ink);
+}
+.card .more{margin-top:2px}
+.card .more a{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;
+  color:var(--cost);text-decoration-color:var(--cost);
+}
+.c-z5 .figure{color:var(--zen5)}
+.c-z5c .figure{color:var(--zen5c)}
+.c-z5c .more a{color:var(--zen5c);text-decoration-color:var(--zen5c)}
+.c-cost .figure{color:var(--cost)}
+.c-ink .figure{color:var(--ink)}
+.c-ink .more a{color:var(--ink-2);text-decoration-color:var(--ink-3)}
+section[id]{scroll-margin-top:20px}
+
+/* ---------- callout ---------- */
+.note{
+  background:var(--surface);border:1px solid var(--rule);
+  border-left:3px solid var(--zen5);border-radius:0 3px 3px 0;
+  padding:18px 20px;display:flex;flex-direction:column;gap:8px;
+}
+.note h3{
+  font-family:"IBM Plex Sans",sans-serif;font-size:.95rem;font-weight:600;margin:0;
+}
+.note p{font-size:14px;color:var(--ink-2)}
+.note.warn{border-left-color:var(--cost)}
+
+/* ---------- decomposition list ---------- */
+.puzzles{display:flex;flex-direction:column;gap:18px;margin:0;padding:0}
+.puzzles div{display:flex;flex-direction:column;gap:5px}
+.puzzles dt{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:13px;font-weight:500;color:var(--ink);
+}
+.puzzles dd{margin:0;font-size:14.5px;color:var(--ink-2);max-width:68ch}
+
+/* ---------- table ---------- */
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:660px;font-size:13.5px}
+table.compact{min-width:430px}
+th,td{padding:11px 16px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;background:var(--sunken);
+}
+tbody td{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+tbody td:first-child{font-family:"IBM Plex Sans",sans-serif;font-weight:600;color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.divide td{border-top:2px solid var(--rule)}
+
+/* ---------- colophon ---------- */
+.colophon{
+  border-top:1px solid var(--rule);padding-top:22px;
+  display:flex;flex-direction:column;gap:10px;
+  font-size:13px;color:var(--ink-2);
+}
+.colophon h2{font-size:1.05rem}
+.colophon code{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;
+  background:var(--sunken);padding:1px 5px;border-radius:2px;color:var(--ink);
+}
+a{color:var(--ink);text-decoration-color:var(--ink-3);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--ink)}
+a:focus-visible{outline:2px solid var(--zen5);outline-offset:3px;border-radius:2px}
+
+@media (max-width:640px){
+  .wrap{padding:40px 18px 64px;gap:44px}
+  figure{padding:18px 16px 14px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Measured floorplan</p>
+    <h1>Strix Point Cache Map</h1>
+    <p class="standfirst">
+      Every capacity, latency and bandwidth below was measured on one laptop, not read off a
+      datasheet. The chip is not the uniform 12-core part its spec sheet implies: it is two
+      unequal core complexes that disagree about how much cache a thread gets and how much it
+      costs to talk to a neighbor.
+    </p>
+    <div class="machine">
+      <span><b>AMD Ryzen AI 9 HX 370</b> &middot; Zen 5 &ldquo;Strix Point&rdquo;</span>
+      <span>12 cores / 24 threads</span>
+      <span>LPDDR5X</span>
+      <span>Linux 6.x, gcc 13.3</span>
+    </div>
+  </header>
+
+  <!-- ============ FIGURE 1: THE FLOORPLAN ============ -->
+  <section>
+    <h2><span class="num">01</span>The floorplan</h2>
+    <p class="lede">
+      Cache blocks are drawn to capacity: the two L3 slabs share a width, so the taller slab
+      really is twice the memory. Four cores sit on 16&nbsp;MB; eight cores sit on 8&nbsp;MB.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1160 545" role="img"
+             aria-label="Floorplan of the Ryzen AI 9 HX 370. Complex zero holds four Zen 5 cores over a 16 megabyte L3, giving 4 megabytes per core. Complex one holds eight Zen 5c cores over an 8 megabyte L3, giving 1 megabyte per core. The two complexes are joined by the Infinity Fabric at 167 nanoseconds per cache-line handoff. Both miss to shared LPDDR5X at 104 nanoseconds, and below that an NVMe SSD at 45.8 microseconds.">
+          <defs>
+            <marker id="ar-ink" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,1 L9,5 L0,9 z" class="sv-dim"/>
+            </marker>
+            <marker id="ar-cost" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,1 L9,5 L0,9 z" class="sv-cost"/>
+            </marker>
+          </defs>
+
+          <!-- ---------- left gutter: what each tier costs ---------- -->
+          <text x="140" y="127" text-anchor="end" class="mono sv-ink w500">L1d hit &nbsp;4 cyc &middot; 0.78 ns</text>
+          <line x1="146" y1="123" x2="160" y2="123" class="st-grid" stroke-width="1"/>
+
+          <text x="140" y="159" text-anchor="end" class="mono sv-ink w500">L2 hit &nbsp;14 cyc &middot; 2.73 ns</text>
+          <line x1="146" y1="155" x2="160" y2="155" class="st-grid" stroke-width="1"/>
+
+          <text x="140" y="236" text-anchor="end" class="mono sv-ink w500">L3 hit &nbsp;27&ndash;60 cyc</text>
+          <line x1="146" y1="232" x2="160" y2="232" class="st-grid" stroke-width="1"/>
+
+          <text x="140" y="366" text-anchor="end" class="mono sv-ink w500">DRAM &nbsp;530 cyc &middot; 104 ns</text>
+          <line x1="146" y1="362" x2="160" y2="362" class="st-grid" stroke-width="1"/>
+
+          <text x="140" y="474" text-anchor="end" class="mono sv-ink w500">SSD &nbsp;232,000 cyc &middot; 45.8 &micro;s</text>
+          <line x1="146" y1="470" x2="160" y2="470" class="st-grid" stroke-width="1"/>
+
+          <!-- ================= CCX 0 ================= -->
+          <rect x="160" y="56" width="420" height="216" rx="2" class="fill-z5" opacity="0.55"/>
+          <rect x="160" y="56" width="420" height="216" rx="2" class="st-z5" stroke-width="1.25"/>
+          <text x="170" y="48" class="cap sv-z5">CCX 0 &nbsp;&middot;&nbsp; 4 &times; Zen 5 &nbsp;&middot;&nbsp; up to 5.16 GHz</text>
+
+          <!-- core 0 -->
+          <rect x="170" y="72" width="96" height="104" rx="2" class="fill-surface"/>
+          <rect x="170" y="72" width="96" height="104" rx="2" class="st-z5" stroke-width="1"/>
+          <text x="218" y="90" text-anchor="middle" class="lbl sv-ink w600">Core 0</text>
+          <text x="218" y="102" text-anchor="middle" class="mono-sm sv-faint">2 threads</text>
+          <rect x="176" y="110" width="84" height="22" rx="1" class="fill-sunken"/>
+          <text x="218" y="125" text-anchor="middle" class="mono-sm sv-dim">L1d 48K &middot; L1i 32K</text>
+          <rect x="176" y="140" width="84" height="26" rx="1" class="fill-sunken"/>
+          <text x="218" y="157" text-anchor="middle" class="mono sv-dim">L2 1 MB</text>
+
+          <!-- core 1 -->
+          <rect x="278" y="72" width="96" height="104" rx="2" class="fill-surface"/>
+          <rect x="278" y="72" width="96" height="104" rx="2" class="st-z5" stroke-width="1"/>
+          <text x="326" y="90" text-anchor="middle" class="lbl sv-ink w600">Core 1</text>
+          <text x="326" y="102" text-anchor="middle" class="mono-sm sv-faint">2 threads</text>
+          <rect x="284" y="110" width="84" height="22" rx="1" class="fill-sunken"/>
+          <text x="326" y="125" text-anchor="middle" class="mono-sm sv-dim">L1d 48K &middot; L1i 32K</text>
+          <rect x="284" y="140" width="84" height="26" rx="1" class="fill-sunken"/>
+          <text x="326" y="157" text-anchor="middle" class="mono sv-dim">L2 1 MB</text>
+
+          <!-- core 2 -->
+          <rect x="386" y="72" width="96" height="104" rx="2" class="fill-surface"/>
+          <rect x="386" y="72" width="96" height="104" rx="2" class="st-z5" stroke-width="1"/>
+          <text x="434" y="90" text-anchor="middle" class="lbl sv-ink w600">Core 2</text>
+          <text x="434" y="102" text-anchor="middle" class="mono-sm sv-faint">2 threads</text>
+          <rect x="392" y="110" width="84" height="22" rx="1" class="fill-sunken"/>
+          <text x="434" y="125" text-anchor="middle" class="mono-sm sv-dim">L1d 48K &middot; L1i 32K</text>
+          <rect x="392" y="140" width="84" height="26" rx="1" class="fill-sunken"/>
+          <text x="434" y="157" text-anchor="middle" class="mono sv-dim">L2 1 MB</text>
+
+          <!-- core 3 -->
+          <rect x="494" y="72" width="96" height="104" rx="2" class="fill-surface"/>
+          <rect x="494" y="72" width="96" height="104" rx="2" class="st-z5" stroke-width="1"/>
+          <text x="542" y="90" text-anchor="middle" class="lbl sv-ink w600">Core 3</text>
+          <text x="542" y="102" text-anchor="middle" class="mono-sm sv-faint">2 threads</text>
+          <rect x="500" y="110" width="84" height="22" rx="1" class="fill-sunken"/>
+          <text x="542" y="125" text-anchor="middle" class="mono-sm sv-dim">L1d 48K &middot; L1i 32K</text>
+          <rect x="500" y="140" width="84" height="26" rx="1" class="fill-sunken"/>
+          <text x="542" y="157" text-anchor="middle" class="mono sv-dim">L2 1 MB</text>
+
+          <!-- L2 -> L3 -->
+          <line x1="218" y1="176" x2="218" y2="202" class="st-dim" stroke-width="1" marker-end="url(#ar-ink)"/>
+          <line x1="326" y1="176" x2="326" y2="202" class="st-dim" stroke-width="1" marker-end="url(#ar-ink)"/>
+          <line x1="434" y1="176" x2="434" y2="202" class="st-dim" stroke-width="1" marker-end="url(#ar-ink)"/>
+          <line x1="542" y1="176" x2="542" y2="202" class="st-dim" stroke-width="1" marker-end="url(#ar-ink)"/>
+
+          <!-- CCX0 L3: 16 MB, drawn at double height -->
+          <rect x="170" y="204" width="410" height="56" rx="2" class="fill-surface"/>
+          <rect x="170" y="204" width="410" height="56" rx="2" class="st-z5" stroke-width="1.5"/>
+          <text x="375" y="228" text-anchor="middle" class="lbl sv-ink w600">L3 &nbsp;16 MB &nbsp;&middot;&nbsp; 16-way</text>
+          <text x="375" y="246" text-anchor="middle" class="mono sv-z5 w500">4 MB per core</text>
+
+          <!-- ================= CCX 1 ================= -->
+          <rect x="700" y="56" width="420" height="216" rx="2" class="fill-z5c" opacity="0.55"/>
+          <rect x="700" y="56" width="420" height="216" rx="2" class="st-z5c" stroke-width="1.25"/>
+          <text x="710" y="48" class="cap sv-z5c">CCX 1 &nbsp;&middot;&nbsp; 8 &times; Zen 5c &nbsp;&middot;&nbsp; up to 3.29 GHz</text>
+
+          <rect x="708" y="72" width="46" height="104" rx="2" class="fill-surface"/>
+          <rect x="708" y="72" width="46" height="104" rx="2" class="st-z5c" stroke-width="1"/>
+          <text x="731" y="90" text-anchor="middle" class="mono-sm sv-ink w500">c4</text>
+          <rect x="713" y="110" width="36" height="22" rx="1" class="fill-sunken"/>
+          <text x="731" y="125" text-anchor="middle" class="mono-sm sv-dim">L1</text>
+          <rect x="713" y="140" width="36" height="26" rx="1" class="fill-sunken"/>
+          <text x="731" y="157" text-anchor="middle" class="mono-sm sv-dim">L2</text>
+
+          <rect x="759" y="72" width="46" height="104" rx="2" class="fill-surface"/>
+          <rect x="759" y="72" width="46" height="104" rx="2" class="st-z5c" stroke-width="1"/>
+          <text x="782" y="90" text-anchor="middle" class="mono-sm sv-ink w500">c5</text>
+          <rect x="764" y="110" width="36" height="22" rx="1" class="fill-sunken"/>
+          <text x="782" y="125" text-anchor="middle" class="mono-sm sv-dim">L1</text>
+          <rect x="764" y="140" width="36" height="26" rx="1" class="fill-sunken"/>
+          <text x="782" y="157" text-anchor="middle" class="mono-sm sv-dim">L2</text>
+
+          <rect x="810" y="72" width="46" height="104" rx="2" class="fill-surface"/>
+          <rect x="810" y="72" width="46" height="104" rx="2" class="st-z5c" stroke-width="1"/>
+          <text x="833" y="90" text-anchor="middle" class="mono-sm sv-ink w500">c6</text>
+          <rect x="815" y="110" width="36" height="22" rx="1" class="fill-sunken"/>
+          <text x="833" y="125" text-anchor="middle" class="mono-sm sv-dim">L1</text>
+          <rect x="815" y="140" width="36" height="26" rx="1" class="fill-sunken"/>
+          <text x="833" y="157" text-anchor="middle" class="mono-sm sv-dim">L2</text>
+
+          <rect x="861" y="72" width="46" height="104" rx="2" class="fill-surface"/>
+          <rect x="861" y="72" width="46" height="104" rx="2" class="st-z5c" stroke-width="1"/>
+          <text x="884" y="90" text-anchor="middle" class="mono-sm sv-ink w500">c7</text>
+          <rect x="866" y="110" width="36" height="22" rx="1" class="fill-sunken"/>
+          <text x="884" y="125" text-anchor="middle" class="mono-sm sv-dim">L1</text>
+          <rect x="866" y="140" width="36" height="26" rx="1" class="fill-sunken"/>
+          <text x="884" y="157" text-anchor="middle" class="mono-sm sv-dim">L2</text>
+
+          <rect x="912" y="72" width="46" height="104" rx="2" class="fill-surface"/>
+          <rect x="912" y="72" width="46" height="104" rx="2" class="st-z5c" stroke-width="1"/>
+          <text x="935" y="90" text-anchor="middle" class="mono-sm sv-ink w500">c8</text>
+          <rect x="917" y="110" width="36" height="22" rx="1" class="fill-sunken"/>
+          <text x="935" y="125" text-anchor="middle" class="mono-sm sv-dim">L1</text>
+          <rect x="917" y="140" width="36" height="26" rx="1" class="fill-sunken"/>
+          <text x="935" y="157" text-anchor="middle" class="mono-sm sv-dim">L2</text>
+
+          <rect x="963" y="72" width="46" height="104" rx="2" class="fill-surface"/>
+          <rect x="963" y="72" width="46" height="104" rx="2" class="st-z5c" stroke-width="1"/>
+          <text x="986" y="90" text-anchor="middle" class="mono-sm sv-ink w500">c9</text>
+          <rect x="968" y="110" width="36" height="22" rx="1" class="fill-sunken"/>
+          <text x="986" y="125" text-anchor="middle" class="mono-sm sv-dim">L1</text>
+          <rect x="968" y="140" width="36" height="26" rx="1" class="fill-sunken"/>
+          <text x="986" y="157" text-anchor="middle" class="mono-sm sv-dim">L2</text>
+
+          <rect x="1014" y="72" width="46" height="104" rx="2" class="fill-surface"/>
+          <rect x="1014" y="72" width="46" height="104" rx="2" class="st-z5c" stroke-width="1"/>
+          <text x="1037" y="90" text-anchor="middle" class="mono-sm sv-ink w500">c10</text>
+          <rect x="1019" y="110" width="36" height="22" rx="1" class="fill-sunken"/>
+          <text x="1037" y="125" text-anchor="middle" class="mono-sm sv-dim">L1</text>
+          <rect x="1019" y="140" width="36" height="26" rx="1" class="fill-sunken"/>
+          <text x="1037" y="157" text-anchor="middle" class="mono-sm sv-dim">L2</text>
+
+          <rect x="1065" y="72" width="46" height="104" rx="2" class="fill-surface"/>
+          <rect x="1065" y="72" width="46" height="104" rx="2" class="st-z5c" stroke-width="1"/>
+          <text x="1088" y="90" text-anchor="middle" class="mono-sm sv-ink w500">c11</text>
+          <rect x="1070" y="110" width="36" height="22" rx="1" class="fill-sunken"/>
+          <text x="1088" y="125" text-anchor="middle" class="mono-sm sv-dim">L1</text>
+          <rect x="1070" y="140" width="36" height="26" rx="1" class="fill-sunken"/>
+          <text x="1088" y="157" text-anchor="middle" class="mono-sm sv-dim">L2</text>
+
+          <line x1="731" y1="176" x2="731" y2="202" class="st-dim" stroke-width="1" marker-end="url(#ar-ink)"/>
+          <line x1="884" y1="176" x2="884" y2="202" class="st-dim" stroke-width="1" marker-end="url(#ar-ink)"/>
+          <line x1="1037" y1="176" x2="1037" y2="202" class="st-dim" stroke-width="1" marker-end="url(#ar-ink)"/>
+
+          <!-- CCX1 L3: 8 MB, half the height of CCX0's -->
+          <rect x="708" y="204" width="403" height="28" rx="2" class="fill-surface"/>
+          <rect x="708" y="204" width="403" height="28" rx="2" class="st-z5c" stroke-width="1.5"/>
+          <text x="909" y="222" text-anchor="middle" class="lbl sv-ink w600">
+            L3 &nbsp;8 MB &nbsp;&middot;&nbsp; 16-way &nbsp;&middot;&nbsp; <tspan class="sv-z5c w600">1 MB per core</tspan>
+          </text>
+          <text x="909" y="250" text-anchor="middle" class="mono-sm sv-faint">identical L1 and L2 to CCX 0 &mdash; only the L3 share and the clock differ</text>
+
+          <!-- ---------- the fabric ---------- -->
+          <line x1="582" y1="228" x2="698" y2="228" class="st-cost" stroke-width="2"
+                marker-start="url(#ar-cost)" marker-end="url(#ar-cost)"/>
+          <text x="640" y="208" text-anchor="middle" class="mono sv-cost w600">Infinity Fabric</text>
+          <text x="640" y="250" text-anchor="middle" class="mono-sm sv-cost">167 ns / handoff</text>
+
+          <!-- ---------- DRAM ---------- -->
+          <line x1="375" y1="260" x2="375" y2="328" class="st-dim" stroke-width="1.25" marker-end="url(#ar-ink)"/>
+          <text x="385" y="298" class="mono-sm sv-dim">L3 miss</text>
+          <line x1="909" y1="232" x2="909" y2="328" class="st-dim" stroke-width="1.25" marker-end="url(#ar-ink)"/>
+          <text x="919" y="298" class="mono-sm sv-dim">L3 miss</text>
+
+          <rect x="160" y="330" width="960" height="64" rx="2" class="fill-sunken"/>
+          <rect x="160" y="330" width="960" height="64" rx="2" class="st-rule" stroke-width="1.25"/>
+          <text x="180" y="356" class="lbl sv-ink w600">LPDDR5X &nbsp;&middot;&nbsp; 14 GB &nbsp;&middot;&nbsp; shared by all 12 cores</text>
+          <text x="180" y="376" class="mono-sm sv-dim">38.5 GB/s with one thread &mdash; and 38.8 GB/s with twelve</text>
+          <text x="1100" y="356" text-anchor="end" class="mono sv-ink w500">104 ns</text>
+          <text x="1100" y="376" text-anchor="end" class="mono-sm sv-dim">530 cycles</text>
+
+          <!-- ---------- SSD ---------- -->
+          <line x1="640" y1="394" x2="640" y2="438" class="st-dim" stroke-width="1.25" marker-end="url(#ar-ink)"/>
+          <text x="650" y="420" class="mono-sm sv-dim">page fault &middot; 440&times; DRAM</text>
+
+          <rect x="160" y="440" width="960" height="56" rx="2" class="fill-sunken"/>
+          <rect x="160" y="440" width="960" height="56" rx="2" class="st-rule" stroke-width="1.25"/>
+          <text x="180" y="464" class="lbl sv-ink w600">NVMe SSD &nbsp;&middot;&nbsp; 931 GB</text>
+          <text x="180" y="482" class="mono-sm sv-dim">2.95 GB/s sequential, O_DIRECT</text>
+          <text x="1100" y="464" text-anchor="end" class="mono sv-ink w500">45.8 &micro;s</text>
+          <text x="1100" y="482" text-anchor="end" class="mono-sm sv-dim">random 4 KB read</text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>The asymmetry is the point.</b> Both complexes run the same instruction set with the
+        same L1 and L2 per core, so nothing in your code distinguishes them &mdash; but a thread
+        scheduled on core&nbsp;0 has four times the last-level cache of a thread on core&nbsp;9,
+        and runs 57% faster in clock terms. A working set of 12&nbsp;MB is an L3 hit on one
+        complex and a DRAM miss on the other.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ FIGURE 2: LATENCY LADDER ============ -->
+  <section>
+    <h2><span class="num">02</span>How far apart the tiers really are</h2>
+    <p class="lede">
+      The floorplan draws the levels as neighbors. On a log scale of measured latency they are
+      nothing of the sort &mdash; and the second row rescales the same measurements so that an
+      L1 hit takes one second.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 250" role="img"
+             aria-label="Logarithmic latency scale from 0.1 nanoseconds to 100 microseconds, marking a register at 0.2 nanoseconds, L1 at 0.78, L2 at 2.73, L3 at 11.9, DRAM at 104 nanoseconds, and the SSD at 45.8 microseconds. Rescaled so an L1 hit is one second, L2 is 3.5 seconds, L3 is 15 seconds, DRAM is 2.2 minutes and the SSD is 16.3 hours.">
+          <!-- axis -->
+          <line x1="70" y1="120" x2="990" y2="120" class="st-rule" stroke-width="1.25"/>
+
+          <line x1="70"  y1="116" x2="70"  y2="126" class="st-rule" stroke-width="1"/>
+          <line x1="217" y1="116" x2="217" y2="126" class="st-rule" stroke-width="1"/>
+          <line x1="363" y1="116" x2="363" y2="126" class="st-rule" stroke-width="1"/>
+          <line x1="510" y1="116" x2="510" y2="126" class="st-rule" stroke-width="1"/>
+          <line x1="657" y1="116" x2="657" y2="126" class="st-rule" stroke-width="1"/>
+          <line x1="803" y1="116" x2="803" y2="126" class="st-rule" stroke-width="1"/>
+          <line x1="950" y1="116" x2="950" y2="126" class="st-rule" stroke-width="1"/>
+
+          <text x="70"  y="142" text-anchor="middle" class="mono-sm sv-faint">0.1 ns</text>
+          <text x="217" y="142" text-anchor="middle" class="mono-sm sv-faint">1 ns</text>
+          <text x="363" y="142" text-anchor="middle" class="mono-sm sv-faint">10 ns</text>
+          <text x="510" y="142" text-anchor="middle" class="mono-sm sv-faint">100 ns</text>
+          <text x="657" y="142" text-anchor="middle" class="mono-sm sv-faint">1 &micro;s</text>
+          <text x="803" y="142" text-anchor="middle" class="mono-sm sv-faint">10 &micro;s</text>
+          <text x="950" y="142" text-anchor="middle" class="mono-sm sv-faint">100 &micro;s</text>
+
+          <!-- register -->
+          <line x1="113" y1="120" x2="113" y2="86" class="st-dim" stroke-width="1"/>
+          <circle cx="113" cy="120" r="3.5" class="sv-dim"/>
+          <text x="113" y="78" text-anchor="middle" class="mono-sm sv-dim">register</text>
+          <text x="113" y="66" text-anchor="middle" class="mono-sm sv-faint">0.20 ns</text>
+
+          <!-- L1 -->
+          <line x1="201" y1="120" x2="201" y2="52" class="st-z5" stroke-width="1.5"/>
+          <circle cx="201" cy="120" r="4.5" class="sv-z5"/>
+          <text x="201" y="44" text-anchor="middle" class="lbl sv-ink w600">L1d</text>
+          <text x="201" y="32" text-anchor="middle" class="mono-sm sv-z5">0.78 ns</text>
+
+          <!-- L2 -->
+          <line x1="281" y1="120" x2="281" y2="86" class="st-z5" stroke-width="1.5"/>
+          <circle cx="281" cy="120" r="4.5" class="sv-z5"/>
+          <text x="281" y="78" text-anchor="middle" class="lbl sv-ink w600">L2</text>
+          <text x="281" y="66" text-anchor="middle" class="mono-sm sv-z5">2.73 ns</text>
+
+          <!-- L3 -->
+          <line x1="375" y1="120" x2="375" y2="52" class="st-z5" stroke-width="1.5"/>
+          <circle cx="375" cy="120" r="4.5" class="sv-z5"/>
+          <text x="375" y="44" text-anchor="middle" class="lbl sv-ink w600">L3</text>
+          <text x="375" y="32" text-anchor="middle" class="mono-sm sv-z5">11.9 ns</text>
+
+          <!-- DRAM -->
+          <line x1="513" y1="120" x2="513" y2="86" class="st-cost" stroke-width="1.5"/>
+          <circle cx="513" cy="120" r="4.5" class="sv-cost"/>
+          <text x="513" y="78" text-anchor="middle" class="lbl sv-ink w600">DRAM</text>
+          <text x="513" y="66" text-anchor="middle" class="mono-sm sv-cost">104 ns</text>
+
+          <!-- SSD -->
+          <line x1="901" y1="120" x2="901" y2="52" class="st-cost" stroke-width="1.5"/>
+          <circle cx="901" cy="120" r="4.5" class="sv-cost"/>
+          <text x="901" y="44" text-anchor="middle" class="lbl sv-ink w600">NVMe SSD</text>
+          <text x="901" y="32" text-anchor="middle" class="mono-sm sv-cost">45.8 &micro;s</text>
+
+          <!-- human scale row -->
+          <line x1="70" y1="186" x2="990" y2="186" class="st-grid" stroke-width="1" stroke-dasharray="3 4"/>
+          <text x="70" y="176" class="cap sv-faint">If an L1 hit took one second</text>
+
+          <text x="113" y="206" text-anchor="middle" class="mono-sm sv-faint">0.25 s</text>
+          <text x="201" y="206" text-anchor="middle" class="mono sv-ink w500">1 s</text>
+          <text x="281" y="206" text-anchor="middle" class="mono sv-dim">3.5 s</text>
+          <text x="375" y="206" text-anchor="middle" class="mono sv-dim">15 s</text>
+          <text x="513" y="206" text-anchor="middle" class="mono sv-cost w500">2.2 min</text>
+          <text x="901" y="206" text-anchor="middle" class="mono sv-cost w500">16.3 h</text>
+
+          <text x="70" y="236" class="mono-sm sv-faint">
+            Random pointer chase, one dependent access at a time &mdash; nothing the prefetcher can hide.
+          </text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Two minutes versus one second.</b> The gap that matters is not L1 to L2, it is cache to
+        DRAM: 133 L1 hits, or roughly 500 instructions this core could have retired instead of
+        waiting. Every optimization on the parent notebook exists to keep accesses to the left of
+        that DRAM mark.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ BANDWIDTH SCALING ============ -->
+  <section id="bandwidth">
+    <h2><span class="num">03</span>One core already saturates DRAM</h2>
+    <p class="lede">
+      Latency is how long <em>one dependent</em> access takes. Bandwidth is how much
+      <em>independent</em> traffic the memory system will sustain, and it is the number that decides
+      whether parallelism helps you. Here it decides that it does not: each thread streams its own
+      slice of a 1 GB array, no sharing, no false sharing, only capacity.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 360" role="img"
+             aria-label="Aggregate DRAM read bandwidth against thread count. One thread reads 38.5 gigabytes per second. Twelve threads read at best 38.8, and by twelve the curve has drifted down to 34.4. Perfect scaling would reach 462 gigabytes per second and leaves the top of the chart before four threads.">
+          <defs>
+            <marker id="b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-faint"/></marker>
+          </defs>
+
+          <!-- axes -->
+          <line x1="120" y1="280" x2="930" y2="280" class="st-rule" stroke-width="1.25"/>
+          <line x1="120" y1="40" x2="120" y2="280" class="st-rule" stroke-width="1.25"/>
+          <g class="st-grid" stroke-width="1">
+            <line x1="120" y1="220" x2="930" y2="220"/>
+            <line x1="120" y1="160" x2="930" y2="160"/>
+            <line x1="120" y1="100" x2="930" y2="100"/>
+            <line x1="120" y1="40"  x2="930" y2="40"/>
+          </g>
+          <g class="mono-sm sv-faint">
+            <text x="112" y="283" text-anchor="end">0</text>
+            <text x="112" y="223" text-anchor="end">40</text>
+            <text x="112" y="163" text-anchor="end">80</text>
+            <text x="112" y="103" text-anchor="end">120</text>
+            <text x="112" y="43"  text-anchor="end">160 GB/s</text>
+          </g>
+
+          <!-- perfect scaling, which leaves the chart before 5 threads -->
+          <line x1="120" y1="222.3" x2="343.8" y2="40" class="st-dim" stroke-width="1.5"
+                stroke-dasharray="6 4"/>
+          <text x="352" y="52" class="mono-sm sv-dim w500">perfect scaling</text>
+          <text x="352" y="66" class="lbl-sm sv-faint">would reach 462 GB/s at 12 threads</text>
+
+          <!-- one-thread reference -->
+          <line x1="120" y1="222.3" x2="930" y2="222.3" class="st-z5" stroke-width="1"
+                stroke-dasharray="3 4"/>
+          <text x="936" y="215" class="mono-sm sv-z5">one thread</text>
+          <text x="936" y="227" class="mono-sm sv-z5">38.5 GB/s</text>
+
+          <!-- Zen 5c boundary -->
+          <line x1="368" y1="240" x2="368" y2="280" class="st-grid" stroke-width="1.25"/>
+          <text x="374" y="252" class="mono-sm sv-faint">Zen 5c cores</text>
+          <text x="374" y="264" class="mono-sm sv-faint">start here</text>
+
+          <!-- measured -->
+          <polyline class="st-cost fill-none" stroke-width="2.5"
+                    points="120,222.3 190.9,222.1 261.8,223.7 332.7,224.8 403.6,223.3 474.5,223.2 545.5,222.4 616.4,221.8 687.3,223.3 758.2,224.5 829.1,227.6 900,228.4"/>
+          <g class="sv-cost">
+            <circle cx="120" cy="222.3" r="3.5"/><circle cx="190.9" cy="222.1" r="3.5"/>
+            <circle cx="261.8" cy="223.7" r="3.5"/><circle cx="332.7" cy="224.8" r="3.5"/>
+            <circle cx="403.6" cy="223.3" r="3.5"/><circle cx="474.5" cy="223.2" r="3.5"/>
+            <circle cx="545.5" cy="222.4" r="3.5"/><circle cx="616.4" cy="221.8" r="3.5"/>
+            <circle cx="687.3" cy="223.3" r="3.5"/><circle cx="758.2" cy="224.5" r="3.5"/>
+            <circle cx="829.1" cy="227.6" r="3.5"/><circle cx="900" cy="228.4" r="3.5"/>
+          </g>
+          <text x="640" y="248" class="mono sv-cost w600">measured</text>
+
+          <!-- the 1.01x callout -->
+          <line x1="616.4" y1="221.8" x2="700" y2="150" class="st-ink" stroke-width="1"
+                marker-start="url(#b1)"/>
+          <rect x="700" y="112" width="228" height="44" rx="2" class="fill-cost"/>
+          <rect x="700" y="112" width="228" height="44" rx="2" class="st-cost" stroke-width="1.25"/>
+          <text x="814" y="131" text-anchor="middle" class="lbl sv-ink w600">best of all thread counts:</text>
+          <text x="814" y="147" text-anchor="middle" class="mono sv-cost w600">38.8 GB/s &mdash; 1.01&times; one thread</text>
+
+          <!-- x labels -->
+          <g class="mono-sm sv-faint">
+            <text x="120" y="298" text-anchor="middle">1</text>
+            <text x="190.9" y="298" text-anchor="middle">2</text>
+            <text x="261.8" y="298" text-anchor="middle">3</text>
+            <text x="332.7" y="298" text-anchor="middle">4</text>
+            <text x="403.6" y="298" text-anchor="middle">5</text>
+            <text x="474.5" y="298" text-anchor="middle">6</text>
+            <text x="545.5" y="298" text-anchor="middle">7</text>
+            <text x="616.4" y="298" text-anchor="middle">8</text>
+            <text x="687.3" y="298" text-anchor="middle">9</text>
+            <text x="758.2" y="298" text-anchor="middle">10</text>
+            <text x="829.1" y="298" text-anchor="middle">11</text>
+            <text x="900" y="298" text-anchor="middle">12</text>
+          </g>
+          <text x="525" y="318" text-anchor="middle" class="lbl sv-dim">threads, one per physical core</text>
+
+          <text x="120" y="344" class="mono-sm sv-faint">
+            Each thread streams its own contiguous slice, so there is no sharing to pay for. Aggregate
+            is total bytes over the slowest thread's time, not the sum of per-thread rates.
+          </text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Twelve times the cores, 1.01&times; the bandwidth.</b> The curve is not merely
+        sublinear &mdash; it is flat, and past ten threads it bends <em>down</em>, because the extra
+        threads are Zen 5c cores contending for a memory controller that was already saturated by
+        the first one.
+      </figcaption>
+    </figure>
+
+    <p>
+      This is the single most consequential number on this page for anyone about to parallelize
+      something. A memory-bound loop gets <strong>no speedup at all</strong> from more cores here.
+      Not a disappointing speedup &mdash; none. Amdahl&rsquo;s law is not what is binding; the memory
+      controller is.
+    </p>
+    <p>
+      Parallelism still pays when the extra threads bring extra <em>cache</em> with them, since every
+      core has its own L1 and L2, or when the work is genuinely compute-bound. The dividing line is
+      the machine&rsquo;s balance: a Zen 5 core retires two 512-bit FMAs per cycle, so
+      <code>2 &times; 8 doubles &times; 2 flops = 32 flops/cycle</code>, or 162 GFLOP/s at 5.07 GHz,
+      against 38.5 GB/s of DRAM &mdash; 4.8 billion doubles per second.
+    </p>
+    <div class="note warn">
+      <h3>About 34 flops per double</h3>
+      <p>
+        <code>162 GFLOP/s &divide; 4.8 Gdouble/s &asymp; 34</code>. If your loop does fewer than
+        roughly 34 floating-point operations per element it reads from DRAM, it is not a computation
+        &mdash; it is a memory system with some arithmetic attached, and this flat line is your
+        ceiling. Dot products, <code>saxpy</code>, most elementwise array work and every graph
+        traversal sit far below that line. Dense matrix multiply is one of the few common kernels
+        above it, which is exactly why it is the example everyone tiles.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ FIGURE 3: SHARING ============ -->
+  <section>
+    <h2><span class="num">04</span>What it costs two threads to share a line</h2>
+    <p class="lede">
+      A cache line is owned by one core at a time. When a second core writes it, the line has to
+      travel &mdash; and how far it travels depends entirely on where the scheduler put the two
+      threads. These are measured handoffs of one line, one way.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 260" role="img"
+             aria-label="Four cases for handing one cache line between two threads. Between SMT siblings on one core the line stays in L1 and costs 18 nanoseconds. Between two Zen 5 cores it travels through the shared L3 and costs 20 nanoseconds. Between two Zen 5c cores, 30 nanoseconds. Between cores in different complexes it crosses the Infinity Fabric and costs 167 nanoseconds.">
+          <defs>
+            <marker id="ar2-ink" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+              <path d="M0,1 L9,5 L0,9 z" class="sv-dim"/>
+            </marker>
+            <marker id="ar2-cost" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+              <path d="M0,1 L9,5 L0,9 z" class="sv-cost"/>
+            </marker>
+          </defs>
+
+          <!-- ---- A: SMT siblings ---- -->
+          <text x="118" y="20" text-anchor="middle" class="cap sv-faint">Same core</text>
+          <rect x="48" y="34" width="140" height="70" rx="2" class="fill-surface"/>
+          <rect x="48" y="34" width="140" height="70" rx="2" class="st-z5" stroke-width="1.25"/>
+          <rect x="60" y="48" width="50" height="24" rx="1" class="fill-sunken"/>
+          <text x="85" y="64" text-anchor="middle" class="mono-sm sv-dim">T0</text>
+          <rect x="126" y="48" width="50" height="24" rx="1" class="fill-sunken"/>
+          <text x="151" y="64" text-anchor="middle" class="mono-sm sv-dim">T1</text>
+          <line x1="112" y1="60" x2="124" y2="60" class="st-dim" stroke-width="1.25"
+                marker-start="url(#ar2-ink)" marker-end="url(#ar2-ink)"/>
+          <text x="118" y="92" text-anchor="middle" class="mono-sm sv-faint">shared L1</text>
+          <text x="118" y="152" text-anchor="middle" class="mono-lg sv-ink">18 ns</text>
+          <text x="118" y="172" text-anchor="middle" class="lbl-sm sv-dim">line never leaves the core</text>
+
+          <!-- ---- B: same complex, Zen 5 ---- -->
+          <text x="386" y="20" text-anchor="middle" class="cap sv-z5">CCX 0 &middot; Zen 5</text>
+          <rect x="316" y="34" width="60" height="42" rx="2" class="fill-surface"/>
+          <rect x="316" y="34" width="60" height="42" rx="2" class="st-z5" stroke-width="1.25"/>
+          <text x="346" y="60" text-anchor="middle" class="mono-sm sv-dim">c0</text>
+          <rect x="396" y="34" width="60" height="42" rx="2" class="fill-surface"/>
+          <rect x="396" y="34" width="60" height="42" rx="2" class="st-z5" stroke-width="1.25"/>
+          <text x="426" y="60" text-anchor="middle" class="mono-sm sv-dim">c1</text>
+          <line x1="346" y1="76" x2="346" y2="98" class="st-dim" stroke-width="1.25" marker-end="url(#ar2-ink)"/>
+          <line x1="426" y1="98" x2="426" y2="76" class="st-dim" stroke-width="1.25" marker-end="url(#ar2-ink)"/>
+          <rect x="316" y="100" width="140" height="24" rx="2" class="fill-sunken"/>
+          <rect x="316" y="100" width="140" height="24" rx="2" class="st-z5" stroke-width="1.25"/>
+          <text x="386" y="116" text-anchor="middle" class="mono-sm sv-dim">L3 &nbsp;16 MB</text>
+          <text x="386" y="152" text-anchor="middle" class="mono-lg sv-ink">20 ns</text>
+          <text x="386" y="172" text-anchor="middle" class="lbl-sm sv-dim">resolves in the shared L3</text>
+
+          <!-- ---- C: same complex, Zen 5c ---- -->
+          <text x="654" y="20" text-anchor="middle" class="cap sv-z5c">CCX 1 &middot; Zen 5c</text>
+          <rect x="584" y="34" width="60" height="42" rx="2" class="fill-surface"/>
+          <rect x="584" y="34" width="60" height="42" rx="2" class="st-z5c" stroke-width="1.25"/>
+          <text x="614" y="60" text-anchor="middle" class="mono-sm sv-dim">c5</text>
+          <rect x="664" y="34" width="60" height="42" rx="2" class="fill-surface"/>
+          <rect x="664" y="34" width="60" height="42" rx="2" class="st-z5c" stroke-width="1.25"/>
+          <text x="694" y="60" text-anchor="middle" class="mono-sm sv-dim">c6</text>
+          <line x1="614" y1="76" x2="614" y2="98" class="st-dim" stroke-width="1.25" marker-end="url(#ar2-ink)"/>
+          <line x1="694" y1="98" x2="694" y2="76" class="st-dim" stroke-width="1.25" marker-end="url(#ar2-ink)"/>
+          <rect x="584" y="100" width="140" height="24" rx="2" class="fill-sunken"/>
+          <rect x="584" y="100" width="140" height="24" rx="2" class="st-z5c" stroke-width="1.25"/>
+          <text x="654" y="116" text-anchor="middle" class="mono-sm sv-dim">L3 &nbsp;8 MB</text>
+          <text x="654" y="152" text-anchor="middle" class="mono-lg sv-ink">30 ns</text>
+          <text x="654" y="172" text-anchor="middle" class="lbl-sm sv-dim">same path, slower clock</text>
+
+          <!-- ---- D: across complexes ---- -->
+          <text x="922" y="20" text-anchor="middle" class="cap sv-cost">Across complexes</text>
+          <rect x="852" y="34" width="60" height="42" rx="2" class="fill-surface"/>
+          <rect x="852" y="34" width="60" height="42" rx="2" class="st-z5" stroke-width="1.25"/>
+          <text x="882" y="60" text-anchor="middle" class="mono-sm sv-dim">c0</text>
+          <rect x="932" y="34" width="60" height="42" rx="2" class="fill-surface"/>
+          <rect x="932" y="34" width="60" height="42" rx="2" class="st-z5c" stroke-width="1.25"/>
+          <text x="962" y="60" text-anchor="middle" class="mono-sm sv-dim">c5</text>
+          <line x1="882" y1="76" x2="882" y2="94" class="st-cost" stroke-width="1.25"/>
+          <line x1="962" y1="76" x2="962" y2="94" class="st-cost" stroke-width="1.25"/>
+          <rect x="852" y="96" width="60" height="18" rx="2" class="fill-sunken"/>
+          <rect x="852" y="96" width="60" height="18" rx="2" class="st-z5" stroke-width="1"/>
+          <text x="882" y="109" text-anchor="middle" class="mono-sm sv-faint">L3</text>
+          <rect x="932" y="96" width="60" height="18" rx="2" class="fill-sunken"/>
+          <rect x="932" y="96" width="60" height="18" rx="2" class="st-z5c" stroke-width="1"/>
+          <text x="962" y="109" text-anchor="middle" class="mono-sm sv-faint">L3</text>
+          <line x1="882" y1="114" x2="882" y2="128" class="st-cost" stroke-width="1.25"/>
+          <line x1="962" y1="114" x2="962" y2="128" class="st-cost" stroke-width="1.25"/>
+          <rect x="852" y="128" width="140" height="20" rx="2" class="fill-cost"/>
+          <rect x="852" y="128" width="140" height="20" rx="2" class="st-cost" stroke-width="1.25"/>
+          <text x="922" y="142" text-anchor="middle" class="mono-sm sv-cost">Infinity Fabric</text>
+          <text x="922" y="176" text-anchor="middle" class="mono-lg sv-cost">167 ns</text>
+          <text x="922" y="196" text-anchor="middle" class="lbl-sm sv-cost">slower than missing to DRAM</text>
+
+          <line x1="48" y1="222" x2="992" y2="222" class="st-grid" stroke-width="1"/>
+          <text x="48" y="242" class="mono-sm sv-faint">
+            Ping-pong of one 64-byte line, 200,000 exchanges, median of five runs, threads pinned.
+            Cross-complex handoffs also scatter between 67 and 171 ns run to run; the others repeat to within a few percent.
+          </text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Placement is an 8&times; decision you never wrote down.</b> The same two-thread program
+        pays 20&nbsp;ns or 167&nbsp;ns per handoff depending on which cores the scheduler picked.
+        Worse, the expensive case is also the unstable one, and a barrier waits for the tail.
+        None of these match the latency scale above &mdash; &sect;05 takes them apart.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ DECOMPOSITION ============ -->
+  <section>
+    <h2><span class="num">05</span>Why a handoff costs more than a cache hit</h2>
+    <p class="lede">
+      Those four numbers do not line up with the latency scale, and the mismatch is worth chasing.
+      Two threads sharing an L1 &mdash; a cache with a <strong>0.78 ns</strong> hit time &mdash;
+      take <strong>18 ns</strong> to pass a line. Two complexes take <strong>167 ns</strong>, which
+      is <em>slower than fetching from DRAM</em>. Neither is an anomaly; the two benchmarks measure
+      different quantities.
+    </p>
+    <p>
+      Latency times <strong>one uncontended load from a passive cache</strong>: the line is sitting
+      there, nobody else wants it, and the only question is how far away it is. A handoff is a
+      <strong>contended ownership transfer between two active cores</strong>, and it is mediated by
+      software &mdash; the receiving thread has to <em>notice</em> the write by polling. That poll
+      has a granularity, and on this machine the granularity dwarfs a cache hit.
+    </p>
+
+    <div class="tablewrap">
+      <table class="compact">
+        <thead>
+          <tr>
+            <th scope="col">Waiter&rsquo;s core</th>
+            <th scope="col">PAUSE</th>
+            <th scope="col">Poll without PAUSE</th>
+            <th scope="col">Polling quantum</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Zen 5 @ 5.09 GHz</td><td>65 cyc</td><td>0.21 ns</td><td>12.87 ns</td></tr>
+          <tr><td>Zen 5c @ 3.25 GHz</td><td>65 cyc</td><td>0.31 ns</td><td>20.13 ns</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13.5px" class="lede">
+      <code>PAUSE</code> costs the same <strong>~62&ndash;65 cycles</strong> on both core types, so its
+      cost in nanoseconds tracks the clock &mdash; and the 1.56&times; ratio between those two
+      quantum figures is exactly the 1.57&times; ratio between the two clocks. A spin loop without it polls in 0.19 ns &mdash; but
+      removing <code>PAUSE</code> makes the whole benchmark <em>slower</em>, because a core
+      hammering the line stops the writer from ever winning ownership.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 300" role="img"
+             aria-label="Stacked bars splitting each measured handoff into the waiter's PAUSE polling quantum and the remaining coherence work. SMT siblings: 12.9 nanoseconds of polling plus about 5 nanoseconds, with no data movement. Within complex zero: 12.9 plus 8. Within complex one: 20.1 plus 10.6. Across complexes: 12.9 plus 154, far beyond the 104-nanosecond DRAM fetch marked on the axis.">
+          <defs>
+            <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M0,1 L9,5 L0,9 z" class="sv-faint"/>
+            </marker>
+          </defs>
+
+          <!-- legend -->
+          <rect x="200" y="12" width="12" height="12" rx="1" class="fill-sunken"/>
+          <rect x="200" y="12" width="12" height="12" rx="1" class="st-rule" stroke-width="1"/>
+          <text x="219" y="22" class="lbl-sm sv-dim">waiting to notice it &mdash; PAUSE quantum</text>
+          <rect x="470" y="12" width="12" height="12" rx="1" class="sv-dim"/>
+          <text x="489" y="22" class="lbl-sm sv-dim">moving the line &mdash; coherence work, colored by complex</text>
+
+          <!-- DRAM reference -->
+          <line x1="656" y1="44" x2="656" y2="248" class="st-cost" stroke-width="1"
+                stroke-dasharray="4 4"/>
+          <text x="656" y="40" text-anchor="middle" class="mono-sm sv-cost">DRAM fetch &middot; 104 ns</text>
+
+          <!-- row 1: SMT -->
+          <text x="180" y="69" text-anchor="end" class="lbl sv-ink w600">SMT siblings</text>
+          <text x="180" y="82" text-anchor="end" class="mono-sm sv-faint">line never moves</text>
+          <rect x="200" y="56" width="56.6" height="30" class="fill-sunken"/>
+          <rect x="200" y="56" width="56.6" height="30" class="st-rule" stroke-width="1"/>
+          <rect x="256.6" y="56" width="23.7" height="30" class="sv-dim"/>
+          <text x="292" y="75" class="mono sv-ink w500">18.3 ns</text>
+
+          <!-- row 2: CCX0 -->
+          <text x="180" y="117" text-anchor="end" class="lbl sv-ink w600">CCX 0 &middot; Zen 5</text>
+          <text x="180" y="130" text-anchor="end" class="mono-sm sv-faint">via 16 MB L3</text>
+          <rect x="200" y="104" width="56.6" height="30" class="fill-sunken"/>
+          <rect x="200" y="104" width="56.6" height="30" class="st-rule" stroke-width="1"/>
+          <rect x="256.6" y="104" width="35.1" height="30" class="sv-z5"/>
+          <text x="303" y="123" class="mono sv-ink w500">20.9 ns</text>
+
+          <!-- row 3: CCX1 -->
+          <text x="180" y="165" text-anchor="end" class="lbl sv-ink w600">CCX 1 &middot; Zen 5c</text>
+          <text x="180" y="178" text-anchor="end" class="mono-sm sv-faint">via 8 MB L3</text>
+          <rect x="200" y="152" width="88.2" height="30" class="fill-sunken"/>
+          <rect x="200" y="152" width="88.2" height="30" class="st-rule" stroke-width="1"/>
+          <rect x="288.2" y="152" width="46.5" height="30" class="sv-z5c"/>
+          <text x="346" y="171" class="mono sv-ink w500">30.7 ns</text>
+
+          <!-- row 4: cross -->
+          <text x="180" y="223" text-anchor="end" class="lbl sv-cost w600">Across complexes</text>
+          <text x="180" y="236" text-anchor="end" class="mono-sm sv-faint">via Infinity Fabric</text>
+          <rect x="200" y="210" width="56.6" height="30" class="fill-sunken"/>
+          <rect x="200" y="210" width="56.6" height="30" class="st-rule" stroke-width="1"/>
+          <rect x="256.6" y="210" width="676.4" height="30" class="sv-cost"/>
+          <text x="944" y="229" class="mono sv-cost w500">167 ns</text>
+
+          <!-- axis -->
+          <line x1="200" y1="248" x2="990" y2="248" class="st-rule" stroke-width="1.25"/>
+          <line x1="200" y1="248" x2="200" y2="254" class="st-rule" stroke-width="1"/>
+          <line x1="309.7" y1="248" x2="309.7" y2="254" class="st-rule" stroke-width="1"/>
+          <line x1="419.5" y1="248" x2="419.5" y2="254" class="st-rule" stroke-width="1"/>
+          <line x1="529.2" y1="248" x2="529.2" y2="254" class="st-rule" stroke-width="1"/>
+          <line x1="638.9" y1="248" x2="638.9" y2="254" class="st-rule" stroke-width="1"/>
+          <line x1="748.6" y1="248" x2="748.6" y2="254" class="st-rule" stroke-width="1"/>
+          <line x1="858.4" y1="248" x2="858.4" y2="254" class="st-rule" stroke-width="1"/>
+          <line x1="968.1" y1="248" x2="968.1" y2="254" class="st-rule" stroke-width="1"/>
+          <text x="200" y="268" text-anchor="middle" class="mono-sm sv-faint">0</text>
+          <text x="309.7" y="268" text-anchor="middle" class="mono-sm sv-faint">25</text>
+          <text x="419.5" y="268" text-anchor="middle" class="mono-sm sv-faint">50</text>
+          <text x="529.2" y="268" text-anchor="middle" class="mono-sm sv-faint">75</text>
+          <text x="638.9" y="268" text-anchor="middle" class="mono-sm sv-faint">100</text>
+          <text x="748.6" y="268" text-anchor="middle" class="mono-sm sv-faint">125</text>
+          <text x="858.4" y="268" text-anchor="middle" class="mono-sm sv-faint">150</text>
+          <text x="968.1" y="268" text-anchor="middle" class="mono-sm sv-faint">175 ns</text>
+
+          <text x="200" y="290" class="mono-sm sv-faint">
+            Split subtracts one full polling quantum &mdash; the conservative reading. A waiter that
+            catches the write mid-quantum shifts up to 6 ns from the left segment into the right.
+          </text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Most of the three local bars is apparatus, not data movement.</b> Subtract the polling
+        quantum and the coherence work lands at roughly 5, 8 and 11 ns &mdash; and the two
+        complexes, which look 50% apart, are doing comparable work.
+      </figcaption>
+    </figure>
+
+    <dl class="puzzles">
+      <div>
+        <dt>18 ns between SMT siblings, when L1 hits in 0.78 ns</dt>
+        <dd>
+          The line genuinely never moves &mdash; those two threads share one L1. So all 18 ns is
+          apparatus: the waiter&rsquo;s PAUSE quantum, the store draining out of the store buffer,
+          and two threads contending for one core&rsquo;s pipeline. This row is the benchmark&rsquo;s
+          noise floor, and it is what proves the other rows are mostly floor too.
+        </dd>
+      </div>
+      <div>
+        <dt>30 ns inside CCX 1 against 20 ns inside CCX 0</dt>
+        <dd>
+          Not a slower cache. The same PAUSE costs 20.1 ns on a 3.25 GHz Zen 5c core and 12.9 ns on a 5.09 GHz Zen 5 core, so
+          most of the difference is the Zen 5c core being slower <em>at waiting</em>. Subtract the
+          quantum and both complexes do 8&ndash;11 ns of coherence work, landing right on the
+          measured L3 hit range of 8&ndash;11.9 ns.
+        </dd>
+      </div>
+      <div>
+        <dt>167 ns across the fabric, when DRAM answers in 104 ns</dt>
+        <dd>
+          DRAM is a one-way fetch of a line nobody owns: core &rarr; controller &rarr; DRAM &rarr;
+          core. A cross-complex handoff is a round trip through a protocol &mdash; acquire
+          ownership, cross the fabric to the directory, probe the remote complex, extract the line
+          <em>dirty out of another core&rsquo;s L1</em>, carry it back across the fabric. Several
+          traversals against DRAM&rsquo;s one, over a fabric that is power-managed on a laptop.
+          That last part is also why this row, alone among the four, scatters between 67 and 171 ns.
+        </dd>
+      </div>
+    </dl>
+
+    <div class="note">
+      <h3>Which number applies to your code</h3>
+      <p>
+        <strong>Locks and producer/consumer queues really do pay the polling quantum</strong> &mdash;
+        a waiter there is doing exactly what this benchmark does, so 18&ndash;167 ns is the honest
+        figure. <strong>False sharing does not.</strong> Those threads are not waiting on each
+        other, only writing, so the cost per contended write is the coherence segment alone:
+        roughly 8&ndash;14 ns inside a complex, ~150 ns across it.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ CONSEQUENCES ============ -->
+  <section>
+    <h2><span class="num">06</span>Four numbers the map cannot draw</h2>
+    <p class="lede">
+      Capacity and latency are only half of it. These came out of the same benchmark runs and each
+      one changes how you write the loop. The second has its own page, because it is the one nobody
+      believes until they see the address arithmetic.
+    </p>
+    <div class="cards">
+      <div class="card c-z5">
+        <div class="figure">77&times;</div>
+        <h3>Prefetching, when the pattern is predictable</h3>
+        <p>
+          Sequential access at DRAM sizes costs 1.8&nbsp;ns instead of 104&nbsp;ns. The hardware
+          issues the loads before you ask. Pointer chasing and hash probes get none of this.
+        </p>
+      </div>
+      <div class="card c-cost">
+        <div class="figure">32&times;</div>
+        <h3>The cost of a power-of-two row length</h3>
+        <p>
+          A 1024&times;1024 matrix walked down its columns takes 9.8 ns per element. Add one unused
+          element to each row and it takes 0.36 ns &mdash; a bigger array, 27&times; faster, because
+          of where four bits sit in the address.
+        </p>
+        <p class="more"><a href="why_1024_is_slow.html">Read the full explanation &rarr;</a></p>
+      </div>
+      <div class="card c-z5c">
+        <div class="figure">2.4&times;</div>
+        <h3>Address translation, on 4 KB pages</h3>
+        <p>
+          The L1 DTLB holds 96 translations &mdash; 384&nbsp;KB of reach, less than this core&rsquo;s
+          L2. A 12&nbsp;MB working set that fits in L3 spans 3,072 pages, so it pays a page walk
+          almost every access.
+        </p>
+        <p class="more"><a href="tlb_cliff.html">Read the full explanation &rarr;</a></p>
+      </div>
+      <div class="card c-ink">
+        <div class="figure">1.01&times;</div>
+        <h3>What twelve cores add to DRAM bandwidth</h3>
+        <p>
+          One thread reads 38.5&nbsp;GB/s; twelve threads read 38.8&nbsp;GB/s. A memory-bound loop
+          gets no speedup from more cores on this machine &mdash; not a poor one, none.
+        </p>
+        <p class="more"><a href="#bandwidth">See the scaling curve &rarr;</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TABLE ============ -->
+  <section>
+    <h2><span class="num">07</span>Every number on this page</h2>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Level</th>
+            <th scope="col">Capacity</th>
+            <th scope="col">Assoc.</th>
+            <th scope="col">Latency</th>
+            <th scope="col">Cycles</th>
+            <th scope="col">Read BW</th>
+            <th scope="col">Shared by</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Register</td><td>&mdash;</td><td>&mdash;</td><td>0.20 ns</td><td>1</td><td>&mdash;</td><td>one thread</td></tr>
+          <tr><td>L1d</td><td>48 KB</td><td>12-way</td><td>0.78 ns</td><td>4</td><td>223 GB/s</td><td>one core, 2 threads</td></tr>
+          <tr><td>L1i</td><td>32 KB</td><td>8-way</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>one core, 2 threads</td></tr>
+          <tr><td>L2</td><td>1 MB</td><td>16-way</td><td>2.73 ns</td><td>14</td><td>165 GB/s</td><td>one core, 2 threads</td></tr>
+          <tr><td>L3 &mdash; CCX 0</td><td>16 MB</td><td>16-way</td><td>5.2&ndash;11.9 ns</td><td>27&ndash;60</td><td>157 GB/s</td><td>4 Zen 5 cores</td></tr>
+          <tr><td>L3 &mdash; CCX 1</td><td>8 MB</td><td>16-way</td><td>5.2&ndash;11.9 ns</td><td>27&ndash;60</td><td>157 GB/s</td><td>8 Zen 5c cores</td></tr>
+          <tr class="divide"><td>DRAM</td><td>14 GB</td><td>&mdash;</td><td>104 ns</td><td>530</td><td>38.5 GB/s</td><td>everything</td></tr>
+          <tr><td>NVMe SSD</td><td>931 GB</td><td>&mdash;</td><td>45.8 &micro;s</td><td>232,000</td><td>2.95 GB/s</td><td>everything, persistently</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lede" style="font-size:13.5px">
+      Cache line is 64 bytes at every level. Cycle counts use the 5.07 GHz the Zen 5 cores held
+      during the runs; the Zen 5c cores top out at 3.29 GHz, so their cycle counts differ while
+      their nanoseconds do not.
+    </p>
+  </section>
+
+  <footer class="colophon">
+    <h2>How this was measured</h2>
+    <p>
+      Six C benchmarks, single-threaded ones pinned to <code>cpu0</code>, on an otherwise idle
+      machine. Latency comes from a <strong>randomized pointer chase</strong> &mdash; a fixed stride
+      would measure the prefetcher rather than the cache. The core clock is re-measured with a
+      dependent add chain immediately before every data point, because this part moves between 0.6
+      and 5.16 GHz and a clock sampled once at startup silently corrupts every cycle count.
+      Capacities and associativity are read from <code>/sys/devices/system/cpu/cpu*/cache/</code>,
+      not from a datasheet. Handoff costs come from a 200,000-exchange ping-pong of one line
+      between pinned threads; the PAUSE and polling figures in &sect;05 come from <code>spin_cost.c</code>,
+      run on each core type.
+    </p>
+    <p>
+      Sources and raw <code>.csv</code> results are in this directory; the full write-up is
+      <a href="cache_hierarchy.ipynb">cache_hierarchy.ipynb</a>.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>

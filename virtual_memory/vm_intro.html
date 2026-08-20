@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Three Illusions (vm_intro.html) -- generated for the pppe26 repo; opens
+     standalone in any browser, no server and no external assets beyond the
+     web fonts, which fall back to system faces offline. -->
+<title>Three Illusions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* the hosted version of this page got a reset from its runtime; standalone,
+   it brings its own */
+html{-webkit-text-size-adjust:100%}
+figure,blockquote,dl,dd{margin:0}
+ul,ol{margin:0}
+img,svg{max-width:100%}
+
+:root{
+  --bg:#F3F2F7;
+  --surface:#FFFFFF;
+  --sunken:#E7E6EF;
+  --ink:#191824;
+  --ink-2:#514E63;
+  --ink-3:#827E96;
+  --rule:#D2D0DE;
+  --grid:#E0DEEA;
+  /* same key as the companion page: virtual is indigo, physical is bronze,
+     and the cost of crossing between them is crimson */
+  --virt:#5A4FCF;
+  --virt-soft:#E6E4F8;
+  --phys:#8C5D18;
+  --phys-soft:#F3E7D4;
+  --cost:#A82D4E;
+  --cost-soft:#F7DCE4;
+  --shadow:0 1px 2px rgba(25,24,36,.06), 0 10px 28px rgba(25,24,36,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111019; --surface:#1A1826; --sunken:#0D0C14;
+    --ink:#EAE8F4; --ink-2:#A8A3BF; --ink-3:#78738F;
+    --rule:#302D40; --grid:#262336;
+    --virt:#9A90F0; --virt-soft:#1E1B33;
+    --phys:#D9A45A; --phys-soft:#2A2015;
+    --cost:#EE7A98; --cost-soft:#2E1521;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111019; --surface:#1A1826; --sunken:#0D0C14;
+  --ink:#EAE8F4; --ink-2:#A8A3BF; --ink-3:#78738F;
+  --rule:#302D40; --grid:#262336;
+  --virt:#9A90F0; --virt-soft:#1E1B33;
+  --phys:#D9A45A; --phys-soft:#2A2015;
+  --cost:#EE7A98; --cost-soft:#2E1521;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Source Serif 4",Georgia,"Times New Roman",serif;
+  font-size:18px;line-height:1.72;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:820px;margin:0 auto;padding:52px 28px 96px;
+      display:flex;flex-direction:column;gap:0}
+
+/* ---------- front matter ---------- */
+.masthead{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--virt);margin:0;
+}
+h1{
+  font-family:Sora,ui-sans-serif,system-ui,sans-serif;
+  font-weight:700;font-size:clamp(2.1rem,5.4vw,3.2rem);
+  line-height:1.05;letter-spacing:-.03em;margin:0;text-wrap:balance;
+}
+.standfirst{margin:0;font-size:1.15rem;color:var(--ink-2);max-width:60ch}
+.standfirst b{color:var(--ink);font-weight:600}
+
+.toc{
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  padding:16px 0;margin:22px 0 0;
+  display:flex;flex-direction:column;gap:7px;
+}
+.toc a{
+  display:flex;gap:14px;align-items:baseline;text-decoration:none;
+  font-family:"Source Serif 4",serif;color:var(--ink);
+}
+.toc a:hover .t{text-decoration:underline;text-underline-offset:3px}
+.toc .n{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--virt);
+        flex:0 0 auto;width:2.4em}
+.toc .t{font-weight:600}
+.toc .d{color:var(--ink-3);font-size:.95rem}
+
+/* ---------- chapters ---------- */
+.chapter{margin-top:56px;padding-top:34px;border-top:2px solid var(--rule);
+         display:flex;flex-direction:column;gap:18px;scroll-margin-top:20px}
+.chapter-label{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--virt);margin:0;
+}
+h2{
+  font-family:Sora,ui-sans-serif,system-ui,sans-serif;
+  font-weight:600;font-size:1.85rem;letter-spacing:-.025em;
+  margin:0;text-wrap:balance;line-height:1.15;
+}
+h3{
+  font-family:Sora,ui-sans-serif,system-ui,sans-serif;
+  font-weight:600;font-size:1.12rem;letter-spacing:-.01em;
+  margin:16px 0 0;text-wrap:balance;
+}
+p{margin:0;max-width:66ch}
+p + p{margin-top:.9em}
+strong{font-weight:600}
+em{font-style:italic}
+.lede{font-size:1.06rem;color:var(--ink-2)}
+
+code{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.84em;
+  background:var(--sunken);padding:1px 5px;border-radius:2px;color:var(--ink);
+}
+pre{
+  margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:4px;
+  padding:16px 18px;overflow-x:auto;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;line-height:1.7;
+  color:var(--ink-2);
+}
+pre b{color:var(--ink);font-weight:500}
+pre .v{color:var(--virt);font-weight:500}
+pre .p{color:var(--phys);font-weight:500}
+pre .c{color:var(--ink-3);font-style:italic}
+pre .hot{color:var(--cost);font-weight:500}
+
+ul.plain{margin:0;padding-left:1.15em;max-width:66ch}
+ul.plain li{margin:.35em 0}
+ul.plain li::marker{color:var(--virt)}
+
+/* ---------- figures ---------- */
+figure{
+  margin:8px 0;background:var(--surface);border:1px solid var(--rule);border-radius:4px;
+  box-shadow:var(--shadow);padding:22px 22px 16px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.canvas{overflow-x:auto;overflow-y:hidden}
+figure svg{display:block;width:100%;min-width:560px;height:auto}
+figcaption{
+  font-size:13.5px;color:var(--ink-2);border-top:1px solid var(--grid);padding-top:12px;
+  font-family:"Source Serif 4",serif;
+}
+figcaption b{color:var(--ink);font-weight:600;
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.06em;
+  text-transform:uppercase;margin-right:.5em}
+
+.sv-ink{fill:var(--ink)}
+.sv-dim{fill:var(--ink-2)}
+.sv-faint{fill:var(--ink-3)}
+.sv-virt{fill:var(--virt)}
+.sv-phys{fill:var(--phys)}
+.sv-cost{fill:var(--cost)}
+.fill-surface{fill:var(--surface)}
+.fill-sunken{fill:var(--sunken)}
+.fill-virt{fill:var(--virt-soft)}
+.fill-phys{fill:var(--phys-soft)}
+.fill-cost{fill:var(--cost-soft)}
+.fill-none{fill:none}
+.st-rule{stroke:var(--rule);fill:none}
+.st-grid{stroke:var(--grid);fill:none}
+.st-dim{stroke:var(--ink-2);fill:none}
+.st-virt{stroke:var(--virt);fill:none}
+.st-phys{stroke:var(--phys);fill:none}
+.st-cost{stroke:var(--cost);fill:none}
+.lbl{font-family:"Source Serif 4",serif;font-size:12px}
+.lbl-sm{font-family:"Source Serif 4",serif;font-size:10.5px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px}
+.mono-sm{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9px}
+.cap{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9.5px;
+     letter-spacing:.13em;text-transform:uppercase}
+.w500{font-weight:500}
+.w600{font-weight:600}
+
+/* ---------- pedagogy boxes ---------- */
+.box{
+  border:1px solid var(--rule);border-radius:4px;background:var(--surface);
+  padding:17px 20px;display:flex;flex-direction:column;gap:7px;margin:6px 0;
+}
+.box .cap{color:var(--virt)}
+.box p{font-size:.95rem;color:var(--ink-2)}
+.box.confusion{border-left:3px solid var(--cost)}
+.box.confusion .cap{color:var(--cost)}
+.box.nutshell{background:var(--virt-soft);border-color:var(--virt)}
+.box.nutshell p{color:var(--ink)}
+
+details.check{
+  border:1px solid var(--rule);border-radius:4px;background:var(--surface);
+  padding:14px 18px;margin:6px 0;
+}
+details.check summary{
+  cursor:pointer;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--virt);
+}
+details.check summary:hover{color:var(--ink)}
+details.check summary::marker{color:var(--virt)}
+details.check p{margin-top:11px;font-size:.95rem;color:var(--ink-2)}
+details.check[open] summary{margin-bottom:2px}
+
+/* ---------- tables ---------- */
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;
+           background:var(--surface);margin:6px 0}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:14.5px}
+th,td{padding:10px 16px;text-align:left;border-bottom:1px solid var(--grid);
+      vertical-align:top}
+thead th{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9.5px;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:500;background:var(--sunken);white-space:nowrap;
+}
+tbody td:first-child{font-weight:600;color:var(--ink);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+
+/* ---------- colophon ---------- */
+.colophon{
+  border-top:2px solid var(--rule);padding-top:24px;margin-top:56px;
+  display:flex;flex-direction:column;gap:10px;font-size:14px;color:var(--ink-2);
+}
+.colophon h2{font-size:1.1rem}
+a{color:var(--ink);text-decoration-color:var(--ink-3);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--ink)}
+a:focus-visible{outline:2px solid var(--virt);outline-offset:3px;border-radius:2px}
+
+@media (max-width:640px){
+  .wrap{padding:36px 18px 64px}
+  body{font-size:17px}
+  figure{padding:16px 14px 12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+    <p class="eyebrow">An introduction</p>
+    <h1>Three Illusions</h1>
+    <p class="standfirst">
+      Three things your program believes that are not true: that it has the machine's memory to
+      itself, that <b>malloc</b> gave it memory, and that <b>fork</b> copied that memory. Each
+      belief is useful, each is maintained by a specific mechanism, and knowing the mechanism
+      explains a surprising amount of behaviour that otherwise looks arbitrary.
+    </p>
+
+    <nav class="toc">
+      <a href="#vm"><span class="n">1</span><span><span class="t">Virtual memory</span>
+        <span class="d">&mdash; why your addresses are not addresses</span></span></a>
+      <a href="#malloc"><span class="n">2</span><span><span class="t">malloc</span>
+        <span class="d">&mdash; who actually gives you memory, and when</span></span></a>
+      <a href="#fork"><span class="n">3</span><span><span class="t">fork</span>
+        <span class="d">&mdash; how one process becomes two without copying anything</span></span></a>
+    </nav>
+  </header>
+
+  <!-- ==================== CHAPTER 1 ==================== -->
+  <section class="chapter" id="vm">
+    <p class="chapter-label">Chapter one</p>
+    <h2>Virtual memory</h2>
+
+    <p class="lede">
+      Start with the problem, not the solution. Suppose there were no virtual memory: every program
+      names memory by its real, physical location.
+    </p>
+
+    <p>
+      Three difficulties appear immediately. First, two programs cannot both use location 1000, so
+      every program must be built knowing what else will be running — an impossible requirement.
+      Second, nothing stops a program from writing to another program's data; a single stray pointer
+      takes down the machine. Third, a program needs its memory in one contiguous run, so it cannot
+      start unless a large enough gap happens to be free, even when plenty of total memory is
+      available.
+    </p>
+
+    <p>
+      All three problems are about <em>names</em>. And the standard fix for a naming problem is a
+      layer of indirection.
+    </p>
+
+    <h3>The idea</h3>
+
+    <p>
+      Give every process its own private set of names, and keep a table that translates those names
+      into real locations. The names are <strong>virtual addresses</strong>; the real locations are
+      <strong>physical addresses</strong>; the table is the <strong>page table</strong>. Because each
+      process has its own table, process A's address 1000 and process B's address 1000 can lead
+      wherever the operating system chooses — including to two entirely different places.
+    </p>
+
+    <p>
+      Translating every individual byte would need a table larger than the memory it describes. So
+      memory is translated in fixed-size blocks called <strong>pages</strong> — 4096 bytes on most
+      machines, including the one behind this page. A virtual address splits in two: the upper bits
+      name a page, and the lower 12 bits are an offset within it. Only the page number gets
+      translated; the offset is carried across untouched.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 760 300" role="img"
+             aria-label="Two processes each have a page table. Process A's page 2 and process B's page 2 are the same virtual page number but their page tables send them to different physical frames, so neither can see the other's data. A third entry in each table points at the same shared frame holding the C library.">
+          <defs>
+            <marker id="i1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-dim"/></marker>
+            <marker id="i1p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-phys"/></marker>
+          </defs>
+
+          <!-- process A -->
+          <text x="16" y="20" class="cap sv-virt">process A &mdash; its own addresses</text>
+          <rect x="16" y="30" width="150" height="90" rx="3" class="fill-virt"/>
+          <rect x="16" y="30" width="150" height="90" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="28" y="50" class="mono sv-dim">page 2</text>
+          <text x="28" y="72" class="mono sv-dim">page 5</text>
+          <text x="28" y="94" class="mono sv-dim">page 9</text>
+          <text x="91" y="112" text-anchor="middle" class="lbl-sm sv-faint">page table A</text>
+
+          <!-- process B -->
+          <text x="16" y="184" class="cap sv-virt">process B &mdash; the same numbers</text>
+          <rect x="16" y="194" width="150" height="90" rx="3" class="fill-virt"/>
+          <rect x="16" y="194" width="150" height="90" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="28" y="214" class="mono sv-dim">page 2</text>
+          <text x="28" y="236" class="mono sv-dim">page 5</text>
+          <text x="28" y="258" class="mono sv-dim">page 9</text>
+          <text x="91" y="276" text-anchor="middle" class="lbl-sm sv-faint">page table B</text>
+
+          <!-- physical memory -->
+          <text x="520" y="20" class="cap sv-phys">physical memory &mdash; the real thing</text>
+          <rect x="520" y="30" width="224" height="254" rx="3" class="fill-phys"/>
+          <rect x="520" y="30" width="224" height="254" rx="3" class="st-phys" stroke-width="1.25"/>
+          <rect x="534" y="44" width="196" height="30" rx="2" class="fill-surface"/>
+          <rect x="534" y="44" width="196" height="30" rx="2" class="st-phys" stroke-width="1"/>
+          <text x="632" y="64" text-anchor="middle" class="mono sv-dim">frame 17 &mdash; A's data</text>
+
+          <rect x="534" y="86" width="196" height="30" rx="2" class="fill-surface"/>
+          <rect x="534" y="86" width="196" height="30" rx="2" class="st-phys" stroke-width="1"/>
+          <text x="632" y="106" text-anchor="middle" class="mono sv-dim">frame 42 &mdash; B's data</text>
+
+          <rect x="534" y="150" width="196" height="34" rx="2" class="fill-cost"/>
+          <rect x="534" y="150" width="196" height="34" rx="2" class="st-cost" stroke-width="1.25"/>
+          <text x="632" y="164" text-anchor="middle" class="mono sv-cost w600">frame 88</text>
+          <text x="632" y="177" text-anchor="middle" class="mono-sm sv-dim">the C library &mdash; shared</text>
+
+          <text x="632" y="240" text-anchor="middle" class="lbl-sm sv-faint">other frames, used by</text>
+          <text x="632" y="254" text-anchor="middle" class="lbl-sm sv-faint">other processes or free</text>
+
+          <!-- arrows -->
+          <path d="M166,46 L520,58" class="st-dim" stroke-width="1.25" marker-end="url(#i1)"/>
+          <path d="M166,210 L520,100" class="st-dim" stroke-width="1.25" marker-end="url(#i1)"/>
+          <path d="M166,90 L520,163" class="st-cost" stroke-width="1.25" marker-end="url(#i1p)"/>
+          <path d="M166,254 L520,170" class="st-cost" stroke-width="1.25" marker-end="url(#i1p)"/>
+
+          <text x="330" y="130" text-anchor="middle" class="lbl-sm sv-dim">same page number,</text>
+          <text x="330" y="144" text-anchor="middle" class="lbl-sm sv-dim">different frame</text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Figure 1</b> Both processes use page 2, and neither can reach the other's data — not
+        because anything checks, but because no table entry leads there. The shared library is the
+        opposite case: two entries deliberately pointing at one frame, which is how a single copy of
+        the C library serves every program on the machine.
+      </figcaption>
+    </figure>
+
+    <h3>A worked translation</h3>
+
+    <p>
+      Suppose a program reads virtual address <code>0x1234</code> and pages are 4096 bytes
+      (<code>0x1000</code>). Split the address:
+    </p>
+
+    <pre><span class="v">0x1234</span>  =  <span class="v">0x1</span> <span class="p">234</span>
+          <span class="c">     └── page number 1</span>
+          <span class="c">        └── offset 0x234 = 564 bytes into the page</span>
+
+look up page 1 in this process's page table  &rarr;  <span class="p">frame 17</span>
+physical address  =  frame 17 &times; 4096 + 564  =  <span class="p">0x11234</span></pre>
+
+    <p>
+      Notice that the last three hex digits did not change. Within a page, virtual and physical
+      addresses differ by a constant, which is exactly why the page is the unit of everything that
+      follows.
+    </p>
+
+    <div class="box confusion">
+      <span class="cap">A common confusion</span>
+      <p>
+        The page table is not consulted by your program, your compiler, or even the operating system
+        on each access — it is walked by <em>hardware</em>, on every load and store, invisibly. The
+        operating system's job is only to build and maintain the tables. This is why virtual memory
+        costs so little in the common case and why it cannot be turned off for a program that would
+        rather go fast.
+      </p>
+    </div>
+
+    <h3>What the indirection buys</h3>
+
+    <ul class="plain">
+      <li><strong>Isolation.</strong> A process cannot name what is not in its table. This is the
+        entire mechanism; there is no additional guard.</li>
+      <li><strong>Sharing, when wanted.</strong> Two entries can point at one frame — libraries,
+        shared buffers, memory-mapped files.</li>
+      <li><strong>Contiguity, faked.</strong> A program's memory looks like one unbroken run to the
+        program, while the frames behind it are scattered wherever there was room.</li>
+      <li><strong>Protection.</strong> Each entry carries permission bits, so a page can be
+        readable but not writable, or writable but not executable. The hardware enforces it.</li>
+      <li><strong>More memory than exists.</strong> An entry can say "not present", and the
+        operating system can fetch the page from disk when it is touched. This is the part that
+        makes the next chapter possible.</li>
+    </ul>
+
+    <div class="box nutshell">
+      <span class="cap">In a nutshell</span>
+      <p>
+        An address is a <em>name</em>, not a place. The page table turns names into places, one
+        4096-byte page at a time, and every useful property of a modern process — isolation,
+        sharing, protection, memory that is not there — falls out of controlling that table.
+      </p>
+    </div>
+
+    <details class="check">
+      <summary>Check yourself</summary>
+      <p>
+        Two processes each print the address of a variable, and both print
+        <code>0x7ffd4a2b18</code>. Are they using the same memory?
+      </p>
+      <p>
+        <strong>Almost certainly not.</strong> They are using the same <em>name</em>. Unless the two
+        processes deliberately arranged to share (with <code>mmap</code> and a shared file or a
+        shared-memory object), their page tables send that identical address to different frames.
+        The companion page demonstrates exactly this experiment on real hardware.
+      </p>
+    </details>
+  </section>
+
+  <!-- ==================== CHAPTER 2 ==================== -->
+  <section class="chapter" id="malloc">
+    <p class="chapter-label">Chapter two</p>
+    <h2>malloc</h2>
+
+    <p class="lede">
+      It is worth being blunt about what <code>malloc</code> is not. It is not a system call. It is
+      not part of the operating system. And it does not, in the moment you call it, give you any
+      memory.
+    </p>
+
+    <p>
+      <code>malloc</code> is an ordinary function in an ordinary library, written in C, running in
+      your process like any other code you call. Its job is to be a retailer: it buys memory from
+      the operating system in large amounts, infrequently, and hands it back to you in whatever odd
+      little sizes you ask for.
+    </p>
+
+    <h3>Why a middleman is needed at all</h3>
+
+    <p>
+      The operating system deals only in whole pages, and asking it for memory means a system call —
+      a trap into the kernel, hundreds of times more expensive than a function call. A program that
+      asked the kernel directly for each of its ten million 24-byte structures would spend all of
+      its time in the kernel and waste 4072 bytes out of every 4096.
+    </p>
+
+    <p>
+      So <code>malloc</code> keeps a pool. When you ask for 24 bytes it carves them from a chunk it
+      already owns, and returns in a few dozen nanoseconds without the kernel being involved at all.
+      Only when the pool runs low does it go to the kernel — for a megabyte or more at a time.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 760 250" role="img"
+             aria-label="Three layers. Your program calls malloc, which is a library inside the process; malloc carves small pieces out of a pool it already owns. When the pool runs low malloc calls the kernel, which extends the address space by whole pages. Physical memory is attached later still, one page at a time, on first touch.">
+          <defs>
+            <marker id="m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-dim"/></marker>
+            <marker id="m1p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-phys"/></marker>
+          </defs>
+
+          <rect x="16" y="24" width="200" height="58" rx="3" class="fill-surface"/>
+          <rect x="16" y="24" width="200" height="58" rx="3" class="st-dim" stroke-width="1.25"/>
+          <text x="116" y="48" text-anchor="middle" class="lbl sv-ink w600">your program</text>
+          <text x="116" y="66" text-anchor="middle" class="mono-sm sv-faint">malloc(24)</text>
+
+          <path d="M216,53 L268,53" class="st-dim" stroke-width="1.25" marker-end="url(#m1)"/>
+          <text x="242" y="44" text-anchor="middle" class="mono-sm sv-faint">a call</text>
+
+          <rect x="270" y="24" width="210" height="58" rx="3" class="fill-virt"/>
+          <rect x="270" y="24" width="210" height="58" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="375" y="48" text-anchor="middle" class="lbl sv-ink w600">malloc &mdash; a library</text>
+          <text x="375" y="66" text-anchor="middle" class="mono-sm sv-dim">still inside your process</text>
+
+          <path d="M480,53 L532,53" class="st-dim" stroke-width="1.25" marker-end="url(#m1)"/>
+          <text x="506" y="44" text-anchor="middle" class="mono-sm sv-cost">rarely</text>
+
+          <rect x="534" y="24" width="210" height="58" rx="3" class="fill-sunken"/>
+          <rect x="534" y="24" width="210" height="58" rx="3" class="st-dim" stroke-width="1.25"/>
+          <text x="639" y="48" text-anchor="middle" class="lbl sv-ink w600">the kernel</text>
+          <text x="639" y="66" text-anchor="middle" class="mono-sm sv-dim">brk / mmap &mdash; whole pages</text>
+
+          <!-- the pool -->
+          <path d="M375,82 L375,110" class="st-virt" stroke-width="1.25" marker-end="url(#m1)"/>
+          <text x="16" y="128" class="cap sv-virt">malloc's pool, already owned</text>
+          <rect x="150" y="116" width="450" height="30" rx="3" class="fill-virt"/>
+          <rect x="150" y="116" width="450" height="30" rx="3" class="st-virt" stroke-width="1.25"/>
+          <rect x="158" y="122" width="40" height="18" rx="2" class="fill-surface"/>
+          <rect x="158" y="122" width="40" height="18" rx="2" class="st-virt" stroke-width="1"/>
+          <text x="178" y="135" text-anchor="middle" class="mono-sm sv-dim">24 B</text>
+          <rect x="204" y="122" width="70" height="18" rx="2" class="fill-surface"/>
+          <rect x="204" y="122" width="70" height="18" rx="2" class="st-virt" stroke-width="1"/>
+          <text x="239" y="135" text-anchor="middle" class="mono-sm sv-dim">in use</text>
+          <rect x="280" y="122" width="36" height="18" rx="2" class="fill-sunken"/>
+          <text x="298" y="135" text-anchor="middle" class="mono-sm sv-faint">free</text>
+          <rect x="322" y="122" width="90" height="18" rx="2" class="fill-surface"/>
+          <rect x="322" y="122" width="90" height="18" rx="2" class="st-virt" stroke-width="1"/>
+          <text x="367" y="135" text-anchor="middle" class="mono-sm sv-dim">in use</text>
+          <text x="510" y="135" text-anchor="middle" class="mono-sm sv-faint">not yet handed out</text>
+
+          <!-- physical -->
+          <path d="M639,82 L639,166" class="st-phys" stroke-width="1.25" stroke-dasharray="4 4"
+                marker-end="url(#m1p)"/>
+          <text x="16" y="186" class="cap sv-phys">physical memory, attached later still</text>
+          <rect x="150" y="174" width="450" height="30" rx="3" class="fill-phys"/>
+          <rect x="150" y="174" width="450" height="30" rx="3" class="st-phys" stroke-width="1.25"/>
+          <rect x="158" y="180" width="52" height="18" rx="2" class="fill-surface"/>
+          <rect x="158" y="180" width="52" height="18" rx="2" class="st-phys" stroke-width="1"/>
+          <text x="184" y="193" text-anchor="middle" class="mono-sm sv-phys">1 page</text>
+          <text x="400" y="193" text-anchor="middle" class="mono-sm sv-faint">
+            the rest arrives only when you touch it &mdash; one page per first write
+          </text>
+
+          <text x="16" y="230" class="lbl sv-dim">Each arrow crosses a boundary, and each boundary is crossed less often than the one to its left.</text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Figure 2</b> Three separate questions that beginners often merge into one: did malloc
+        give me an address (yes, immediately), did the kernel extend my address space (only
+        sometimes), and is there physical memory behind it (not until you write to it).
+      </figcaption>
+    </figure>
+
+    <h3>Two calls, two very different stories</h3>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>call</th><th>what usually happens</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>malloc(24)</code></td>
+            <td>malloc finds a free chunk in its pool, marks it used, returns a pointer. No system
+                call, no kernel, tens of nanoseconds. The memory has existed since the last time the
+                pool grew.</td>
+          </tr>
+          <tr>
+            <td><code>malloc(10&nbsp;MB)</code></td>
+            <td>Too big to carve out, so malloc asks the kernel directly with <code>mmap</code>. The
+                kernel notes a new region in the page table and returns — <em>without allocating any
+                physical memory.</em> The pages arrive one at a time, as you write to them.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box confusion">
+      <span class="cap">A common confusion</span>
+      <p>
+        <code>free()</code> usually does not return memory to the operating system. It returns the
+        chunk to malloc's pool, where it waits to satisfy your next request. This is why a program's
+        memory use, as reported by the system, so often goes up and stays up even though the program
+        frees everything it allocates. It is not a leak — it is a retailer keeping stock on the
+        shelf.
+      </p>
+    </div>
+
+    <div class="box nutshell">
+      <span class="cap">In a nutshell</span>
+      <p>
+        <code>malloc</code> is a library that resells memory. It gives you an address immediately,
+        involves the kernel rarely, and the physical memory shows up later still — on the first
+        write to each page. Three separate events, easily mistaken for one.
+      </p>
+    </div>
+
+    <details class="check">
+      <summary>Check yourself</summary>
+      <p>
+        A program calls <code>malloc(1&nbsp;GB)</code> on a machine with 8 GB of RAM, and it
+        succeeds. Then it calls it four more times, and those succeed too. Is the machine about to
+        run out of memory?
+      </p>
+      <p>
+        <strong>Not yet, and possibly never.</strong> Five gigabytes of <em>addresses</em> have been
+        handed out; no physical memory has been committed. If the program writes to only the first
+        few megabytes of each region, that is all it will ever consume. Trouble comes at
+        <em>touch</em> time, not allocation time — and if the machine cannot then keep the promise,
+        the failure arrives as a killed process rather than as a null pointer from
+        <code>malloc</code>.
+      </p>
+    </details>
+  </section>
+
+  <!-- ==================== CHAPTER 3 ==================== -->
+  <section class="chapter" id="fork">
+    <p class="chapter-label">Chapter three</p>
+    <h2>fork</h2>
+
+    <p class="lede">
+      <code>fork</code> is the only way to create a process on a Unix system, and it works in a way
+      that surprises nearly everyone the first time: it does not start a new program. It makes a
+      duplicate of the one already running.
+    </p>
+
+    <p>
+      After <code>fork</code> returns, there are two processes. Both have the same code, the same
+      variables with the same values, the same open files, and both are sitting at the same
+      instruction — the one just after the <code>fork</code>. The only thing that differs is the
+      value <code>fork</code> returned.
+    </p>
+
+    <pre>pid_t pid = fork();
+
+if (pid == 0) {
+    <span class="c">/* only the child gets here: fork returned 0 */</span>
+    printf("I am the child\n");
+} else {
+    <span class="c">/* only the parent gets here: fork returned the child's pid */</span>
+    printf("I am the parent of %d\n", pid);
+}</pre>
+
+    <p>
+      One call, two returns. That single asymmetry — zero to the child, the child's process id to
+      the parent — is the whole mechanism by which the two copies tell themselves apart.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 760 240" role="img"
+             aria-label="A timeline in which one process calls fork and becomes two. Both continue from the same instruction. Immediately after the fork, both page tables point at the same physical frames, marked read-only. When the child writes to a page, that one page is copied and the child's table is updated to point at the copy, while every other page stays shared.">
+          <defs>
+            <marker id="f1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-dim"/></marker>
+            <marker id="f1c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-cost"/></marker>
+          </defs>
+
+          <!-- timeline -->
+          <line x1="30" y1="46" x2="250" y2="46" class="st-dim" stroke-width="2"/>
+          <text x="30" y="34" class="lbl sv-ink w600">one process</text>
+          <circle cx="250" cy="46" r="5" class="sv-virt"/>
+          <text x="250" y="30" text-anchor="middle" class="mono-sm sv-virt">fork()</text>
+
+          <path d="M250,46 L340,26 L560,26" class="st-dim fill-none" stroke-width="2" marker-end="url(#f1)"/>
+          <path d="M250,46 L340,72 L560,72" class="st-dim fill-none" stroke-width="2" marker-end="url(#f1)"/>
+          <text x="574" y="30" class="lbl sv-ink w600">parent</text>
+          <text x="574" y="76" class="lbl sv-ink w600">child</text>
+          <text x="420" y="18" text-anchor="middle" class="mono-sm sv-faint">fork() returns 1234</text>
+          <text x="420" y="90" text-anchor="middle" class="mono-sm sv-faint">fork() returns 0</text>
+
+          <line x1="30" y1="112" x2="730" y2="112" class="st-grid" stroke-width="1"/>
+
+          <!-- memory before write -->
+          <text x="30" y="134" class="cap sv-virt">immediately after fork</text>
+          <rect x="30" y="144" width="110" height="26" rx="3" class="fill-virt"/>
+          <rect x="30" y="144" width="110" height="26" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="85" y="161" text-anchor="middle" class="mono-sm sv-dim">parent's table</text>
+          <rect x="30" y="182" width="110" height="26" rx="3" class="fill-virt"/>
+          <rect x="30" y="182" width="110" height="26" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="85" y="199" text-anchor="middle" class="mono-sm sv-dim">child's table</text>
+
+          <path d="M140,157 L212,172" class="st-dim" stroke-width="1.25" marker-end="url(#f1)"/>
+          <path d="M140,195 L212,180" class="st-dim" stroke-width="1.25" marker-end="url(#f1)"/>
+          <rect x="214" y="160" width="120" height="32" rx="3" class="fill-phys"/>
+          <rect x="214" y="160" width="120" height="32" rx="3" class="st-phys" stroke-width="1.5"/>
+          <text x="274" y="173" text-anchor="middle" class="mono-sm sv-ink w600">one set of frames</text>
+          <text x="274" y="186" text-anchor="middle" class="mono-sm sv-phys">marked read-only</text>
+          <text x="274" y="212" text-anchor="middle" class="lbl-sm sv-dim">nothing was copied</text>
+
+          <!-- memory after write -->
+          <text x="410" y="134" class="cap sv-cost">after the child writes one page</text>
+          <rect x="410" y="144" width="110" height="26" rx="3" class="fill-virt"/>
+          <rect x="410" y="144" width="110" height="26" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="465" y="161" text-anchor="middle" class="mono-sm sv-dim">parent's table</text>
+          <rect x="410" y="182" width="110" height="26" rx="3" class="fill-virt"/>
+          <rect x="410" y="182" width="110" height="26" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="465" y="199" text-anchor="middle" class="mono-sm sv-dim">child's table</text>
+
+          <path d="M520,157 L592,157" class="st-dim" stroke-width="1.25" marker-end="url(#f1)"/>
+          <path d="M520,195 L592,195" class="st-cost" stroke-width="1.5" marker-end="url(#f1c)"/>
+          <rect x="594" y="142" width="120" height="28" rx="3" class="fill-phys"/>
+          <rect x="594" y="142" width="120" height="28" rx="3" class="st-phys" stroke-width="1.25"/>
+          <text x="654" y="160" text-anchor="middle" class="mono-sm sv-dim">the original</text>
+          <rect x="594" y="182" width="120" height="28" rx="3" class="fill-cost"/>
+          <rect x="594" y="182" width="120" height="28" rx="3" class="st-cost" stroke-width="1.25"/>
+          <text x="654" y="200" text-anchor="middle" class="mono-sm sv-cost">a copy of that page</text>
+          <text x="654" y="228" text-anchor="middle" class="lbl-sm sv-dim">every other page stays shared</text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Figure 3</b> Copy-on-write. The duplicate address space is created by copying the
+        <em>page table</em>, not the pages. Marking everything read-only means the first write to any
+        page traps, and only that page is copied. A process that forks and immediately runs a
+        different program copies almost nothing at all.
+      </figcaption>
+    </figure>
+
+    <h3>Why the copy is usually wasted, and why that is fine</h3>
+
+    <p>
+      The overwhelmingly common use of <code>fork</code> is to follow it immediately with
+      <code>exec</code>, which throws the whole address space away and loads a different program.
+      That is what a shell does every time you run a command. Copying the parent's memory in order to
+      discard it a microsecond later would be pure waste — and with copy-on-write, almost none of it
+      ever happens.
+    </p>
+
+    <div class="box confusion">
+      <span class="cap">A common confusion</span>
+      <p>
+        A program prints one line, then forks, and the line appears <em>twice</em>. Nothing printed
+        it twice. Output is buffered inside the process, and if the buffer had not yet been flushed
+        when <code>fork</code> ran, the child inherited a copy of it — and both processes flushed it
+        on exit. Flush before forking, and the problem disappears. This is not a hypothetical; it
+        happened while writing the companion page, and cost the child's entire output.
+      </p>
+    </div>
+
+    <div class="box nutshell">
+      <span class="cap">In a nutshell</span>
+      <p>
+        <code>fork</code> duplicates a process by duplicating its page table and sharing every frame
+        read-only. The copy is real but lazy: it happens one page at a time, only for pages that are
+        actually written, and often never happens at all.
+      </p>
+    </div>
+
+    <details class="check">
+      <summary>Check yourself</summary>
+      <p>
+        A parent process holds a 4 GB in-memory index and forks 8 worker children that only
+        <em>read</em> it. Does the machine now need 36 GB?
+      </p>
+      <p>
+        <strong>No — it needs a little over 4 GB.</strong> All nine processes share one set of
+        frames, and readers never trigger a copy. This is exactly why the pre-fork server model
+        works. It also explains the failure mode: if the children start <em>writing</em> to that
+        index, memory use climbs steadily as pages diverge, and a machine that was comfortable can
+        run out with no change in the number of processes.
+      </p>
+    </details>
+  </section>
+
+  <!-- ==================== CLOSING ==================== -->
+  <section class="chapter" id="together">
+    <p class="chapter-label">Putting it together</p>
+    <h2>One mechanism, three illusions</h2>
+
+    <p>
+      All three chapters describe the same table doing the same job. Virtual memory is what the page
+      table is; <code>malloc</code> and <code>fork</code> are two things you can do with it.
+    </p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>the illusion</th><th>what really happens</th></tr></thead>
+        <tbody>
+          <tr><td>My program has memory to itself</td>
+              <td>It has a private page table. Isolation is the absence of entries, not the presence of checks.</td></tr>
+          <tr><td>malloc gave me 10 MB</td>
+              <td>It gave you 10 MB of addresses. Frames are attached one page at a time, on first write.</td></tr>
+          <tr><td>fork copied my memory</td>
+              <td>It copied your page table and marked the frames read-only. Pages copy themselves, later, only if written.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      Each illusion is worth maintaining, and each becomes a source of confusion the moment you need
+      to reason about performance or about how much memory a program really uses. The pattern to
+      carry forward is that <strong>in all three cases the expensive part is deferred to the first
+      write</strong> — which is why the memory a program consumes correlates with what it touches,
+      not with what it asks for.
+    </p>
+  </section>
+
+  <footer class="colophon">
+    <h2>Where to go next</h2>
+    <p>
+      This chapter deliberately contains no measurements. Its companion is all measurement:
+      <a href="vm_reality.html">The Address Is Not The Memory</a> runs each of these mechanisms on a
+      real machine and reports what they cost — a 128 TiB address space that is 0.00005% used, 64 GB
+      allocated for 0.1 MB of actual memory, 853 ns for the first touch of a page, and a 256 MB
+      <code>fork</code> that copies nothing in 2.3 ms.
+    </p>
+    <p>
+      For what happens to an address <em>after</em> it has been translated — caches, and why the
+      hardware that remembers translations has a capacity cliff of its own — see
+      <a href="../memory_hierarchy/cache_map.html">Strix Point Cache Map</a> and
+      <a href="../memory_hierarchy/tlb_cliff.html">The TLB Cliff</a>.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>

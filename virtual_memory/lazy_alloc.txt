@@ -1,0 +1,26 @@
+=== 1. how much can be reserved ===
+      size  MAP_NORESERVE  default     
+       8 GB  reserved      reserved    
+      16 GB  reserved      reserved    
+      32 GB  reserved      refused     
+      64 GB  reserved      refused     
+     128 GB  reserved      refused     
+     256 GB  reserved      refused     
+     512 GB  reserved      refused     
+
+=== 2. reserving 64 GB on a machine with 15 GB of RAM ===
+VmSize       2.6 MB ->  65538.6 MB   (+65536 MB)
+VmRSS        1.7 MB ->      1.8 MB   (+0.1 MB)  <- nothing arrived
+
+=== 3. what arrives as it is touched ===
+  touched MB    VmSize MB     VmRSS MB   VmPTE KB present pages  expected
+           0      65538.6          1.8         48             0         0
+           1      65538.6          2.8         56           256       256
+           4      65538.8          6.0         60          1024      1024
+          16      65538.8         18.0         84          4096      4096
+          64      65538.8         66.0        180         16384     16384
+         256      65538.8        258.0        564         16384     16384
+         512      65538.8        514.0       1080         16384     16384
+        1024      65538.8       1026.0       2104         16384     16384
+
+(present pages counted over the first 64 MB of the mapping)

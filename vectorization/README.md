@@ -1,5 +1,7 @@
 **RB**
 
+Zen5 only.
+
 Standalone, one file, no Makefile needed:
 
 ```

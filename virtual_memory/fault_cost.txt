@@ -1,0 +1,12 @@
+CASE                    total  per 4K page    minor flt    major   
+------------------------------------------------------------------------------------------------
+anon 4K cold          48.0 ms        733 ns        65539        0   one fault per page
+anon 4K warm           0.7 ms         11 ns            0        0   already present
+anon 2M cold          19.2 ms        293 ns          128        0   512x fewer faults
+anon 2M warm           0.8 ms         12 ns            0        0   already present
+MAP_POPULATE          34.2 ms        522 ns            -        -   cost of the mmap call itself
+populated touch        1.2 ms         19 ns            0        0   nothing left to fault
+file cold             75.5 ms       1152 ns         2052        1   page cache misses -> NVMe
+file warm              0.6 ms          9 ns            0        0   now in the page cache
+file cold rand        37.8 ms       2308 ns         1057      703   no readahead -> real major faults
+                                 53.8 us per major fault -- the device latency

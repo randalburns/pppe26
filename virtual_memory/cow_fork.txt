@@ -1,0 +1,16 @@
+parent, 256 MB written and resident:
+  before fork                    shared_dirty     0.0 MB   private_dirty   256.1 MB
+
+child, immediately after fork (2.7 ms for the fork itself):
+  after fork                     shared_dirty   256.1 MB   private_dirty     0.0 MB
+
+child reads all 256 MB:
+  read pass                              10.4 ms     158 ns/page  0 faults
+  after reading                  shared_dirty   256.1 MB   private_dirty     0.0 MB
+
+child writes one byte in every page:
+  write pass                             82.9 ms    1264 ns/page  65536 faults
+  after writing                  shared_dirty     0.1 MB   private_dirty   256.0 MB
+
+parent, after the child copied everything:
+  after child exits              shared_dirty     0.0 MB   private_dirty   256.1 MB

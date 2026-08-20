@@ -1,0 +1,10 @@
+case,total_ms,ns_per_4k_page,minor_faults,major_faults,bytes
+anon 4K cold,48.023,732.8,65539,0,268435456
+anon 4K warm,0.725,11.1,0,0,268435456
+anon 2M cold,19.198,292.9,128,0,268435456
+anon 2M warm,0.757,11.6,0,0,268435456
+MAP_POPULATE,34.207,522.0,,,268435456
+populated touch,1.214,18.5,0,0,268435456
+file cold,75.526,1152.4,2052,1,268435456
+file warm,0.581,8.9,0,0,268435456
+file cold rand,37.822,2308.5,1057,703,67108864

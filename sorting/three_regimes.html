@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Three Regimes of std::sort -- generated for the pppe26 repo; opens standalone
+     in any browser, no server and no external assets beyond the web fonts, which
+     fall back to system faces offline. -->
+<title>Three Regimes of std::sort</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* the hosted version of this page got a reset from its runtime; standalone,
+     it brings its own */
+  body { margin: 0; }
+  img { max-width: 100%; }
+
+  :root {
+    --bg: #F4F5F7;
+    --surface: #FFFFFF;
+    --surface-sunken: #ECEEF1;
+    --border: #DBDFE4;
+    --border-strong: #C3C8CF;
+    --text-primary: #171B21;
+    --text-secondary: #4B525C;
+    --text-muted: #7C838D;
+    --copper: #C1682F;
+    --copper-soft: #C1682F26;
+    --slate: #3E6FA6;
+    --slate-soft: #3E6FA626;
+    --grid-line: #D3D7DC;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11151B;
+      --surface: #171C24;
+      --surface-sunken: #10141A;
+      --border: #2A313C;
+      --border-strong: #3A4350;
+      --text-primary: #EDEFF2;
+      --text-secondary: #AEB4BE;
+      --text-muted: #7A8290;
+      --copper: #CC7038;
+      --copper-soft: #CC703833;
+      --slate: #5B93CE;
+      --slate-soft: #5B93CE33;
+      --grid-line: #262C36;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #11151B;
+    --surface: #171C24;
+    --surface-sunken: #10141A;
+    --border: #2A313C;
+    --border-strong: #3A4350;
+    --text-primary: #EDEFF2;
+    --text-secondary: #AEB4BE;
+    --text-muted: #7A8290;
+    --copper: #CC7038;
+    --copper-soft: #CC703833;
+    --slate: #5B93CE;
+    --slate-soft: #5B93CE33;
+    --grid-line: #262C36;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.6;
+    font-size: 16.5px;
+    -webkit-font-smoothing: antialiased;
+    padding: 0 0 6rem;
+  }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 4.5rem 1.5rem 0; }
+  .wide  { max-width: 940px; margin: 0 auto; padding: 0 1.5rem; }
+
+  .kicker {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--copper);
+  }
+  .kicker.slate { color: var(--slate); }
+
+  h1 {
+    font-family: "Big Shoulders Display", "Arial Narrow", sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.6rem, 6vw, 3.9rem);
+    line-height: 0.98;
+    letter-spacing: 0.002em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    margin: 0.3rem 0 0;
+  }
+
+  .dek {
+    font-size: 1.12rem;
+    color: var(--text-secondary);
+    max-width: 58ch;
+    margin: 1.1rem 0 0;
+  }
+  .dek em { color: var(--text-primary); font-style: normal; font-weight: 500; }
+
+  h2 {
+    font-family: "Big Shoulders Display", "Arial Narrow", sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.6vw, 2.35rem);
+    text-transform: uppercase;
+    letter-spacing: 0.003em;
+    line-height: 1.02;
+    margin: 0.35rem 0 0;
+  }
+
+  h3 {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin: 0 0 0.5rem;
+    color: var(--text-primary);
+  }
+
+  p { margin: 0.9rem 0; color: var(--text-primary); }
+  .lede { color: var(--text-secondary); }
+
+  a { color: var(--copper); text-decoration-color: var(--copper-soft); text-underline-offset: 2px; }
+  a:hover { text-decoration-color: var(--copper); }
+
+  code, .mono {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  code {
+    background: var(--surface-sunken);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    font-size: 0.88em;
+  }
+
+  hr.rule {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 3.2rem 0;
+  }
+  .wide hr.rule { margin: 2.6rem 0; }
+
+  .regime-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+  }
+  .regime-num {
+    font-family: "Big Shoulders Display", sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-muted);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    width: 1.9rem; height: 1.9rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+
+  /* ---- schematic (decision flow) ---- */
+  .schematic {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin: 2.2rem 0 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .schematic .cell {
+    padding: 1.15rem 1.2rem 1.3rem;
+    border-left: 1px solid var(--border);
+    position: relative;
+  }
+  .schematic .cell:first-child { border-left: none; }
+  .schematic .tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .schematic .decision {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    margin-bottom: 0.55rem;
+  }
+  .schematic .outcome {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+  .schematic .swatch {
+    display: inline-block;
+    width: 0.6rem; height: 0.6rem;
+    border-radius: 2px;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+  .schematic .arrow {
+    position: absolute;
+    top: 50%;
+    right: -0.62rem;
+    transform: translateY(-50%);
+    width: 1.1rem; height: 1.1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+  }
+
+  /* ---- chart panels ---- */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem 1.6rem 1.2rem;
+    margin: 1.6rem 0;
+  }
+  .panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.2rem;
+  }
+  .panel-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-primary);
+  }
+  .panel-sub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+  }
+  .legend {
+    display: flex;
+    gap: 1.2rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+    flex: none;
+  }
+  .legend .item { display: flex; align-items: center; gap: 0.4rem; }
+  .legend .dot { width: 0.65rem; height: 0.65rem; border-radius: 2px; }
+
+  svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .axis-label { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; fill: var(--text-muted); }
+  .band-label { font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.04em; fill: var(--text-muted); text-transform: uppercase; }
+  .gridline { stroke: var(--grid-line); stroke-width: 1; }
+
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--text-primary);
+    color: var(--bg);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    padding: 0.5rem 0.65rem;
+    border-radius: 6px;
+    line-height: 1.5;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    white-space: nowrap;
+    z-index: 5;
+    transform: translate(-50%, -110%);
+  }
+  .tooltip .row { display: flex; justify-content: space-between; gap: 0.8rem; }
+  .tooltip .n { color: var(--bg); opacity: 0.6; margin-bottom: 0.15rem; }
+
+  .chart-wrap { position: relative; }
+
+  /* ---- proportional split bar ---- */
+  .split-bar {
+    display: flex;
+    width: 100%;
+    height: 2.6rem;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 1.6rem 0 0.4rem;
+    border: 1px solid var(--border);
+  }
+  .split-seg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    padding: 0 0.4rem;
+  }
+  .split-small { background: var(--surface-sunken); color: var(--text-secondary); }
+  .split-big   { background: var(--copper-soft); color: var(--copper); font-weight: 600; }
+
+  /* ---- data tables ---- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 1rem 0;
+  }
+  th, td {
+    text-align: right;
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  th:first-child, td:first-child { text-align: left; font-family: "IBM Plex Sans", sans-serif; }
+  th {
+    color: var(--text-muted);
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 600;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .table-scroll { overflow-x: auto; }
+
+  details.data-table summary {
+    cursor: pointer;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0.6rem 0;
+  }
+  details.data-table summary:hover { color: var(--text-primary); }
+
+  footer {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+  footer .files th, footer .files td { text-align: left; }
+  footer p { color: var(--text-muted); font-size: 0.85rem; }
+
+  @media (max-width: 640px) {
+    .schematic { grid-template-columns: 1fr; }
+    .schematic .cell { border-left: none; border-top: 1px solid var(--border); }
+    .schematic .cell:first-child { border-top: none; }
+    .schematic .arrow { top: auto; bottom: -0.62rem; right: 50%; transform: translate(50%, 0) rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <p class="kicker">algorithm design &middot; libstdc++ / libc++ introsort</p>
+  <h1>Three Regimes<br>of std::sort</h1>
+  <p class="dek">
+    <code>std::sort</code> is not one algorithm. It is three algorithms and two size
+    checks, stitched together so that whichever regime an array falls into, a
+    different piece of the implementation does the work. This is what each piece
+    is for, and — measured against a plain median-of-three
+    <a href="sort_mechanisms.html#quicksort">quicksort</a>
+    with none of the three decisions — <em>what each one actually buys you.</em>
+  </p>
+</div>
+
+<div class="wide">
+  <div class="schematic" role="img" aria-label="Introsort decision flow: check partition size, then recursion depth, then partition and recurse.">
+    <div class="cell">
+      <span class="tag">Decision 1</span>
+      <div class="decision">size ≤ 16 ?</div>
+      <div class="outcome"><span class="swatch" style="background:var(--copper)"></span>skip — <a href="sort_mechanisms.html#insertion">insertion sort</a> handles it in one final pass</div>
+      <div class="arrow">&rarr;</div>
+    </div>
+    <div class="cell">
+      <span class="tag">Decision 2</span>
+      <div class="decision">depth &gt; 2&middot;log&#8322;n ?</div>
+      <div class="outcome"><span class="swatch" style="background:var(--text-muted)"></span><a href="sort_mechanisms.html#heapsort">heapsort</a> — bounds the worst case, rarely fires</div>
+      <div class="arrow">&rarr;</div>
+    </div>
+    <div class="cell">
+      <span class="tag">otherwise</span>
+      <div class="decision">median-of-3 partition</div>
+      <div class="outcome"><span class="swatch" style="background:var(--slate)"></span>quicksort proper — recurse on both halves</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <p>
+    Isolating each decision's contribution needs a control: an implementation
+    that does <em>none</em> of them. This repository's <code>quicksort.cpp</code>
+    is exactly that — the same median-of-three Hoare partition std::sort uses
+    internally, with no cutoff and no depth limit, recursing all the way to
+    partitions of one. Benchmarked head-to-head against <code>std::sort</code>
+    across the same size sweep, the gap between them <em>is</em> the value of
+    decisions 1 and 2 — measured, not asserted.
+  </p>
+  <p>
+    That control is only meaningful if its partition code really is what
+    <code>std::sort</code> runs for every node above the cutoff — not just
+    asserted from reading both source trees, but shown. Instrumenting
+    <code>quicksort.cpp</code> to record wall time by node size, for one
+    sort of 1,048,576 random ints, answers that directly.
+  </p>
+
+  <div class="split-bar" role="img" aria-label="21.9% of quicksort's time is spent in nodes of 16 or fewer elements; 78.1% is spent in nodes larger than 16.">
+    <div class="split-seg split-small" style="width:21.9%">
+      <span>&le;16<br>21.9%</span>
+    </div>
+    <div class="split-seg split-big" style="width:78.1%">
+      <span>&gt;16 — the code std::sort also runs, unchanged<br>78.1%</span>
+    </div>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>node size</th><th>nodes</th><th>excl. time</th><th>% of total</th><th>ns / node</th></tr></thead>
+      <tbody>
+        <tr><td>&le; 16</td><td>499,334</td><td>11.9 ms</td><td>21.9%</td><td>23.8</td></tr>
+        <tr><td>17 – 64</td><td>72,555</td><td>7.3 ms</td><td>13.5%</td><td>100.8</td></tr>
+        <tr><td>65 – 256</td><td>20,238</td><td>5.7 ms</td><td>10.4%</td><td>279.8</td></tr>
+        <tr><td>257 – 1,024</td><td>5,250</td><td>5.1 ms</td><td>9.3%</td><td>964.0</td></tr>
+        <tr><td>1,025 – 4,096</td><td>1,342</td><td>4.9 ms</td><td>8.9%</td><td>3,615.9</td></tr>
+        <tr><td>4,097 – 16,384</td><td>331</td><td>5.0 ms</td><td>9.2%</td><td>15,078.4</td></tr>
+        <tr><td>16,385 – 65,536</td><td>77</td><td>4.5 ms</td><td>8.3%</td><td>58,515.7</td></tr>
+        <tr><td>65,537 – 262,144</td><td>19</td><td>3.8 ms</td><td>7.0%</td><td>200,074.4</td></tr>
+        <tr><td>262,145 – 1,048,576</td><td>7</td><td>6.2 ms</td><td>11.5%</td><td>889,982.1</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    &ldquo;Node size&rdquo; is the size of one partition call; &ldquo;excl.
+    time&rdquo; is that call's own partition-loop cost with every descendant
+    call's time subtracted out — the technique is the same outermost-entry
+    guard <code>timing_size_breakdown.md</code> uses for its ≤16 figure,
+    generalized to nine nested size bands via successive differences. Rows
+    don't overlap and sum to the total.
+  </p>
+  <p>
+    Only 21.9% of quicksort's own time is spent in the ≤16 partitions that
+    <code>std::sort</code> replaces with a single insertion-sort pass. The
+    other 78.1% — nodes from 17 elements up to the root call on the full
+    1,048,576-element array — is spent inside the identical median-of-three
+    Hoare partition <code>std::sort</code> also calls, recursively, the exact
+    same number of times. There's no room for <code>std::sort</code> to be
+    doing that majority of the work any differently: it's the same function.
+    Its entire measured advantage comes out of the remaining fifth.
+  </p>
+</div>
+
+<div class="wide">
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Normalized cost per comparison sort</div>
+        <div class="panel-sub">ns / (n&middot;log&#8322;n) &middot; Apple M5 &middot; -O2 &middot; random int32, independent buffers, best of 7</div>
+      </div>
+      <div class="legend">
+        <span class="item"><span class="dot" style="background:var(--slate)"></span>quicksort (no cutoff)</span>
+        <span class="item"><span class="dot" style="background:var(--copper)"></span>std::sort</span>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <svg class="chart" id="chartA" viewBox="0 0 900 380" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="tooltip" id="tipA"></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <hr class="rule">
+
+  <div class="regime-head">
+    <span class="regime-num">1</span>
+    <div>
+      <p class="kicker">regime 1 &middot; n &asymp; 16</p>
+      <h2>The Leaf</h2>
+    </div>
+  </div>
+  <p class="lede">Where the ≤16 cutoff fires before quicksort ever partitions.</p>
+
+  <p>
+    <strong>Insertion sort</strong> shifts each new element backward past every
+    larger element already placed — quadratic in the worst case, but with no
+    recursion, no pivot selection, and a strictly sequential access pattern. At
+    n = 16 that quadratic cost is 256 simple compare-and-shift steps; the
+    constant factor is what matters, and insertion sort's is tiny.
+  </p>
+  <p>
+    Plain quicksort's constant factor is not. At n = 16 it still recurses
+    roughly four levels deep, and every level pays a function-call frame,
+    a median-of-three selection, and a Hoare partition loop before it has
+    sorted anything. <code>std::sort</code>'s first decision is to skip all of
+    that: below the threshold it does nothing, and a single final insertion-sort
+    pass — over the whole array, not per partition — cleans up every
+    left-almost-sorted region at once.
+  </p>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>n</th><th>quicksort</th><th>std::sort</th><th>speedup</th></tr></thead>
+      <tbody>
+        <tr><td>16</td><td>4.06</td><td>2.16</td><td>1.88&times;</td></tr>
+        <tr><td>32</td><td>4.03</td><td>2.21</td><td>1.82&times;</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="rule">
+
+  <div class="regime-head">
+    <span class="regime-num">2</span>
+    <div>
+      <p class="kicker">regime 2 &middot; n = 64 &ndash; 4,096</p>
+      <h2>The Widening Middle</h2>
+    </div>
+  </div>
+  <p class="lede">Where both implementations are running the identical partition — and the gap keeps growing, smoothly, with no crossover.</p>
+
+  <p>
+    Above the leaf, both algorithms do the same thing: pick a median-of-three
+    pivot, partition with two inward-walking pointers, recurse on each side.
+    <code>std::sort</code>'s only edge here is that it stops recursing at 16
+    elements instead of 1 — so this regime is a clean measurement of what that
+    one decision is worth as recursion gets deeper. Measured honestly,
+    quicksort never catches up: the margin runs 2.0&times; at n&nbsp;=&nbsp;64
+    up to 2.7&times; at n&nbsp;=&nbsp;4,096, rising the whole way.
+  </p>
+  <p>
+    The reason is call count, not cache behavior. Raw quicksort recurses to
+    partitions of size 1 — roughly <code>2n</code> total calls — while
+    <code>std::sort</code> stops at 16 and cleans up with one linear
+    insertion-sort pass over the whole array, roughly <code>n/8</code> calls.
+    That fixed per-call overhead (a stack frame, a median-of-three selection,
+    a partition loop) recurs at every level all the way down for plain
+    quicksort; <code>std::sort</code> pays it only down to the cutoff. The
+    share of that overhead in the total shrinks for neither algorithm in a way
+    that produces a crossover — it just keeps compounding in
+    <code>std::sort</code>'s favor.
+  </p>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>n</th><th>quicksort</th><th>std::sort</th><th>speedup</th></tr></thead>
+      <tbody>
+        <tr><td>64</td><td>3.91</td><td>1.92</td><td>2.04&times;</td></tr>
+        <tr><td>128</td><td>5.24</td><td>2.30</td><td>2.28&times;</td></tr>
+        <tr><td>256</td><td>3.74</td><td>1.57</td><td>2.39&times;</td></tr>
+        <tr><td>512</td><td>2.76</td><td>1.18</td><td>2.35&times;</td></tr>
+        <tr><td>1,024</td><td>2.47</td><td>1.01</td><td>2.44&times;</td></tr>
+        <tr><td>2,048</td><td>2.45</td><td>0.95</td><td>2.58&times;</td></tr>
+        <tr><td>4,096</td><td>2.44</td><td>0.90</td><td>2.69&times;</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="rule">
+
+  <div class="regime-head">
+    <span class="regime-num">3</span>
+    <div>
+      <p class="kicker">regime 3 &middot; n &ge; 8,192</p>
+      <h2>The Safety Net</h2>
+    </div>
+  </div>
+  <p class="lede">Where a decision built for adversarial input stays dormant on ordinary random data — and the widening gap from Regime 2 simply keeps going.</p>
+
+  <p>
+    <strong>Heapsort</strong> is <code>std::sort</code>'s second decision: if
+    recursion ever passes depth 2&middot;log&#8322;n, abandon quicksort and
+    switch to heapsort, which is slower on average but has no input that makes
+    it quadratic. It exists to stop a hostile or already-sorted array from
+    driving naive quicksort toward O(n²) — on the uniform random data measured
+    here, that depth limit is essentially never reached, and heapsort never
+    runs. It is insurance, and its cost shows up nowhere in this benchmark;
+    its payoff only shows up on inputs this benchmark doesn't contain.
+  </p>
+  <p>
+    So what explains the numbers below? Nothing new — the same recursion-
+    overhead mechanism from Regime 2, continuing. There is no discontinuity at
+    n&nbsp;=&nbsp;8,192 in a correctly measured run: quicksort's own
+    <code>ns/(n&middot;log&#8322;n)</code> is nearly flat across this entire
+    range (2.42 down to 2.33), and so is <code>std::sort</code>'s decline
+    (0.87 down to 0.69). If cache capacity affected the two differently, it
+    would show up here — above the 16-element cutoff they run the
+    <em>identical</em> partition code, so a cache effect would have to hit
+    both equally. The margin keeps widening anyway, slowly, from 2.8&times; to
+    3.4&times;, for the same amortization reason as Regime 2: fixed overhead
+    recurs at every level for plain quicksort and doesn't for
+    <code>std::sort</code>.
+  </p>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>n</th><th>quicksort</th><th>std::sort</th><th>speedup</th></tr></thead>
+      <tbody>
+        <tr><td>8,192</td><td>2.42</td><td>0.87</td><td>2.80&times;</td></tr>
+        <tr><td>16,384</td><td>2.40</td><td>0.83</td><td>2.90&times;</td></tr>
+        <tr><td>32,768</td><td>2.39</td><td>0.80</td><td>3.00&times;</td></tr>
+        <tr><td>65,536</td><td>2.38</td><td>0.77</td><td>3.09&times;</td></tr>
+        <tr><td>131,072</td><td>2.37</td><td>0.75</td><td>3.16&times;</td></tr>
+        <tr><td>262,144</td><td>2.35</td><td>0.73</td><td>3.23&times;</td></tr>
+        <tr><td>524,288</td><td>2.33</td><td>0.71</td><td>3.29&times;</td></tr>
+        <tr><td>1,048,576</td><td>2.33</td><td>0.69</td><td>3.38&times;</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="wide">
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Speedup of std::sort over plain quicksort</div>
+        <div class="panel-sub">same runs as above &middot; ratio of total sort time &middot; std::sort wins at every size tested</div>
+      </div>
+      <div class="legend">
+        <span class="item"><span class="dot" style="background:var(--copper)"></span>std::sort faster</span>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <svg class="chart" id="chartB" viewBox="0 0 900 340" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="tooltip" id="tipB"></div>
+    </div>
+  </div>
+
+  <details class="data-table">
+    <summary>View full data table</summary>
+    <div class="table-scroll">
+      <table id="fullTable">
+        <thead><tr><th>n</th><th>quicksort ns/(n&middot;log&#8322;n)</th><th>std::sort ns/(n&middot;log&#8322;n)</th><th>speedup</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </details>
+
+  <hr class="rule">
+
+  <p style="color:var(--text-secondary); max-width:68ch;">
+    Three decisions, and — because this repository's plain quicksort
+    implements the exact same partition std::sort uses internally — a fair
+    way to measure what they're worth. The insertion-sort cutoff is doing
+    essentially all the work measured here: a real, monotonically widening
+    margin from 1.8&times; at n&nbsp;=&nbsp;16 to 3.4&times; at
+    n&nbsp;=&nbsp;1,048,576, driven by recursion overhead that std::sort pays
+    once per ~16 elements and plain quicksort pays at every level down to 1.
+    There is no separate cache-related regime and no crossover — that was an
+    artifact of measuring with a harness this repo's own benchmarks have
+    already warned against. The depth-limited heapsort fallback buys nothing
+    on this data at all; its payoff only shows up on inputs — adversarial or
+    already-sorted — that this benchmark doesn't contain.
+  </p>
+
+  <footer>
+    <table class="files">
+      <tbody>
+        <tr><th>quicksort.cpp</th><td>Median-of-three Hoare quicksort, no cutoff, no depth limit — the control</td></tr>
+        <tr><th>std_sort.cpp</th><td><code>std::sort</code> algorithm; re-benchmarked here with a corrected harness</td></tr>
+        <tr><th>timing_size_breakdown.md</th><td>Source of the corrected numbers above, plus the ≤16-partition time breakdown and the methodology note</td></tr>
+      </tbody>
+    </table>
+    <p>Apple M5 &middot; clang &middot; -O2 &middot; random int32 &middot; independent buffers refilled outside the timed region &middot; best of 7 runs.</p>
+    <p>Companion page: <a href="sort_mechanisms.html">Sort Mechanisms</a> — how each algorithm moves data.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var N = [16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576];
+  var QS = [4.06,4.03,3.91,5.24,3.74,2.76,2.47,2.45,2.44,2.42,2.40,2.39,2.38,2.37,2.35,2.33,2.33];
+  var SS = [2.16,2.21,1.92,2.30,1.57,1.18,1.01,0.95,0.90,0.87,0.83,0.80,0.77,0.75,0.73,0.71,0.69];
+  var SPD = QS.map(function (v, i) { return v / SS[i]; });
+
+  function fmtN(n) { return n >= 1000 ? n.toLocaleString('en-US') : String(n); }
+  var css = getComputedStyle(document.documentElement);
+  function cvar(name) { return css.getPropertyValue(name).trim(); }
+
+  var svgNS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) {
+    var e = document.createElementNS(svgNS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  // ---------------- Chart A: two lines, ns/(n log2 n) ----------------
+  (function () {
+    var svg = document.getElementById('chartA');
+    var W = 900, H = 380, ML = 46, MR = 16, MT = 34, MB = 40;
+    var pw = W - ML - MR, ph = H - MT - MB;
+    var n = N.length;
+    var yMax = 5.6, yMin = 0.4;
+
+    function x(i) { return ML + (pw * i / (n - 1)); }
+    function y(v) { return MT + ph * (1 - (v - yMin) / (yMax - yMin)); }
+
+    // regime bands
+    var bands = [
+      { from: 0, to: 1, label: 'Regime 1 · leaf' },
+      { from: 1, to: 8, label: 'Regime 2 · widening middle' },
+      { from: 8, to: 16, label: 'Regime 3 · safety net' }
+    ];
+    var bandFill = ['var(--surface-sunken)', 'transparent', 'var(--surface-sunken)'];
+    bands.forEach(function (b, bi) {
+      var x0 = x(b.from) - (b.from === 0 ? 0 : (x(b.from) - x(b.from - 1)) / 2);
+      var x1 = x(b.to) + (b.to === n - 1 ? 0 : (x(b.to + 1) - x(b.to)) / 2);
+      svg.appendChild(el('rect', { x: x0, y: MT, width: x1 - x0, height: ph, fill: bandFill[bi] }));
+      var lbl = el('text', { x: (x0 + x1) / 2, y: MT - 12, class: 'band-label', 'text-anchor': 'middle' });
+      lbl.textContent = b.label;
+      svg.appendChild(lbl);
+      if (bi > 0) svg.appendChild(el('line', { x1: x0, x2: x0, y1: MT, y2: MT + ph, class: 'gridline', 'stroke-dasharray': '2,3' }));
+    });
+
+    // y gridlines
+    [1, 2, 3, 4, 5].forEach(function (v) {
+      svg.appendChild(el('line', { x1: ML, x2: ML + pw, y1: y(v), y2: y(v), class: 'gridline' }));
+      var t = el('text', { x: ML - 8, y: y(v) + 3, class: 'axis-label', 'text-anchor': 'end' });
+      t.textContent = v.toFixed(1);
+      svg.appendChild(t);
+    });
+
+    // x axis labels (every other tick to avoid crowding)
+    N.forEach(function (nv, i) {
+      if (i % 2 !== 0 && i !== n - 1) return;
+      var t = el('text', { x: x(i), y: H - MB + 18, class: 'axis-label', 'text-anchor': 'middle' });
+      t.textContent = fmtN(nv);
+      svg.appendChild(t);
+    });
+    var axTitle = el('text', { x: ML + pw / 2, y: H - 4, class: 'axis-label', 'text-anchor': 'middle' });
+    axTitle.textContent = 'n (elements, log scale)';
+    svg.appendChild(axTitle);
+
+    function path(vals, color) {
+      var d = vals.map(function (v, i) { return (i === 0 ? 'M' : 'L') + x(i) + ',' + y(v); }).join(' ');
+      svg.appendChild(el('path', { d: d, fill: 'none', stroke: color, 'stroke-width': 2.25, 'stroke-linejoin': 'round' }));
+    }
+    path(QS, cvar('--slate'));
+    path(SS, cvar('--copper'));
+
+    var tip = document.getElementById('tipA');
+    var wrap = svg.parentElement;
+    [QS, SS].forEach(function (vals, si) {
+      var color = si === 0 ? cvar('--slate') : cvar('--copper');
+      vals.forEach(function (v, i) {
+        var c = el('circle', { cx: x(i), cy: y(v), r: 4, fill: color, stroke: cvar('--surface'), 'stroke-width': 1.5 });
+        c.style.cursor = 'pointer';
+        c.addEventListener('mouseenter', function (ev) { showTip(i, ev); });
+        c.addEventListener('mousemove', function (ev) { showTip(i, ev); });
+        c.addEventListener('mouseleave', function () { tip.style.opacity = 0; });
+        svg.appendChild(c);
+      });
+    });
+    function showTip(i, ev) {
+      var r = wrap.getBoundingClientRect();
+      tip.innerHTML = '<div class="n">n = ' + fmtN(N[i]) + '</div>' +
+        '<div class="row"><span>quicksort</span><span>' + QS[i].toFixed(2) + '</span></div>' +
+        '<div class="row"><span>std::sort</span><span>' + SS[i].toFixed(2) + '</span></div>';
+      tip.style.left = (ev.clientX - r.left) + 'px';
+      tip.style.top = (ev.clientY - r.top) + 'px';
+      tip.style.opacity = 1;
+    }
+  })();
+
+  // ---------------- Chart B: diverging bars, speedup ratio ----------------
+  (function () {
+    var svg = document.getElementById('chartB');
+    var W = 900, H = 340, ML = 46, MR = 16, MT = 26, MB = 40;
+    var pw = W - ML - MR, ph = H - MT - MB;
+    var n = N.length;
+    var lo = 1.0, hi = 3.6;
+    var baseline = 1.0;
+
+    function x(i) { return ML + (pw * i / (n - 1)); }
+    function y(v) { return MT + ph * (1 - (Math.log(v / lo)) / (Math.log(hi / lo))); }
+    var yBase = y(baseline);
+
+    svg.appendChild(el('line', { x1: ML, x2: ML + pw, y1: yBase, y2: yBase, stroke: cvar('--border-strong'), 'stroke-width': 1 }));
+    var bt = el('text', { x: ML + pw + 0, y: yBase - 6, class: 'axis-label', 'text-anchor': 'end' });
+    bt.textContent = '1.0× parity';
+    svg.appendChild(bt);
+
+    [1, 1.5, 2, 2.5, 3, 3.5].forEach(function (v) {
+      if (v < lo || v > hi) return;
+      svg.appendChild(el('line', { x1: ML, x2: ML + pw, y1: y(v), y2: y(v), class: 'gridline' }));
+      var t = el('text', { x: ML - 8, y: y(v) + 3, class: 'axis-label', 'text-anchor': 'end' });
+      t.textContent = v.toFixed(1) + '×';
+      svg.appendChild(t);
+    });
+
+    var barW = (pw / n) * 0.56;
+    var tip = document.getElementById('tipB');
+    var wrap = svg.parentElement;
+
+    SPD.forEach(function (v, i) {
+      var winner = v >= 1 ? 'std::sort' : 'quicksort';
+      var color = v >= 1 ? cvar('--copper') : cvar('--slate');
+      var yv = y(Math.max(v, lo));
+      var yTop = Math.min(yv, yBase), hgt = Math.max(Math.abs(yv - yBase), 1.5);
+      var rect = el('rect', {
+        x: x(i) - barW / 2, y: yTop, width: barW, height: hgt,
+        fill: color, rx: 2
+      });
+      rect.style.cursor = 'pointer';
+      rect.addEventListener('mouseenter', function (ev) { showTip(i, winner, ev); });
+      rect.addEventListener('mousemove', function (ev) { showTip(i, winner, ev); });
+      rect.addEventListener('mouseleave', function () { tip.style.opacity = 0; });
+      svg.appendChild(rect);
+    });
+
+    N.forEach(function (nv, i) {
+      if (i % 2 !== 0 && i !== n - 1) return;
+      var t = el('text', { x: x(i), y: H - MB + 18, class: 'axis-label', 'text-anchor': 'middle' });
+      t.textContent = fmtN(nv);
+      svg.appendChild(t);
+    });
+    var axTitle = el('text', { x: ML + pw / 2, y: H - 4, class: 'axis-label', 'text-anchor': 'middle' });
+    axTitle.textContent = 'n (elements, log scale)';
+    svg.appendChild(axTitle);
+
+    function showTip(i, winner, ev) {
+      var r = wrap.getBoundingClientRect();
+      tip.innerHTML = '<div class="n">n = ' + fmtN(N[i]) + '</div>' +
+        '<div class="row"><span>' + winner + '</span><span>' + SPD[i].toFixed(2) + '&times;</span></div>';
+      tip.style.left = (ev.clientX - r.left) + 'px';
+      tip.style.top = (ev.clientY - r.top) + 'px';
+      tip.style.opacity = 1;
+    }
+  })();
+
+  // ---------------- full data table ----------------
+  (function () {
+    var tbody = document.querySelector('#fullTable tbody');
+    N.forEach(function (nv, i) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + fmtN(nv) + '</td><td>' + QS[i].toFixed(2) + '</td><td>' + SS[i].toFixed(2) + '</td><td>' + SPD[i].toFixed(2) + '&times;</td>';
+      tbody.appendChild(tr);
+    });
+  })();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- The Address Is Not The Memory (vm_reality.html) -- generated for the pppe26 repo; opens
+     standalone in any browser, no server and no external assets beyond the
+     web fonts, which fall back to system faces offline. -->
+<title>The Address Is Not The Memory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* the hosted version of this page got a reset from its runtime; standalone,
+   it brings its own */
+html{-webkit-text-size-adjust:100%}
+figure,blockquote,dl,dd{margin:0}
+ul,ol{margin:0}
+img,svg{max-width:100%}
+
+:root{
+  --bg:#F3F2F7;
+  --surface:#FFFFFF;
+  --sunken:#E7E6EF;
+  --ink:#191824;
+  --ink-2:#514E63;
+  --ink-3:#827E96;
+  --rule:#D2D0DE;
+  --grid:#E0DEEA;
+  /* the page's one structural idea: virtual things are indigo, physical
+     things are bronze, and the cost of crossing between them is crimson */
+  --virt:#5A4FCF;
+  --virt-soft:#E6E4F8;
+  --phys:#8C5D18;
+  --phys-soft:#F3E7D4;
+  --cost:#A82D4E;
+  --cost-soft:#F7DCE4;
+  --shadow:0 1px 2px rgba(25,24,36,.06), 0 10px 28px rgba(25,24,36,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111019;
+    --surface:#1A1826;
+    --sunken:#0D0C14;
+    --ink:#EAE8F4;
+    --ink-2:#A8A3BF;
+    --ink-3:#78738F;
+    --rule:#302D40;
+    --grid:#262336;
+    --virt:#9A90F0;
+    --virt-soft:#1E1B33;
+    --phys:#D9A45A;
+    --phys-soft:#2A2015;
+    --cost:#EE7A98;
+    --cost-soft:#2E1521;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111019;
+  --surface:#1A1826;
+  --sunken:#0D0C14;
+  --ink:#EAE8F4;
+  --ink-2:#A8A3BF;
+  --ink-3:#78738F;
+  --rule:#302D40;
+  --grid:#262336;
+  --virt:#9A90F0;
+  --virt-soft:#1E1B33;
+  --phys:#D9A45A;
+  --phys-soft:#2A2015;
+  --cost:#EE7A98;
+  --cost-soft:#2E1521;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Source Sans 3",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1160px;margin:0 auto;padding:52px 28px 96px;
+      display:flex;flex-direction:column;gap:58px}
+
+/* ---------- masthead ---------- */
+.masthead{display:flex;flex-direction:column;gap:16px}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--virt);margin:0;
+}
+h1{
+  font-family:Sora,ui-sans-serif,system-ui,sans-serif;
+  font-weight:700;font-size:clamp(2.05rem,4.8vw,3.15rem);
+  line-height:1.06;letter-spacing:-.03em;margin:0;text-wrap:balance;max-width:20ch;
+}
+.standfirst{margin:0;max-width:63ch;font-size:1.1rem;color:var(--ink-2)}
+.standfirst b{color:var(--ink);font-weight:600}
+.machine{
+  display:flex;flex-wrap:wrap;gap:0 24px;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  padding:13px 0;margin-top:8px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-2);
+}
+.machine b{color:var(--ink);font-weight:500}
+
+/* ---------- sections ---------- */
+section{display:flex;flex-direction:column;gap:20px;scroll-margin-top:20px}
+h2{
+  font-family:Sora,ui-sans-serif,system-ui,sans-serif;
+  font-weight:600;font-size:1.5rem;letter-spacing:-.02em;margin:0;text-wrap:balance;
+}
+h2 .num{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.7em;color:var(--virt);font-weight:500;margin-right:.75em;
+}
+p{margin:0;max-width:70ch}
+p + p{margin-top:.85em}
+strong{font-weight:600}
+.lede{color:var(--ink-2)}
+code{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.88em;
+  background:var(--sunken);padding:1px 5px;border-radius:2px;color:var(--ink);
+}
+pre{
+  margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:4px;
+  padding:16px 18px;overflow-x:auto;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;line-height:1.65;
+  color:var(--ink-2);
+}
+pre b{color:var(--ink);font-weight:500}
+pre .v{color:var(--virt);font-weight:500}
+pre .p{color:var(--phys);font-weight:500}
+
+/* ---------- figures ---------- */
+figure{
+  margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:4px;
+  box-shadow:var(--shadow);padding:26px 26px 20px;
+  display:flex;flex-direction:column;gap:16px;
+}
+.canvas{overflow-x:auto;overflow-y:hidden}
+figure svg{display:block;width:100%;min-width:700px;height:auto}
+figcaption{
+  font-size:13.5px;color:var(--ink-2);max-width:80ch;
+  border-top:1px solid var(--grid);padding-top:14px;
+}
+figcaption b{color:var(--ink);font-weight:600}
+
+.sv-ink{fill:var(--ink)}
+.sv-dim{fill:var(--ink-2)}
+.sv-faint{fill:var(--ink-3)}
+.sv-virt{fill:var(--virt)}
+.sv-phys{fill:var(--phys)}
+.sv-cost{fill:var(--cost)}
+.fill-surface{fill:var(--surface)}
+.fill-sunken{fill:var(--sunken)}
+.fill-virt{fill:var(--virt-soft)}
+.fill-phys{fill:var(--phys-soft)}
+.fill-cost{fill:var(--cost-soft)}
+.fill-none{fill:none}
+.st-rule{stroke:var(--rule);fill:none}
+.st-grid{stroke:var(--grid);fill:none}
+.st-dim{stroke:var(--ink-2);fill:none}
+.st-virt{stroke:var(--virt);fill:none}
+.st-phys{stroke:var(--phys);fill:none}
+.st-cost{stroke:var(--cost);fill:none}
+.lbl{font-family:"Source Sans 3",sans-serif;font-size:11.5px}
+.lbl-sm{font-family:"Source Sans 3",sans-serif;font-size:10px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px}
+.mono-sm{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9px}
+.mono-lg{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:18px;font-weight:600}
+.cap{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9.5px;
+     letter-spacing:.13em;text-transform:uppercase}
+.w500{font-weight:500}
+.w600{font-weight:600}
+
+/* ---------- callout ---------- */
+.note{
+  background:var(--surface);border:1px solid var(--rule);
+  border-left:3px solid var(--virt);border-radius:0 4px 4px 0;
+  padding:18px 20px;display:flex;flex-direction:column;gap:8px;
+}
+.note h3{font-family:"Source Sans 3",sans-serif;font-size:.98rem;font-weight:600;margin:0}
+.note p{font-size:14.5px;color:var(--ink-2)}
+.note.warn{border-left-color:var(--cost)}
+.note.phys{border-left-color:var(--phys)}
+
+/* ---------- tables ---------- */
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+table.compact{min-width:440px}
+th,td{padding:10px 16px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9.5px;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:500;background:var(--sunken);
+}
+tbody td{font-family:"IBM Plex Mono",ui-monospace,monospace;
+         font-variant-numeric:tabular-nums;color:var(--ink-2)}
+tbody td:first-child{font-family:"Source Sans 3",sans-serif;font-weight:600;color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.hi td{background:var(--virt-soft)}
+tbody tr.bad td{background:var(--cost-soft)}
+
+/* ---------- promise / mechanism pairs ---------- */
+.pairs{display:flex;flex-direction:column;gap:0;border:1px solid var(--rule);
+       border-radius:4px;overflow:hidden;background:var(--surface)}
+.pair{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--rule)}
+.pair:first-child{border-top:none}
+.pair > div{padding:15px 18px}
+.pair .promise{border-right:1px solid var(--rule);background:var(--virt-soft)}
+.pair .cap{display:block;margin-bottom:5px}
+.pair p{font-size:14px;margin:0;max-width:46ch}
+@media (max-width:720px){
+  .pair{grid-template-columns:1fr}
+  .pair .promise{border-right:none;border-bottom:1px solid var(--rule)}
+}
+
+/* ---------- steps ---------- */
+.steps{display:flex;flex-direction:column;gap:18px;margin:0;padding:0;list-style:none}
+.steps li{display:flex;gap:15px}
+.steps .n{
+  flex:0 0 auto;width:25px;height:25px;border-radius:50%;
+  border:1px solid var(--rule);background:var(--sunken);
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;
+  display:flex;align-items:center;justify-content:center;color:var(--ink-2);margin-top:3px;
+}
+.steps .body{display:flex;flex-direction:column;gap:3px}
+.steps h3{font-family:"Source Sans 3",sans-serif;font-size:1rem;font-weight:600;margin:0}
+.steps p{font-size:14.5px;color:var(--ink-2)}
+
+/* ---------- colophon ---------- */
+.colophon{
+  border-top:1px solid var(--rule);padding-top:22px;
+  display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--ink-2);
+}
+.colophon h2{font-size:1.05rem}
+a{color:var(--ink);text-decoration-color:var(--ink-3);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--ink)}
+a:focus-visible{outline:2px solid var(--virt);outline-offset:3px;border-radius:2px}
+
+@media (max-width:640px){
+  .wrap{padding:36px 18px 64px;gap:44px}
+  figure{padding:18px 16px 14px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+    <p class="eyebrow">Virtual memory, measured</p>
+    <h1>The Address Is Not The Memory</h1>
+    <p class="standfirst">
+      A process on this machine can address <b>128 TiB</b>. The machine has <b>15 GB</b> of RAM.
+      Neither number is a mistake, and the gap between them is not a rounding error — it is the
+      whole abstraction. Every address your program handles is a lookup key, not a location, and
+      almost none of the keys resolve to anything at all.
+    </p>
+    <div class="machine">
+      <span><b>AMD Ryzen AI 9 HX 370</b> &middot; Linux &middot; gcc 13.3</span>
+      <span>48-bit addresses &middot; 47 bits for userspace</span>
+      <span>4 KB pages, 2 MB huge pages</span>
+      <span>15.3 GB RAM &middot; 15.3 GB swap</span>
+    </div>
+  </header>
+
+  <!-- ============ 01 ============ -->
+  <section id="space">
+    <h2><span class="num">01</span>What a process actually has</h2>
+    <p class="lede">
+      The textbook picture of a process's memory is four stacked boxes — code, data, heap, stack —
+      and a note that shared libraries go somewhere. That picture is not wrong so much as it is
+      the wrong scale. Here is what <code>address_space.c</code> finds when it reads its own
+      <code>/proc/self/maps</code>:
+    </p>
+
+    <div class="tablewrap">
+      <table class="compact">
+        <tbody>
+          <tr><td>regions mapped</td><td>25</td><td>not 4</td></tr>
+          <tr><td>virtual size</td><td>66.6 MB</td><td>what it can address</td></tr>
+          <tr class="hi"><td>resident</td><td>2.7 MB</td><td>what it costs in DRAM</td></tr>
+          <tr><td>resident / virtual</td><td>4.1 %</td><td>the rest is a promise</td></tr>
+          <tr><td>user address space</td><td>131,072 GB</td><td>2<sup>47</sup> bytes</td></tr>
+          <tr class="bad"><td>fraction of it mapped</td><td>0.000050 %</td><td>&mdash;</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 260" role="img"
+             aria-label="The 128 tebibyte user address space drawn as a full-width bar. Everything the process has mapped occupies less than one two-thousandth of a pixel. Three clusters sit in the upper third: the program binary near 68 percent, shared libraries and heap near 90 percent, and the stack at 99.9 percent. Below 68 percent there is nothing at all.">
+          <defs>
+            <marker id="v1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-virt"/></marker>
+          </defs>
+
+          <text x="40" y="26" class="cap sv-virt">the user address space, drawn to scale</text>
+          <text x="1000" y="26" text-anchor="end" class="mono sv-faint">0 &rarr; 2^47</text>
+
+          <!-- the space -->
+          <rect x="40" y="38" width="960" height="46" rx="3" class="fill-sunken"/>
+          <rect x="40" y="38" width="960" height="46" rx="3" class="st-rule" stroke-width="1.25"/>
+
+          <!-- the three clusters, at their real fractional positions -->
+          <line x1="698" y1="38" x2="698" y2="84" class="st-virt" stroke-width="2"/>
+          <line x1="908" y1="38" x2="908" y2="84" class="st-virt" stroke-width="2"/>
+          <line x1="999" y1="38" x2="999" y2="84" class="st-virt" stroke-width="2"/>
+
+          <text x="698" y="102" text-anchor="middle" class="mono-sm sv-virt">0x57e1_30fe_4240</text>
+          <text x="698" y="114" text-anchor="middle" class="lbl-sm sv-dim">the program</text>
+          <text x="890" y="102" text-anchor="middle" class="mono-sm sv-virt">0x73cd_b93f_f010</text>
+          <text x="890" y="114" text-anchor="middle" class="lbl-sm sv-dim">libc, heap</text>
+          <text x="985" y="130" text-anchor="middle" class="mono-sm sv-virt">0x7ffd_55e5_e7dc</text>
+          <text x="985" y="142" text-anchor="middle" class="lbl-sm sv-dim">stack</text>
+
+          <path d="M360,66 L680,66" class="st-dim" stroke-width="1" stroke-dasharray="4 4"
+                marker-start="url(#v1)" marker-end="url(#v1)"/>
+          <text x="520" y="60" text-anchor="middle" class="lbl sv-dim">90 TB of nothing</text>
+
+          <text x="40" y="176" class="lbl sv-ink w600">At this scale, everything the process has mapped is 0.0005 px wide.</text>
+          <text x="40" y="196" class="lbl sv-dim">All 25 regions, all 66.6 MB of them, would not cover one thousandth of the bar above.</text>
+
+          <!-- zoom inset -->
+          <line x1="40" y1="214" x2="1000" y2="214" class="st-grid" stroke-width="1"/>
+          <text x="40" y="236" class="cap sv-phys">and of that sliver, only 4.1% has physical memory behind it</text>
+          <rect x="40" y="242" width="960" height="12" rx="2" class="fill-virt"/>
+          <rect x="40" y="242" width="39" height="12" rx="2" class="fill-phys"/>
+          <rect x="40" y="242" width="960" height="12" rx="2" class="st-rule" stroke-width="1"/>
+          <text x="86" y="252" class="mono-sm sv-phys">2.7 MB resident</text>
+          <text x="994" y="252" text-anchor="end" class="mono-sm sv-virt">66.6 MB mapped</text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Two nested emptinesses.</b> Almost none of the address space is mapped, and most of what
+        is mapped has no memory behind it. The bash shell that ran these experiments is starker
+        still: 1.32 GiB of virtual size against 7.4 MiB resident — <b>99.5% of it is bookkeeping</b>.
+        Address space is free; memory is not.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ 02 ============ -->
+  <section id="translate">
+    <h2><span class="num">02</span>How an address becomes a location</h2>
+    <p class="lede">
+      If the address is a key, something has to look it up. On x86-64 that something is a
+      four-level tree walked by the hardware on every access that is not already cached. The
+      address is not one number to the MMU — it is five fields.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 330" role="img"
+             aria-label="A 48-bit virtual address splits into four 9-bit indices and a 12-bit offset. Each index selects an entry in one level of the page table tree — PML4, PDPT, page directory, page table — and the final entry gives a physical frame number, which combines with the offset to form the physical address. Each level is itself a 4 kilobyte page in memory holding 512 entries.">
+          <defs>
+            <marker id="t2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-dim"/></marker>
+            <marker id="t2p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-phys"/></marker>
+          </defs>
+
+          <text x="40" y="24" class="cap sv-virt">one 48-bit virtual address</text>
+
+          <!-- the five fields -->
+          <rect x="40" y="34" width="180" height="40" rx="3" class="fill-virt"/>
+          <rect x="40" y="34" width="180" height="40" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="130" y="52" text-anchor="middle" class="lbl sv-ink w600">47:39</text>
+          <text x="130" y="66" text-anchor="middle" class="mono-sm sv-dim">9 bits</text>
+
+          <rect x="224" y="34" width="180" height="40" rx="3" class="fill-virt"/>
+          <rect x="224" y="34" width="180" height="40" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="314" y="52" text-anchor="middle" class="lbl sv-ink w600">38:30</text>
+          <text x="314" y="66" text-anchor="middle" class="mono-sm sv-dim">9 bits</text>
+
+          <rect x="408" y="34" width="180" height="40" rx="3" class="fill-virt"/>
+          <rect x="408" y="34" width="180" height="40" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="498" y="52" text-anchor="middle" class="lbl sv-ink w600">29:21</text>
+          <text x="498" y="66" text-anchor="middle" class="mono-sm sv-dim">9 bits</text>
+
+          <rect x="592" y="34" width="180" height="40" rx="3" class="fill-virt"/>
+          <rect x="592" y="34" width="180" height="40" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="682" y="52" text-anchor="middle" class="lbl sv-ink w600">20:12</text>
+          <text x="682" y="66" text-anchor="middle" class="mono-sm sv-dim">9 bits</text>
+
+          <rect x="776" y="34" width="224" height="40" rx="3" class="fill-phys"/>
+          <rect x="776" y="34" width="224" height="40" rx="3" class="st-phys" stroke-width="1.25"/>
+          <text x="888" y="52" text-anchor="middle" class="lbl sv-ink w600">11:0 &mdash; offset</text>
+          <text x="888" y="66" text-anchor="middle" class="mono-sm sv-dim">byte within the page</text>
+
+          <!-- arrows down to levels -->
+          <line x1="130" y1="74" x2="130" y2="106" class="st-dim" stroke-width="1.25" marker-end="url(#t2)"/>
+          <line x1="314" y1="74" x2="314" y2="106" class="st-dim" stroke-width="1.25" marker-end="url(#t2)"/>
+          <line x1="498" y1="74" x2="498" y2="106" class="st-dim" stroke-width="1.25" marker-end="url(#t2)"/>
+          <line x1="682" y1="74" x2="682" y2="106" class="st-dim" stroke-width="1.25" marker-end="url(#t2)"/>
+
+          <!-- the four levels -->
+          <rect x="40" y="108" width="180" height="52" rx="3" class="fill-surface"/>
+          <rect x="40" y="108" width="180" height="52" rx="3" class="st-dim" stroke-width="1.25"/>
+          <text x="130" y="128" text-anchor="middle" class="lbl sv-ink w600">PML4</text>
+          <text x="130" y="144" text-anchor="middle" class="mono-sm sv-faint">512 entries, 4 KB</text>
+
+          <rect x="224" y="108" width="180" height="52" rx="3" class="fill-surface"/>
+          <rect x="224" y="108" width="180" height="52" rx="3" class="st-dim" stroke-width="1.25"/>
+          <text x="314" y="128" text-anchor="middle" class="lbl sv-ink w600">PDPT</text>
+          <text x="314" y="144" text-anchor="middle" class="mono-sm sv-faint">512 entries, 4 KB</text>
+
+          <rect x="408" y="108" width="180" height="52" rx="3" class="fill-surface"/>
+          <rect x="408" y="108" width="180" height="52" rx="3" class="st-dim" stroke-width="1.25"/>
+          <text x="498" y="128" text-anchor="middle" class="lbl sv-ink w600">page directory</text>
+          <text x="498" y="144" text-anchor="middle" class="mono-sm sv-faint">512 entries, 4 KB</text>
+
+          <rect x="592" y="108" width="180" height="52" rx="3" class="fill-surface"/>
+          <rect x="592" y="108" width="180" height="52" rx="3" class="st-dim" stroke-width="1.25"/>
+          <text x="682" y="128" text-anchor="middle" class="lbl sv-ink w600">page table</text>
+          <text x="682" y="144" text-anchor="middle" class="mono-sm sv-faint">512 entries, 4 KB</text>
+
+          <!-- chain across -->
+          <line x1="220" y1="134" x2="222" y2="134" class="st-dim" stroke-width="1.25"/>
+          <path d="M130,160 L130,176 L314,176 L314,160" class="st-dim fill-none" stroke-width="1.25" marker-end="url(#t2)"/>
+          <path d="M314,160 L314,190 L498,190 L498,160" class="st-dim fill-none" stroke-width="1.25" marker-end="url(#t2)"/>
+          <path d="M498,160 L498,204 L682,204 L682,160" class="st-dim fill-none" stroke-width="1.25" marker-end="url(#t2)"/>
+          <text x="222" y="172" text-anchor="middle" class="mono-sm sv-faint">a memory access</text>
+          <text x="406" y="186" text-anchor="middle" class="mono-sm sv-faint">a memory access</text>
+          <text x="590" y="200" text-anchor="middle" class="mono-sm sv-faint">a memory access</text>
+
+          <!-- result -->
+          <path d="M682,204 L682,232 L888,232 L888,250" class="st-phys fill-none" stroke-width="1.5" marker-end="url(#t2p)"/>
+          <line x1="888" y1="74" x2="888" y2="250" class="st-phys" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#t2p)"/>
+          <text x="700" y="226" class="mono-sm sv-phys">frame number</text>
+
+          <rect x="700" y="252" width="300" height="42" rx="3" class="fill-phys"/>
+          <rect x="700" y="252" width="300" height="42" rx="3" class="st-phys" stroke-width="1.5"/>
+          <text x="850" y="270" text-anchor="middle" class="lbl sv-ink w600">physical address</text>
+          <text x="850" y="286" text-anchor="middle" class="mono-sm sv-dim">frame &times; 4096 + offset</text>
+
+          <text x="40" y="272" class="lbl sv-cost w600">Four lookups, each one a memory access of its own.</text>
+          <text x="40" y="290" class="lbl sv-dim">This is why a translation cache exists — and why the page tables are themselves memory.</text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>The offset never gets translated.</b> Only the top 36 bits do, which is why the page is
+        the unit of everything: within one page, virtual and physical addresses differ by a constant.
+        The hardware caches these lookups in a TLB, whose capacity is a separate story with its own
+        cliff — see <a href="../memory_hierarchy/tlb_cliff.html">The TLB Cliff</a>.
+      </figcaption>
+    </figure>
+
+    <div class="note phys">
+      <h3>The tables are made of memory too</h3>
+      <p>
+        Nine bits per level means 512 entries of 8 bytes — one 4 KB page per table. Those pages are
+        real. Touching 1 GB of anonymous memory on this machine grows the process's page tables from
+        <code>44 KB</code> to <code>2,100 KB</code>: exactly 8 bytes of table per 4 KB page mapped,
+        an 0.2% tax that appears only as you touch. A 64 GB reservation that is never touched costs
+        44 KB, because the tree is built lazily too.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 03 ============ -->
+  <section id="lazy">
+    <h2><span class="num">03</span>Allocation is a promise, not memory</h2>
+    <p class="lede">
+      A successful <code>malloc</code> buys addresses. Physical pages arrive later, one at a time,
+      when each is first touched. On a machine with 15 GB of RAM, <code>lazy_alloc.c</code> asks for
+      64 GB and gets it:
+    </p>
+
+    <pre><span class="v">VmSize</span>       2.6 MB -&gt;  65538.6 MB   (+65536 MB)   <b>addresses: granted immediately</b>
+<span class="p">VmRSS</span>        1.7 MB -&gt;      1.8 MB   (+0.1 MB)    <b>memory: nothing arrived</b></pre>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 300" role="img"
+             aria-label="Resident memory tracked against bytes touched. Resident size follows touched bytes exactly, one to one, from 1 megabyte to 1 gigabyte, while virtual size stays flat at 64 gigabytes throughout. A separate count of present pages read from pagemap matches the expected count exactly at every step.">
+          <text x="60" y="24" class="cap sv-virt">virtual size, flat at 64 GB throughout</text>
+          <rect x="60" y="34" width="920" height="18" rx="2" class="fill-virt"/>
+          <rect x="60" y="34" width="920" height="18" rx="2" class="st-virt" stroke-width="1.25"/>
+          <text x="520" y="47" text-anchor="middle" class="mono-sm sv-virt">65,538 MB reserved &mdash; 4,300&times; the RAM in this machine</text>
+
+          <text x="60" y="82" class="cap sv-phys">resident memory, as pages are touched</text>
+
+          <!-- axis -->
+          <line x1="60" y1="240" x2="980" y2="240" class="st-rule" stroke-width="1.25"/>
+          <line x1="60" y1="96" x2="60" y2="240" class="st-rule" stroke-width="1.25"/>
+          <g class="st-grid" stroke-width="1">
+            <line x1="60" y1="204" x2="980" y2="204"/>
+            <line x1="60" y1="168" x2="980" y2="168"/>
+            <line x1="60" y1="132" x2="980" y2="132"/>
+            <line x1="60" y1="96"  x2="980" y2="96"/>
+          </g>
+          <g class="mono-sm sv-faint">
+            <text x="52" y="243" text-anchor="end">0</text>
+            <text x="52" y="207" text-anchor="end">256</text>
+            <text x="52" y="171" text-anchor="end">512</text>
+            <text x="52" y="135" text-anchor="end">768</text>
+            <text x="52" y="99"  text-anchor="end">1024 MB</text>
+          </g>
+
+          <!-- bars: touched vs resident, side by side -->
+          <g>
+            <rect x="120" y="240" width="26" height="0.3" class="sv-virt"/>
+            <rect x="150" y="240" width="26" height="0.3" class="sv-phys"/>
+            <text x="148" y="256" text-anchor="middle" class="mono-sm sv-faint">0</text>
+
+            <rect x="240" y="239.9" width="26" height="0.1" class="sv-virt"/>
+            <rect x="270" y="239.7" width="26" height="0.3" class="sv-phys"/>
+            <text x="268" y="256" text-anchor="middle" class="mono-sm sv-faint">1</text>
+
+            <rect x="360" y="239.4" width="26" height="0.6" class="sv-virt"/>
+            <rect x="390" y="239.2" width="26" height="0.8" class="sv-phys"/>
+            <text x="388" y="256" text-anchor="middle" class="mono-sm sv-faint">16</text>
+
+            <rect x="480" y="231" width="26" height="9" class="sv-virt"/>
+            <rect x="510" y="230.7" width="26" height="9.3" class="sv-phys"/>
+            <text x="508" y="256" text-anchor="middle" class="mono-sm sv-faint">64</text>
+
+            <rect x="600" y="204" width="26" height="36" class="sv-virt"/>
+            <rect x="630" y="203.7" width="26" height="36.3" class="sv-phys"/>
+            <text x="628" y="256" text-anchor="middle" class="mono-sm sv-faint">256</text>
+
+            <rect x="720" y="168" width="26" height="72" class="sv-virt"/>
+            <rect x="750" y="167.7" width="26" height="72.3" class="sv-phys"/>
+            <text x="748" y="256" text-anchor="middle" class="mono-sm sv-faint">512</text>
+
+            <rect x="840" y="96" width="26" height="144" class="sv-virt"/>
+            <rect x="870" y="95.7" width="26" height="144.3" class="sv-phys"/>
+            <text x="868" y="256" text-anchor="middle" class="mono-sm sv-faint">1024</text>
+          </g>
+
+          <text x="520" y="274" text-anchor="middle" class="lbl sv-dim">megabytes touched</text>
+
+          <!-- legend -->
+          <rect x="740" y="106" width="11" height="11" class="sv-virt"/>
+          <text x="757" y="116" class="lbl-sm sv-dim">bytes touched</text>
+          <rect x="740" y="122" width="11" height="11" class="sv-phys"/>
+          <text x="757" y="132" class="lbl-sm sv-dim">resident memory</text>
+          <text x="757" y="148" class="mono-sm sv-faint">the two bars are the same height</text>
+          <text x="757" y="160" class="mono-sm sv-faint">at every step, to within 2 MB</text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Resident memory tracks touched bytes exactly.</b> Touch 1 MB, RSS rises 1.0 MB; touch
+        1 GB, it rises 1024 MB. Reading the present bit for every page out of
+        <code>/proc/self/pagemap</code> confirms it at page granularity rather than by inference:
+        256 pages touched, 256 present; 16,384 touched, 16,384 present. Not one page arrived early.
+      </figcaption>
+    </figure>
+
+    <div class="note warn">
+      <h3>The kernel will not promise absolutely anything</h3>
+      <p>
+        With <code>MAP_NORESERVE</code> this machine reserved 512 GB without complaint — address
+        space costs nothing to hand out. Without it, the default heuristic
+        (<code>vm.overcommit_memory = 0</code>) accepted <b>16 GB and refused 32 GB</b>. That
+        ceiling is RAM plus swap, 15.3 + 15.3 ≈ 30 GB: the kernel declines commitments it could not
+        conceivably honour, but is perfectly willing to make ones it merely probably cannot.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 04 ============ -->
+  <section id="faults">
+    <h2><span class="num">04</span>What the promise costs to keep</h2>
+    <p class="lede">
+      Every page of a fresh mapping costs one trap into the kernel the first time it is touched:
+      find a free frame, zero it (the previous tenant's data cannot leak), install a page-table
+      entry, return. <code>fault_cost.c</code> times that, and checks every case against the
+      kernel's own fault counters from <code>getrusage</code> rather than trusting the clock alone.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 320" role="img"
+             aria-label="Cost per 4 kilobyte page on a logarithmic scale. An already-present page costs about 10 to 12 nanoseconds. A first touch on 2 megabyte pages costs 277 nanoseconds per 4 kilobytes, on 4 kilobyte pages 853 nanoseconds. A cold file read sequentially costs 1441 nanoseconds, randomly 2485. A single major fault that actually waits for the SSD costs 55,200 nanoseconds.">
+          <text x="60" y="22" class="cap sv-faint">nanoseconds per 4 KB of memory, log scale</text>
+
+          <line x1="120" y1="272" x2="980" y2="272" class="st-rule" stroke-width="1.25"/>
+          <g class="st-grid" stroke-width="1">
+            <line x1="280" y1="36" x2="280" y2="272"/>
+            <line x1="440" y1="36" x2="440" y2="272"/>
+            <line x1="600" y1="36" x2="600" y2="272"/>
+            <line x1="760" y1="36" x2="760" y2="272"/>
+            <line x1="920" y1="36" x2="920" y2="272"/>
+          </g>
+          <g class="mono-sm sv-faint">
+            <text x="120" y="288" text-anchor="middle">1 ns</text>
+            <text x="280" y="288" text-anchor="middle">10</text>
+            <text x="440" y="288" text-anchor="middle">100</text>
+            <text x="600" y="288" text-anchor="middle">1 &micro;s</text>
+            <text x="760" y="288" text-anchor="middle">10</text>
+            <text x="920" y="288" text-anchor="middle">100 &micro;s</text>
+          </g>
+
+          <!-- rows -->
+          <text x="112" y="52" text-anchor="end" class="lbl sv-ink w600">already present</text>
+          <rect x="120" y="40" width="164" height="17" class="sv-phys"/>
+          <text x="292" y="53" class="mono sv-dim">12 ns &middot; no fault</text>
+
+          <text x="112" y="82" text-anchor="end" class="lbl sv-ink w600">first touch, 2 MB page</text>
+          <rect x="120" y="70" width="391" height="17" class="sv-virt"/>
+          <text x="519" y="83" class="mono sv-dim">277 ns &middot; 128 faults for 256 MB</text>
+
+          <text x="112" y="112" text-anchor="end" class="lbl sv-ink w600">first touch, 4 KB page</text>
+          <rect x="120" y="100" width="470" height="17" class="sv-virt"/>
+          <text x="598" y="113" class="mono sv-dim">853 ns &middot; 65,539 faults</text>
+
+          <text x="112" y="142" text-anchor="end" class="lbl sv-ink w600">MAP_POPULATE</text>
+          <rect x="120" y="130" width="448" height="17" class="sv-virt" opacity="0.55"/>
+          <text x="576" y="143" class="mono sv-dim">627 ns &middot; paid inside mmap, not saved</text>
+
+          <text x="112" y="172" text-anchor="end" class="lbl sv-ink w600">cold file, sequential</text>
+          <rect x="120" y="160" width="505" height="17" class="sv-cost" opacity="0.6"/>
+          <text x="633" y="173" class="mono sv-dim">1,441 ns &middot; readahead absorbs it</text>
+
+          <text x="112" y="202" text-anchor="end" class="lbl sv-ink w600">cold file, random</text>
+          <rect x="120" y="190" width="542" height="17" class="sv-cost" opacity="0.8"/>
+          <text x="670" y="203" class="mono sv-dim">2,485 ns average</text>
+
+          <text x="112" y="232" text-anchor="end" class="lbl sv-cost w600">one major fault</text>
+          <rect x="120" y="220" width="638" height="17" class="sv-cost"/>
+          <text x="766" y="233" class="mono sv-cost w600">55,200 ns &mdash; the SSD</text>
+
+          <text x="120" y="308" class="mono-sm sv-faint">
+            256 MB per case, fault counts from getrusage. The major-fault figure divides the random
+            run's elapsed time by the 703 faults that actually blocked on the device.
+          </text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Four orders of magnitude between a page you have and a page you must fetch.</b> The
+        55.2 µs major fault is not an OS number, it is the NVMe device's random-read latency showing
+        through — measured independently at 45.8 µs
+        <a href="../memory_hierarchy/cache_map.html">next door</a>. Demand paging is only cheap while
+        the answer is already in memory.
+      </figcaption>
+    </figure>
+
+    <ol class="steps">
+      <li><span class="n">1</span><div class="body">
+        <h3>Huge pages make faults rarer, not cheaper</h3>
+        <p>256 MB costs 65,539 faults with 4 KB pages and <strong>128</strong> with 2 MB pages —
+        exactly one per huge page. Each is more expensive individually (the kernel zeroes 2 MB, not
+        4 KB), but per byte it wins: 853 ns → 277 ns.</p>
+      </div></li>
+      <li><span class="n">2</span><div class="body">
+        <h3>MAP_POPULATE moves the cost, it does not remove it</h3>
+        <p>The faults are taken inside the <code>mmap</code> call — 627 ns per page there, and then
+        the touch loop runs at warm speed. Useful when you would rather pay at startup than in the
+        middle of a request, useless as an optimization.</p>
+      </div></li>
+      <li><span class="n">3</span><div class="body">
+        <h3>Readahead does for pages what a prefetcher does for lines</h3>
+        <p>Reading a 256 MB cold file sequentially should mean 65,536 trips to the SSD. It cost
+        2,052 faults and <strong>one</strong> blocking read: the kernel saw the pattern and fetched
+        ahead. Touch the same file in random order and that collapses — 703 real major faults.</p>
+      </div></li>
+    </ol>
+  </section>
+
+  <!-- ============ 05 ============ -->
+  <section id="cow">
+    <h2><span class="num">05</span>fork copies an address space without copying memory</h2>
+    <p class="lede">
+      <code>fork</code> is specified to give the child a complete private copy of the parent's
+      memory. Doing that literally would mean copying every resident page. The kernel instead marks
+      every writable page read-only in both processes and lets them share the frames until someone
+      writes. The write traps, one page is copied, both continue.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 300" role="img"
+             aria-label="Three states of a 256 megabyte region. Before fork the parent holds 256 megabytes private and dirty. Immediately after fork both processes map the same frames and the child holds zero private bytes. After the child writes one byte in every page, 65,536 copy-on-write faults have moved all 256 megabytes into the child's own private frames.">
+          <defs>
+            <marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-dim"/></marker>
+          </defs>
+
+          <!-- state 1 -->
+          <text x="30" y="24" class="cap sv-faint">before fork</text>
+          <rect x="30" y="34" width="128" height="34" rx="3" class="fill-virt"/>
+          <rect x="30" y="34" width="128" height="34" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="94" y="56" text-anchor="middle" class="lbl sv-ink w600">parent</text>
+          <line x1="94" y1="68" x2="94" y2="96" class="st-dim" stroke-width="1.25" marker-end="url(#c1)"/>
+          <rect x="30" y="98" width="128" height="46" rx="3" class="fill-phys"/>
+          <rect x="30" y="98" width="128" height="46" rx="3" class="st-phys" stroke-width="1.5"/>
+          <text x="94" y="118" text-anchor="middle" class="mono-sm sv-ink w600">256 MB</text>
+          <text x="94" y="133" text-anchor="middle" class="mono-sm sv-phys">private, dirty</text>
+
+          <!-- state 2 -->
+          <text x="380" y="24" class="cap sv-faint">after fork &mdash; 2.3 ms</text>
+          <rect x="330" y="34" width="120" height="34" rx="3" class="fill-virt"/>
+          <rect x="330" y="34" width="120" height="34" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="390" y="56" text-anchor="middle" class="lbl sv-ink w600">parent</text>
+          <rect x="466" y="34" width="120" height="34" rx="3" class="fill-virt"/>
+          <rect x="466" y="34" width="120" height="34" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="526" y="56" text-anchor="middle" class="lbl sv-ink w600">child</text>
+          <path d="M390,68 L390,86 L458,86" class="st-dim fill-none" stroke-width="1.25"/>
+          <path d="M526,68 L526,86 L458,86" class="st-dim fill-none" stroke-width="1.25"/>
+          <line x1="458" y1="86" x2="458" y2="96" class="st-dim" stroke-width="1.25" marker-end="url(#c1)"/>
+          <rect x="394" y="98" width="128" height="46" rx="3" class="fill-phys"/>
+          <rect x="394" y="98" width="128" height="46" rx="3" class="st-phys" stroke-width="1.5"/>
+          <text x="458" y="118" text-anchor="middle" class="mono-sm sv-ink w600">the same 256 MB</text>
+          <text x="458" y="133" text-anchor="middle" class="mono-sm sv-phys">shared, dirty</text>
+          <text x="458" y="164" text-anchor="middle" class="mono sv-virt w600">child private: 0.0 MB</text>
+
+          <!-- state 3 -->
+          <text x="770" y="24" class="cap sv-cost">after the child writes every page</text>
+          <rect x="700" y="34" width="120" height="34" rx="3" class="fill-virt"/>
+          <rect x="700" y="34" width="120" height="34" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="760" y="56" text-anchor="middle" class="lbl sv-ink w600">parent</text>
+          <rect x="860" y="34" width="120" height="34" rx="3" class="fill-virt"/>
+          <rect x="860" y="34" width="120" height="34" rx="3" class="st-virt" stroke-width="1.25"/>
+          <text x="920" y="56" text-anchor="middle" class="lbl sv-ink w600">child</text>
+          <line x1="760" y1="68" x2="760" y2="96" class="st-dim" stroke-width="1.25" marker-end="url(#c1)"/>
+          <line x1="920" y1="68" x2="920" y2="96" class="st-cost" stroke-width="1.5" marker-end="url(#c1)"/>
+          <rect x="700" y="98" width="120" height="46" rx="3" class="fill-phys"/>
+          <rect x="700" y="98" width="120" height="46" rx="3" class="st-phys" stroke-width="1.5"/>
+          <text x="760" y="118" text-anchor="middle" class="mono-sm sv-ink w600">256 MB</text>
+          <text x="760" y="133" text-anchor="middle" class="mono-sm sv-phys">the originals</text>
+          <rect x="860" y="98" width="120" height="46" rx="3" class="fill-cost"/>
+          <rect x="860" y="98" width="120" height="46" rx="3" class="st-cost" stroke-width="1.5"/>
+          <text x="920" y="118" text-anchor="middle" class="mono-sm sv-ink w600">256 MB</text>
+          <text x="920" y="133" text-anchor="middle" class="mono-sm sv-cost">copies</text>
+          <text x="920" y="164" text-anchor="middle" class="mono sv-cost w600">65,536 COW faults</text>
+
+          <line x1="30" y1="190" x2="1010" y2="190" class="st-grid" stroke-width="1"/>
+
+          <text x="30" y="214" class="lbl sv-ink w600">The child read all 256 MB first: 0 faults, nothing copied.</text>
+          <text x="30" y="234" class="lbl sv-dim">Then it wrote one byte per page: 65,536 faults at 1,308 ns each, and every page became its own.</text>
+          <text x="30" y="262" class="mono-sm sv-faint">Measured from /proc/self/smaps_rollup: Shared_Dirty 256.1 MB &rarr; 0.1 MB, Private_Dirty 0.0 MB &rarr; 256.0 MB.</text>
+          <text x="30" y="278" class="mono-sm sv-faint">The parent's own numbers never moved.</text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>A 256 MB copy that costs 2.3 ms and no memory — until it does.</b> This is why
+        <code>fork</code>+<code>exec</code> is cheap (the child discards the address space before
+        writing much of it) and why a forking server's memory use grows as its children touch pages
+        rather than when they start.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ 06 ============ -->
+  <section id="identity">
+    <h2><span class="num">06</span>The same address is not the same memory</h2>
+    <p class="lede">
+      "The addresses don't correspond to hardware addresses" is easy to nod at. So force the issue:
+      two processes, the same 64-bit number — not similar, not analogous, the identical address —
+      and ask each what it finds there.
+    </p>
+
+    <pre>both processes map the very same virtual address: <span class="v">0x600000000000</span>
+
+private + anonymous  &rarr;  each process gets its own frame
+  A writes  "written by process A"  at <span class="v">0x600000000000</span>
+  B reads   <b>"written by process B"</b>  at <span class="v">0x600000000000</span>
+
+shared + file-backed  &rarr;  both processes get the same frame
+  A writes  "written by process A"  at <span class="v">0x600000000000</span>
+  B reads   <b>"written by process A"</b>  at <span class="v">0x600000000000</span></pre>
+
+    <p>
+      Same number, opposite outcomes. The only thing that changed is one flag on the
+      <code>mmap</code> call, which decides whether the two page-table entries point at one physical
+      frame or two. <strong>The address is not the memory; the entry behind it is.</strong> Isolation
+      between processes is not enforced by checking addresses — it is a consequence of never writing
+      the same frame into two tables.
+    </p>
+  </section>
+
+  <!-- ============ 07 ============ -->
+  <section id="ledger">
+    <h2><span class="num">07</span>What the abstraction buys, and what it costs</h2>
+    <p class="lede">
+      Virtual memory is usually introduced as one idea — programs get their own address space —
+      when it is really a set of separate services that happen to share a mechanism. Each row below
+      is something the page table makes possible, and the price this machine charges for it.
+    </p>
+
+    <div class="pairs">
+      <div class="pair">
+        <div class="promise"><span class="cap sv-virt">the promise</span>
+          <p>Each process has memory to itself.</p></div>
+        <div><span class="cap sv-phys">the mechanism, and its price</span>
+          <p>Separate page tables. Free at runtime; costs a TLB flush at every context switch,
+             and 8 bytes of table per mapped page.</p></div>
+      </div>
+      <div class="pair">
+        <div class="promise"><span class="cap sv-virt">the promise</span>
+          <p>You may allocate more than exists.</p></div>
+        <div><span class="cap sv-phys">the mechanism, and its price</span>
+          <p>Reservations with no frames behind them. Free until touched; the bill arrives as
+             853 ns per page, or as the OOM killer if the promise cannot be met.</p></div>
+      </div>
+      <div class="pair">
+        <div class="promise"><span class="cap sv-virt">the promise</span>
+          <p><code>fork</code> duplicates your memory.</p></div>
+        <div><span class="cap sv-phys">the mechanism, and its price</span>
+          <p>Copy-on-write sharing. 2.3 ms for 256 MB; then 1,308 ns for each page the child
+             actually writes.</p></div>
+      </div>
+      <div class="pair">
+        <div class="promise"><span class="cap sv-virt">the promise</span>
+          <p>Processes can share memory deliberately.</p></div>
+        <div><span class="cap sv-phys">the mechanism, and its price</span>
+          <p>Two entries, one frame. Free — and the reason one copy of libc serves every process
+             on the machine.</p></div>
+      </div>
+      <div class="pair">
+        <div class="promise"><span class="cap sv-virt">the promise</span>
+          <p>Memory can outlive RAM.</p></div>
+        <div><span class="cap sv-phys">the mechanism, and its price</span>
+          <p>Pages backed by a file or by swap. 55.2 µs per major fault on this NVMe — roughly
+             70,000 instructions of waiting.</p></div>
+      </div>
+      <div class="pair">
+        <div class="promise"><span class="cap sv-virt">the promise</span>
+          <p>Code cannot be written; data cannot be run.</p></div>
+        <div><span class="cap sv-phys">the mechanism, and its price</span>
+          <p>Permission bits in the entry, checked by hardware. Free, and the reason this process
+             has 1.7 MB mapped executable and 64.4 MB mapped writable with no overlap.</p></div>
+      </div>
+    </div>
+
+    <div class="note">
+      <h3>The one number to carry away</h3>
+      <p>
+        <b>4.1%.</b> That is how much of this process's mapped address space had physical memory
+        behind it — and its address space is itself 0.00005% of what it could address. Virtual
+        memory is not mostly about translation; it is about how much you can convincingly
+        <em>not</em> do.
+      </p>
+    </div>
+  </section>
+
+  <footer class="colophon">
+    <h2>How this was measured</h2>
+    <p>
+      Five small C programs, no privileges required, reading
+      <code>/proc/self/maps</code>, <code>/proc/self/status</code>,
+      <code>/proc/self/smaps_rollup</code> and <code>/proc/self/pagemap</code>, with fault counts
+      from <code>getrusage</code>. Physical frame numbers in <code>pagemap</code> are zeroed for
+      unprivileged readers, which is why §06 demonstrates frame identity by what each process can
+      see rather than by printing frame numbers.
+    </p>
+    <p>
+      The cold-file cases evict their own pages with
+      <code>posix_fadvise(POSIX_FADV_DONTNEED)</code> rather than dropping the system's caches, and
+      the scratch file lives on the NVMe rather than tmpfs — otherwise "cold" would be served from
+      RAM and measure nothing.
+    </p>
+    <p>
+      New to any of this? <a href="vm_intro.html">Three Illusions</a> is the same
+      material without the measurements &mdash; what virtual memory, <code>malloc</code> and
+      <code>fork</code> actually do, from first principles. Sources and raw output are in this
+      directory; see <a href="README.md">README.md</a>. For the hardware underneath this — cache levels, the TLB,
+      and what an address costs once it has been translated — see
+      <a href="../memory_hierarchy/cache_map.html">Strix Point Cache Map</a> and
+      <a href="../memory_hierarchy/tlb_cliff.html">The TLB Cliff</a>.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>

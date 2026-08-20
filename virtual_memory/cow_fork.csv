@@ -1,0 +1,5 @@
+phase,shared_dirty_mb,private_dirty_mb,ns_per_page,faults
+parent before fork,0.0,256.1,,
+child after fork,256.1,0.0,,
+child read pass,256.1,0.0,158.0,0
+child write pass,0.1,256.1,1264.5,65536

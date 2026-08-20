@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The TLB Cliff -- generated for the pppe26 repo; opens standalone in any browser,
+     no server and no external assets beyond the web fonts, which fall back
+     to system faces offline. -->
+<title>The TLB Cliff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+/* the hosted version of this page got a reset from its runtime; standalone,
+   it brings its own */
+html{-webkit-text-size-adjust:100%}
+figure,blockquote,dl,dd{margin:0}
+ul,ol{margin:0}
+img,svg{max-width:100%}
+
+pre sup{font-size:.72em;line-height:0}
+
+:root{
+  --bg:#EEF1F5;
+  --surface:#FFFFFF;
+  --sunken:#E3E8EE;
+  --ink:#141B24;
+  --ink-2:#4E5A6B;
+  --ink-3:#7C889A;
+  --rule:#C6D0DB;
+  --grid:#D8E0E8;
+  --zen5:#A85C15;
+  --zen5-soft:#F2E3D2;
+  --zen5c:#166F69;
+  --zen5c-soft:#D7E9E7;
+  --cost:#9E2C4A;
+  --cost-soft:#F3DAE1;
+  --shadow:0 1px 2px rgba(20,27,36,.06), 0 8px 24px rgba(20,27,36,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1218;
+    --surface:#151D26;
+    --sunken:#101820;
+    --ink:#E7EDF4;
+    --ink-2:#9FAEC0;
+    --ink-3:#6E7E92;
+    --rule:#2B3743;
+    --grid:#222D38;
+    --zen5:#E0A05C;
+    --zen5-soft:#2A2018;
+    --zen5c:#4FBFB7;
+    --zen5c-soft:#12262A;
+    --cost:#E9758F;
+    --cost-soft:#2B1720;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1218;
+  --surface:#151D26;
+  --sunken:#101820;
+  --ink:#E7EDF4;
+  --ink-2:#9FAEC0;
+  --ink-3:#6E7E92;
+  --rule:#2B3743;
+  --grid:#222D38;
+  --zen5:#E0A05C;
+  --zen5-soft:#2A2018;
+  --zen5c:#4FBFB7;
+  --zen5c-soft:#12262A;
+  --cost:#E9758F;
+  --cost-soft:#2B1720;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:44px 28px 88px;
+      display:flex;flex-direction:column;gap:56px}
+
+/* ---------- masthead ---------- */
+.masthead{display:flex;flex-direction:column;gap:18px}
+.backlink{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;
+  letter-spacing:.04em;color:var(--ink-3);margin:0;
+}
+.backlink a{color:var(--ink-2)}
+h1{
+  font-family:Archivo,ui-sans-serif,system-ui,sans-serif;
+  font-weight:700;font-size:clamp(2.1rem,5vw,3.3rem);
+  line-height:1.04;letter-spacing:-.025em;margin:0;text-wrap:balance;
+}
+.standfirst{margin:0;max-width:64ch;font-size:1.075rem;color:var(--ink-2)}
+.machine{
+  display:flex;flex-wrap:wrap;gap:0 26px;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  padding:14px 0;margin-top:6px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:12.5px;color:var(--ink-2);
+}
+.machine b{color:var(--ink);font-weight:500}
+
+/* ---------- sections ---------- */
+section{display:flex;flex-direction:column;gap:20px}
+h2{
+  font-family:Archivo,ui-sans-serif,system-ui,sans-serif;
+  font-weight:600;font-size:1.55rem;letter-spacing:-.015em;margin:0;text-wrap:balance;
+}
+h2 .num{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.72em;color:var(--ink-3);font-weight:400;margin-right:.7em;
+}
+p{margin:0;max-width:68ch}
+p + p{margin-top:.9em}
+strong{font-weight:600}
+.lede{color:var(--ink-2)}
+code{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.9em;
+  background:var(--sunken);padding:1px 5px;border-radius:2px;color:var(--ink);
+}
+pre{
+  margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:3px;
+  padding:16px 18px;overflow-x:auto;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;line-height:1.7;
+  color:var(--ink-2);
+}
+pre b{color:var(--ink);font-weight:500}
+pre .hot{color:var(--cost);font-weight:500}
+
+/* ---------- figures ---------- */
+figure{
+  margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:3px;
+  box-shadow:var(--shadow);padding:26px 26px 20px;
+  display:flex;flex-direction:column;gap:16px;
+}
+.canvas{overflow-x:auto;overflow-y:hidden}
+figure svg{display:block;width:100%;min-width:700px;height:auto}
+figcaption{
+  font-size:13.5px;color:var(--ink-2);max-width:78ch;
+  border-top:1px solid var(--grid);padding-top:14px;
+}
+figcaption b{color:var(--ink);font-weight:600}
+
+.sv-ink{fill:var(--ink)}
+.sv-dim{fill:var(--ink-2)}
+.sv-faint{fill:var(--ink-3)}
+.sv-z5{fill:var(--zen5)}
+.sv-z5c{fill:var(--zen5c)}
+.sv-cost{fill:var(--cost)}
+.fill-surface{fill:var(--surface)}
+.fill-sunken{fill:var(--sunken)}
+.fill-z5{fill:var(--zen5-soft)}
+.fill-cost{fill:var(--cost-soft)}
+.fill-none{fill:none}
+.st-rule{stroke:var(--rule);fill:none}
+.st-grid{stroke:var(--grid);fill:none}
+.st-dim{stroke:var(--ink-2);fill:none}
+.st-z5{stroke:var(--zen5);fill:none}
+.st-cost{stroke:var(--cost);fill:none}
+.lbl{font-family:"IBM Plex Sans",sans-serif;font-size:11px}
+.lbl-sm{font-family:"IBM Plex Sans",sans-serif;font-size:9.5px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px}
+.mono-sm{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9px}
+.mono-md{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:500}
+.cap{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;
+     letter-spacing:.12em;text-transform:uppercase}
+.w500{font-weight:500}
+.w600{font-weight:600}
+
+/* ---------- callout ---------- */
+.note{
+  background:var(--surface);border:1px solid var(--rule);
+  border-left:3px solid var(--zen5);border-radius:0 3px 3px 0;
+  padding:18px 20px;display:flex;flex-direction:column;gap:8px;
+}
+.note h3{font-family:"IBM Plex Sans",sans-serif;font-size:.95rem;font-weight:600;margin:0}
+.note p{font-size:14px;color:var(--ink-2)}
+.note.warn{border-left-color:var(--cost)}
+
+/* ---------- table ---------- */
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:13.5px}
+th,td{padding:11px 16px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:500;background:var(--sunken);
+}
+tbody td{font-family:"IBM Plex Mono",ui-monospace,monospace;
+         font-variant-numeric:tabular-nums;color:var(--ink-2)}
+tbody td:first-child{font-weight:600;color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.bad td{background:var(--cost-soft)}
+tbody tr.good td{background:var(--zen5-soft)}
+
+/* ---------- steps ---------- */
+.steps{display:flex;flex-direction:column;gap:20px;margin:0;padding:0;list-style:none}
+.steps li{display:flex;gap:16px}
+.steps .n{
+  flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+  border:1px solid var(--rule);background:var(--sunken);
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;
+  display:flex;align-items:center;justify-content:center;color:var(--ink-2);
+  margin-top:2px;
+}
+.steps .body{display:flex;flex-direction:column;gap:4px}
+.steps h3{font-family:"IBM Plex Sans",sans-serif;font-size:1rem;font-weight:600;margin:0}
+.steps p{font-size:14.5px;color:var(--ink-2)}
+
+/* ---------- colophon ---------- */
+.colophon{
+  border-top:1px solid var(--rule);padding-top:22px;
+  display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--ink-2);
+}
+.colophon h2{font-size:1.05rem}
+a{color:var(--ink);text-decoration-color:var(--ink-3);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--ink)}
+a:focus-visible{outline:2px solid var(--zen5);outline-offset:3px;border-radius:2px}
+
+@media (max-width:640px){
+  .wrap{padding:32px 18px 64px;gap:44px}
+  figure{padding:18px 16px 14px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+    <p class="backlink">&larr; a detail from <a href="cache_map.html">Strix Point Cache Map</a></p>
+    <h1>The TLB Cliff</h1>
+    <p class="standfirst">
+      A 12&nbsp;MB array fits comfortably in this machine&rsquo;s 16&nbsp;MB L3. Walking it randomly
+      still costs <strong>31.9 ns per access</strong> &mdash; three times the L3 hit latency. The
+      cache is not the problem. The problem is that before any cache can be consulted, the address
+      has to be <em>translated</em>, and the hardware that does the translating ran out of room
+      long before the cache did.
+    </p>
+    <div class="machine">
+      <span><b>AMD Ryzen AI 9 HX 370</b> &middot; Zen 5</span>
+      <span>L1 DTLB: <b>96 entries</b>, measured</span>
+      <span>4 KB pages &middot; 2 MB huge pages</span>
+    </div>
+  </header>
+
+  <!-- ============ 01 ============ -->
+  <section>
+    <h2><span class="num">01</span>Every load is two lookups, not one</h2>
+    <p class="lede">
+      Your program never handles a real memory address. It handles a <strong>virtual</strong> one,
+      and the hardware must convert it to a <strong>physical</strong> one before anything can be
+      fetched. The conversion table lives in memory, which creates an awkward recursion: looking up
+      where your data is requires reading memory, which requires looking up where <em>that</em> is.
+    </p>
+    <p>
+      The way out is to cache the translations. That cache is the <strong>TLB</strong> &mdash; the
+      translation lookaside buffer &mdash; and it sits in front of everything. Hit it and translation
+      is free. Miss it and the hardware walks a four-level tree, and each level is its own memory
+      access.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 350" role="img"
+             aria-label="A virtual address splits into a page number and a 12-bit offset. On a TLB hit the page number is translated in one step with no memory access. On a miss the hardware walks four levels of page table, PML4 to PDPT to page directory to page table, each level being a separate memory access, before the frame number is found and installed in the TLB.">
+          <defs>
+            <marker id="t1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-dim"/></marker>
+            <marker id="t1g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-z5"/></marker>
+            <marker id="t1c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-cost"/></marker>
+          </defs>
+
+          <!-- virtual address -->
+          <text x="40" y="30" class="cap sv-faint">virtual address</text>
+          <rect x="40" y="40" width="470" height="38" rx="2" class="fill-sunken"/>
+          <rect x="40" y="40" width="470" height="38" rx="2" class="st-rule" stroke-width="1.25"/>
+          <text x="275" y="64" text-anchor="middle" class="lbl sv-ink w600">page number &mdash; bits 47:12</text>
+          <rect x="510" y="40" width="150" height="38" rx="2" class="fill-z5"/>
+          <rect x="510" y="40" width="150" height="38" rx="2" class="st-z5" stroke-width="1.25"/>
+          <text x="585" y="64" text-anchor="middle" class="lbl sv-ink w600">offset &mdash; 11:0</text>
+          <text x="672" y="64" class="mono-sm sv-faint">the offset never needs translating</text>
+
+          <!-- split down -->
+          <line x1="275" y1="78" x2="275" y2="106" class="st-dim" stroke-width="1.25" marker-end="url(#t1)"/>
+
+          <!-- TLB -->
+          <rect x="150" y="108" width="250" height="46" rx="2" class="fill-surface"/>
+          <rect x="150" y="108" width="250" height="46" rx="2" class="st-z5" stroke-width="1.5"/>
+          <text x="275" y="128" text-anchor="middle" class="lbl sv-ink w600">TLB &mdash; 96 entries</text>
+          <text x="275" y="144" text-anchor="middle" class="mono-sm sv-dim">a cache of recent translations</text>
+
+          <!-- hit path -->
+          <path d="M400,131 L560,131" class="st-z5" stroke-width="1.5" marker-end="url(#t1g)"/>
+          <text x="480" y="122" text-anchor="middle" class="mono-sm sv-z5 w600">hit</text>
+          <rect x="560" y="108" width="200" height="46" rx="2" class="fill-surface"/>
+          <rect x="560" y="108" width="200" height="46" rx="2" class="st-z5" stroke-width="1.25"/>
+          <text x="660" y="128" text-anchor="middle" class="lbl sv-ink w600">physical address</text>
+          <text x="660" y="144" text-anchor="middle" class="mono-sm sv-z5">no extra memory access</text>
+          <text x="775" y="135" class="mono sv-z5 w600">0.78 ns total</text>
+
+          <!-- miss path -->
+          <path d="M275,154 L275,186" class="st-cost" stroke-width="1.5" marker-end="url(#t1c)"/>
+          <text x="288" y="176" class="mono-sm sv-cost w600">miss</text>
+
+          <text x="40" y="206" class="cap sv-cost">the page walk &mdash; four levels, each one a memory access</text>
+
+          <rect x="40" y="216" width="150" height="44" rx="2" class="fill-cost"/>
+          <rect x="40" y="216" width="150" height="44" rx="2" class="st-cost" stroke-width="1.25"/>
+          <text x="115" y="234" text-anchor="middle" class="lbl sv-ink w600">PML4</text>
+          <text x="115" y="250" text-anchor="middle" class="mono-sm sv-dim">bits 47:39</text>
+
+          <line x1="190" y1="238" x2="228" y2="238" class="st-cost" stroke-width="1.25" marker-end="url(#t1c)"/>
+          <rect x="230" y="216" width="150" height="44" rx="2" class="fill-cost"/>
+          <rect x="230" y="216" width="150" height="44" rx="2" class="st-cost" stroke-width="1.25"/>
+          <text x="305" y="234" text-anchor="middle" class="lbl sv-ink w600">PDPT</text>
+          <text x="305" y="250" text-anchor="middle" class="mono-sm sv-dim">bits 38:30</text>
+
+          <line x1="380" y1="238" x2="418" y2="238" class="st-cost" stroke-width="1.25" marker-end="url(#t1c)"/>
+          <rect x="420" y="216" width="150" height="44" rx="2" class="fill-cost"/>
+          <rect x="420" y="216" width="150" height="44" rx="2" class="st-cost" stroke-width="1.25"/>
+          <text x="495" y="234" text-anchor="middle" class="lbl sv-ink w600">page directory</text>
+          <text x="495" y="250" text-anchor="middle" class="mono-sm sv-dim">bits 29:21</text>
+
+          <line x1="570" y1="238" x2="608" y2="238" class="st-cost" stroke-width="1.25" marker-end="url(#t1c)"/>
+          <rect x="610" y="216" width="150" height="44" rx="2" class="fill-cost"/>
+          <rect x="610" y="216" width="150" height="44" rx="2" class="st-cost" stroke-width="1.25"/>
+          <text x="685" y="234" text-anchor="middle" class="lbl sv-ink w600">page table</text>
+          <text x="685" y="250" text-anchor="middle" class="mono-sm sv-dim">bits 20:12</text>
+
+          <line x1="760" y1="238" x2="798" y2="238" class="st-cost" stroke-width="1.25" marker-end="url(#t1c)"/>
+          <rect x="800" y="216" width="160" height="44" rx="2" class="fill-surface"/>
+          <rect x="800" y="216" width="160" height="44" rx="2" class="st-cost" stroke-width="1.25"/>
+          <text x="880" y="234" text-anchor="middle" class="lbl sv-ink w600">frame number</text>
+          <text x="880" y="250" text-anchor="middle" class="mono-sm sv-cost">then cached in the TLB</text>
+
+          <!-- huge page shortcut -->
+          <path d="M495,260 C495,290 640,292 660,276" class="st-z5 fill-none" stroke-width="1.5"
+                stroke-dasharray="5 4" marker-end="url(#t1g)"/>
+          <text x="512" y="308" class="mono sv-z5 w600">a 2 MB page stops the walk here &mdash; one level shorter, and 512&times; the reach</text>
+
+          <line x1="40" y1="330" x2="1000" y2="330" class="st-grid" stroke-width="1"/>
+          <text x="40" y="346" class="mono-sm sv-faint">
+            The walk&rsquo;s four reads are themselves cacheable, so a miss costs anywhere from a
+            couple of nanoseconds to a full chain of DRAM accesses, depending on how much of the
+            page table is resident.
+          </text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Translation is not free, it is just usually hidden.</b> Nothing in your source code
+        mentions any of this, and while the TLB is hitting you will never see it. The interesting
+        question is what happens when it stops hitting.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ 02 ============ -->
+  <section>
+    <h2><span class="num">02</span>The number that matters is reach, not entries</h2>
+    <p class="lede">
+      The TLB is a cache, so it has a capacity &mdash; but its capacity is counted in
+      <em>translations</em>, not bytes. What that buys you depends entirely on how much memory sits
+      behind each translation. Same 96 entries, two very different amounts of reachable memory:
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 300" role="img"
+             aria-label="The same 96-entry TLB shown twice. With 4 kilobyte pages its reach is 384 kilobytes; with 2 megabyte pages the identical hardware reaches 192 megabytes, 512 times more. A 12 megabyte array needs 3072 four-kilobyte translations, 32 times what the TLB holds, but only 6 huge-page translations.">
+          <text x="60" y="28" class="cap sv-cost">96 entries &times; 4 KB pages</text>
+          <text x="580" y="28" class="cap sv-z5">96 entries &times; 2 MB pages</text>
+
+          <!-- 4K grid: 12 x 8 -->
+          <g class="st-cost" stroke-width="1">
+            <rect x="60" y="40" width="18" height="18" class="fill-cost"/><rect x="82" y="40" width="18" height="18" class="fill-cost"/><rect x="104" y="40" width="18" height="18" class="fill-cost"/><rect x="126" y="40" width="18" height="18" class="fill-cost"/><rect x="148" y="40" width="18" height="18" class="fill-cost"/><rect x="170" y="40" width="18" height="18" class="fill-cost"/><rect x="192" y="40" width="18" height="18" class="fill-cost"/><rect x="214" y="40" width="18" height="18" class="fill-cost"/><rect x="236" y="40" width="18" height="18" class="fill-cost"/><rect x="258" y="40" width="18" height="18" class="fill-cost"/><rect x="280" y="40" width="18" height="18" class="fill-cost"/><rect x="302" y="40" width="18" height="18" class="fill-cost"/>
+            <rect x="60" y="62" width="18" height="18" class="fill-cost"/><rect x="82" y="62" width="18" height="18" class="fill-cost"/><rect x="104" y="62" width="18" height="18" class="fill-cost"/><rect x="126" y="62" width="18" height="18" class="fill-cost"/><rect x="148" y="62" width="18" height="18" class="fill-cost"/><rect x="170" y="62" width="18" height="18" class="fill-cost"/><rect x="192" y="62" width="18" height="18" class="fill-cost"/><rect x="214" y="62" width="18" height="18" class="fill-cost"/><rect x="236" y="62" width="18" height="18" class="fill-cost"/><rect x="258" y="62" width="18" height="18" class="fill-cost"/><rect x="280" y="62" width="18" height="18" class="fill-cost"/><rect x="302" y="62" width="18" height="18" class="fill-cost"/>
+            <rect x="60" y="84" width="18" height="18" class="fill-cost"/><rect x="82" y="84" width="18" height="18" class="fill-cost"/><rect x="104" y="84" width="18" height="18" class="fill-cost"/><rect x="126" y="84" width="18" height="18" class="fill-cost"/><rect x="148" y="84" width="18" height="18" class="fill-cost"/><rect x="170" y="84" width="18" height="18" class="fill-cost"/><rect x="192" y="84" width="18" height="18" class="fill-cost"/><rect x="214" y="84" width="18" height="18" class="fill-cost"/><rect x="236" y="84" width="18" height="18" class="fill-cost"/><rect x="258" y="84" width="18" height="18" class="fill-cost"/><rect x="280" y="84" width="18" height="18" class="fill-cost"/><rect x="302" y="84" width="18" height="18" class="fill-cost"/>
+            <rect x="60" y="106" width="18" height="18" class="fill-cost"/><rect x="82" y="106" width="18" height="18" class="fill-cost"/><rect x="104" y="106" width="18" height="18" class="fill-cost"/><rect x="126" y="106" width="18" height="18" class="fill-cost"/><rect x="148" y="106" width="18" height="18" class="fill-cost"/><rect x="170" y="106" width="18" height="18" class="fill-cost"/><rect x="192" y="106" width="18" height="18" class="fill-cost"/><rect x="214" y="106" width="18" height="18" class="fill-cost"/><rect x="236" y="106" width="18" height="18" class="fill-cost"/><rect x="258" y="106" width="18" height="18" class="fill-cost"/><rect x="280" y="106" width="18" height="18" class="fill-cost"/><rect x="302" y="106" width="18" height="18" class="fill-cost"/>
+            <rect x="60" y="128" width="18" height="18" class="fill-cost"/><rect x="82" y="128" width="18" height="18" class="fill-cost"/><rect x="104" y="128" width="18" height="18" class="fill-cost"/><rect x="126" y="128" width="18" height="18" class="fill-cost"/><rect x="148" y="128" width="18" height="18" class="fill-cost"/><rect x="170" y="128" width="18" height="18" class="fill-cost"/><rect x="192" y="128" width="18" height="18" class="fill-cost"/><rect x="214" y="128" width="18" height="18" class="fill-cost"/><rect x="236" y="128" width="18" height="18" class="fill-cost"/><rect x="258" y="128" width="18" height="18" class="fill-cost"/><rect x="280" y="128" width="18" height="18" class="fill-cost"/><rect x="302" y="128" width="18" height="18" class="fill-cost"/>
+            <rect x="60" y="150" width="18" height="18" class="fill-cost"/><rect x="82" y="150" width="18" height="18" class="fill-cost"/><rect x="104" y="150" width="18" height="18" class="fill-cost"/><rect x="126" y="150" width="18" height="18" class="fill-cost"/><rect x="148" y="150" width="18" height="18" class="fill-cost"/><rect x="170" y="150" width="18" height="18" class="fill-cost"/><rect x="192" y="150" width="18" height="18" class="fill-cost"/><rect x="214" y="150" width="18" height="18" class="fill-cost"/><rect x="236" y="150" width="18" height="18" class="fill-cost"/><rect x="258" y="150" width="18" height="18" class="fill-cost"/><rect x="280" y="150" width="18" height="18" class="fill-cost"/><rect x="302" y="150" width="18" height="18" class="fill-cost"/>
+            <rect x="60" y="172" width="18" height="18" class="fill-cost"/><rect x="82" y="172" width="18" height="18" class="fill-cost"/><rect x="104" y="172" width="18" height="18" class="fill-cost"/><rect x="126" y="172" width="18" height="18" class="fill-cost"/><rect x="148" y="172" width="18" height="18" class="fill-cost"/><rect x="170" y="172" width="18" height="18" class="fill-cost"/><rect x="192" y="172" width="18" height="18" class="fill-cost"/><rect x="214" y="172" width="18" height="18" class="fill-cost"/><rect x="236" y="172" width="18" height="18" class="fill-cost"/><rect x="258" y="172" width="18" height="18" class="fill-cost"/><rect x="280" y="172" width="18" height="18" class="fill-cost"/><rect x="302" y="172" width="18" height="18" class="fill-cost"/>
+            <rect x="60" y="194" width="18" height="18" class="fill-cost"/><rect x="82" y="194" width="18" height="18" class="fill-cost"/><rect x="104" y="194" width="18" height="18" class="fill-cost"/><rect x="126" y="194" width="18" height="18" class="fill-cost"/><rect x="148" y="194" width="18" height="18" class="fill-cost"/><rect x="170" y="194" width="18" height="18" class="fill-cost"/><rect x="192" y="194" width="18" height="18" class="fill-cost"/><rect x="214" y="194" width="18" height="18" class="fill-cost"/><rect x="236" y="194" width="18" height="18" class="fill-cost"/><rect x="258" y="194" width="18" height="18" class="fill-cost"/><rect x="280" y="194" width="18" height="18" class="fill-cost"/><rect x="302" y="194" width="18" height="18" class="fill-cost"/>
+          </g>
+          <text x="60" y="236" class="mono-md sv-cost">384 KB of reach</text>
+          <text x="60" y="256" class="lbl-sm sv-dim">smaller than L2. Past this, translations start missing.</text>
+
+          <!-- 2M grid -->
+          <g class="st-z5" stroke-width="1">
+            <rect x="580" y="40" width="18" height="18" class="fill-z5"/><rect x="602" y="40" width="18" height="18" class="fill-z5"/><rect x="624" y="40" width="18" height="18" class="fill-z5"/><rect x="646" y="40" width="18" height="18" class="fill-z5"/><rect x="668" y="40" width="18" height="18" class="fill-z5"/><rect x="690" y="40" width="18" height="18" class="fill-z5"/><rect x="712" y="40" width="18" height="18" class="fill-z5"/><rect x="734" y="40" width="18" height="18" class="fill-z5"/><rect x="756" y="40" width="18" height="18" class="fill-z5"/><rect x="778" y="40" width="18" height="18" class="fill-z5"/><rect x="800" y="40" width="18" height="18" class="fill-z5"/><rect x="822" y="40" width="18" height="18" class="fill-z5"/>
+            <rect x="580" y="62" width="18" height="18" class="fill-z5"/><rect x="602" y="62" width="18" height="18" class="fill-z5"/><rect x="624" y="62" width="18" height="18" class="fill-z5"/><rect x="646" y="62" width="18" height="18" class="fill-z5"/><rect x="668" y="62" width="18" height="18" class="fill-z5"/><rect x="690" y="62" width="18" height="18" class="fill-z5"/><rect x="712" y="62" width="18" height="18" class="fill-z5"/><rect x="734" y="62" width="18" height="18" class="fill-z5"/><rect x="756" y="62" width="18" height="18" class="fill-z5"/><rect x="778" y="62" width="18" height="18" class="fill-z5"/><rect x="800" y="62" width="18" height="18" class="fill-z5"/><rect x="822" y="62" width="18" height="18" class="fill-z5"/>
+            <rect x="580" y="84" width="18" height="18" class="fill-z5"/><rect x="602" y="84" width="18" height="18" class="fill-z5"/><rect x="624" y="84" width="18" height="18" class="fill-z5"/><rect x="646" y="84" width="18" height="18" class="fill-z5"/><rect x="668" y="84" width="18" height="18" class="fill-z5"/><rect x="690" y="84" width="18" height="18" class="fill-z5"/><rect x="712" y="84" width="18" height="18" class="fill-z5"/><rect x="734" y="84" width="18" height="18" class="fill-z5"/><rect x="756" y="84" width="18" height="18" class="fill-z5"/><rect x="778" y="84" width="18" height="18" class="fill-z5"/><rect x="800" y="84" width="18" height="18" class="fill-z5"/><rect x="822" y="84" width="18" height="18" class="fill-z5"/>
+            <rect x="580" y="106" width="18" height="18" class="fill-z5"/><rect x="602" y="106" width="18" height="18" class="fill-z5"/><rect x="624" y="106" width="18" height="18" class="fill-z5"/><rect x="646" y="106" width="18" height="18" class="fill-z5"/><rect x="668" y="106" width="18" height="18" class="fill-z5"/><rect x="690" y="106" width="18" height="18" class="fill-z5"/><rect x="712" y="106" width="18" height="18" class="fill-z5"/><rect x="734" y="106" width="18" height="18" class="fill-z5"/><rect x="756" y="106" width="18" height="18" class="fill-z5"/><rect x="778" y="106" width="18" height="18" class="fill-z5"/><rect x="800" y="106" width="18" height="18" class="fill-z5"/><rect x="822" y="106" width="18" height="18" class="fill-z5"/>
+            <rect x="580" y="128" width="18" height="18" class="fill-z5"/><rect x="602" y="128" width="18" height="18" class="fill-z5"/><rect x="624" y="128" width="18" height="18" class="fill-z5"/><rect x="646" y="128" width="18" height="18" class="fill-z5"/><rect x="668" y="128" width="18" height="18" class="fill-z5"/><rect x="690" y="128" width="18" height="18" class="fill-z5"/><rect x="712" y="128" width="18" height="18" class="fill-z5"/><rect x="734" y="128" width="18" height="18" class="fill-z5"/><rect x="756" y="128" width="18" height="18" class="fill-z5"/><rect x="778" y="128" width="18" height="18" class="fill-z5"/><rect x="800" y="128" width="18" height="18" class="fill-z5"/><rect x="822" y="128" width="18" height="18" class="fill-z5"/>
+            <rect x="580" y="150" width="18" height="18" class="fill-z5"/><rect x="602" y="150" width="18" height="18" class="fill-z5"/><rect x="624" y="150" width="18" height="18" class="fill-z5"/><rect x="646" y="150" width="18" height="18" class="fill-z5"/><rect x="668" y="150" width="18" height="18" class="fill-z5"/><rect x="690" y="150" width="18" height="18" class="fill-z5"/><rect x="712" y="150" width="18" height="18" class="fill-z5"/><rect x="734" y="150" width="18" height="18" class="fill-z5"/><rect x="756" y="150" width="18" height="18" class="fill-z5"/><rect x="778" y="150" width="18" height="18" class="fill-z5"/><rect x="800" y="150" width="18" height="18" class="fill-z5"/><rect x="822" y="150" width="18" height="18" class="fill-z5"/>
+            <rect x="580" y="172" width="18" height="18" class="fill-z5"/><rect x="602" y="172" width="18" height="18" class="fill-z5"/><rect x="624" y="172" width="18" height="18" class="fill-z5"/><rect x="646" y="172" width="18" height="18" class="fill-z5"/><rect x="668" y="172" width="18" height="18" class="fill-z5"/><rect x="690" y="172" width="18" height="18" class="fill-z5"/><rect x="712" y="172" width="18" height="18" class="fill-z5"/><rect x="734" y="172" width="18" height="18" class="fill-z5"/><rect x="756" y="172" width="18" height="18" class="fill-z5"/><rect x="778" y="172" width="18" height="18" class="fill-z5"/><rect x="800" y="172" width="18" height="18" class="fill-z5"/><rect x="822" y="172" width="18" height="18" class="fill-z5"/>
+            <rect x="580" y="194" width="18" height="18" class="fill-z5"/><rect x="602" y="194" width="18" height="18" class="fill-z5"/><rect x="624" y="194" width="18" height="18" class="fill-z5"/><rect x="646" y="194" width="18" height="18" class="fill-z5"/><rect x="668" y="194" width="18" height="18" class="fill-z5"/><rect x="690" y="194" width="18" height="18" class="fill-z5"/><rect x="712" y="194" width="18" height="18" class="fill-z5"/><rect x="734" y="194" width="18" height="18" class="fill-z5"/><rect x="756" y="194" width="18" height="18" class="fill-z5"/><rect x="778" y="194" width="18" height="18" class="fill-z5"/><rect x="800" y="194" width="18" height="18" class="fill-z5"/><rect x="822" y="194" width="18" height="18" class="fill-z5"/>
+          </g>
+          <text x="580" y="236" class="mono-md sv-z5">192 MB of reach</text>
+          <text x="580" y="256" class="lbl-sm sv-dim">larger than every cache on the chip, combined.</text>
+
+          <line x1="440" y1="40" x2="440" y2="256" class="st-grid" stroke-width="1"/>
+          <text x="440" y="288" text-anchor="middle" class="mono sv-ink w600">512&times;</text>
+          <text x="60" y="288" class="lbl-sm sv-dim">
+            Identical hardware. Identical entry count. The only thing that changed is how much memory each entry covers.
+          </text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>384 KB is a startling number.</b> It is smaller than this core&rsquo;s 1 MB L2. Any
+        access pattern roaming over more than 384 KB is already missing the first-level TLB on most
+        accesses, however well it fits in cache.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ 03 ============ -->
+  <section>
+    <h2><span class="num">03</span>Finding the edge by walking off it</h2>
+    <p class="lede">
+      That 96 is measured, not quoted. The experiment grows the number of <em>pages</em> touched
+      while keeping the amount of <em>data</em> touched tiny: chase one 64-byte line per page, in
+      random page order. Touching N pages needs N translations but only N&times;64 bytes of data, so
+      translation runs out long before the caches do.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 330" role="img"
+             aria-label="Latency against number of pages touched. With 4 kilobyte pages the curve is flat at 0.78 nanoseconds up to 96 pages, then steps to 2.14 nanoseconds at 112 pages, locating the level-one data TLB at 96 entries. The 2 megabyte curve is identical until a 2 megabyte span, where huge pages become possible and it drops back to 0.78, after which the two curves diverge, peaking at a 3.1 times gap at a 32 megabyte span.">
+          <defs>
+            <marker id="t3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-faint"/></marker>
+          </defs>
+
+          <!-- axes -->
+          <line x1="110" y1="250" x2="975" y2="250" class="st-rule" stroke-width="1.25"/>
+          <line x1="110" y1="40" x2="110" y2="250" class="st-rule" stroke-width="1.25"/>
+          <g class="st-grid" stroke-width="1">
+            <line x1="110" y1="202.3" x2="975" y2="202.3"/>
+            <line x1="110" y1="154.5" x2="975" y2="154.5"/>
+            <line x1="110" y1="106.8" x2="975" y2="106.8"/>
+            <line x1="110" y1="59.1" x2="975" y2="59.1"/>
+          </g>
+          <g class="mono-sm sv-faint">
+            <text x="102" y="253" text-anchor="end">0</text>
+            <text x="102" y="205" text-anchor="end">5</text>
+            <text x="102" y="158" text-anchor="end">10</text>
+            <text x="102" y="110" text-anchor="end">15</text>
+            <text x="102" y="62" text-anchor="end">20 ns</text>
+          </g>
+
+          <g class="mono-sm sv-faint">
+            <text x="110" y="268" text-anchor="middle">16</text>
+            <text x="248" y="268" text-anchor="middle">64</text>
+            <text x="387" y="268" text-anchor="middle">256</text>
+            <text x="525" y="268" text-anchor="middle">1K</text>
+            <text x="663" y="268" text-anchor="middle">4K</text>
+            <text x="802" y="268" text-anchor="middle">16K</text>
+            <text x="940" y="268" text-anchor="middle">64K</text>
+            <text x="110" y="282" text-anchor="middle">64 KB</text>
+            <text x="248" y="282" text-anchor="middle">256 KB</text>
+            <text x="387" y="282" text-anchor="middle">1 MB</text>
+            <text x="525" y="282" text-anchor="middle">4 MB</text>
+            <text x="663" y="282" text-anchor="middle">16 MB</text>
+            <text x="802" y="282" text-anchor="middle">64 MB</text>
+            <text x="940" y="282" text-anchor="middle">256 MB</text>
+          </g>
+          <text x="542" y="302" text-anchor="middle" class="lbl sv-dim">pages touched &nbsp;/&nbsp; address span</text>
+
+          <!-- the 96-entry cliff -->
+          <line x1="296" y1="40" x2="296" y2="250" class="st-cost" stroke-width="1" stroke-dasharray="4 4"/>
+          <text x="302" y="52" class="mono sv-cost w600">96 entries</text>
+          <text x="302" y="64" class="lbl-sm sv-cost">L1 DTLB full</text>
+
+          <!-- 2 MB span marker -->
+          <line x1="456" y1="150" x2="456" y2="250" class="st-z5" stroke-width="1" stroke-dasharray="4 4"/>
+          <text x="462" y="162" class="mono sv-z5 w600">2 MB span</text>
+          <text x="462" y="174" class="lbl-sm sv-z5">huge pages first possible</text>
+
+          <!-- series: 4 KB -->
+          <polyline class="st-cost fill-none" stroke-width="2" points="110,242.6 150.5,242.6 179.2,242.6 219.6,242.6 248.3,242.6 270.6,242.6 288.8,242.6 304.2,229.6 317.5,229.6 339.8,229.6 358,229.6 386.7,229.6 427.1,229.6 455.8,229.6 496.3,229.5 525,211.0 565.5,203.8 594.2,206.6 634.6,199.8 663.3,187.3 703.8,176.1 732.5,165.9 773,134.6 801.7,90.6 842.1,75.6 870.8,70.3 911.3,52.9 940,42.9"/>
+          <!-- series: 2 MB -->
+          <polyline class="st-z5 fill-none" stroke-width="2" points="110,242.6 150.5,242.6 179.2,242.6 219.6,242.6 248.3,242.6 270.6,242.6 288.8,242.6 304.2,229.6 317.5,229.6 339.8,229.6 358,229.6 386.7,229.6 427.1,229.6 455.8,242.6 496.3,238.2 525,223.9 565.5,224.0 594.2,223.9 634.6,224.0 663.3,223.6 703.8,223.3 732.5,222.8 773,194.6 801.7,170.5 842.1,155.9 870.8,155.6 911.3,141.4 940,130.0"/>
+
+          <circle cx="288.8" cy="242.6" r="3" class="sv-cost"/>
+          <circle cx="304.2" cy="229.6" r="3" class="sv-cost"/>
+
+          <text x="948" y="42" class="mono sv-cost w600">4 KB</text>
+          <text x="948" y="130" class="mono sv-z5 w600">2 MB</text>
+
+          <!-- peak gap -->
+          <line x1="732.5" y1="165.9" x2="732.5" y2="222.8" class="st-dim" stroke-width="1"
+                marker-start="url(#t3)" marker-end="url(#t3)"/>
+          <text x="740" y="200" class="mono-sm sv-ink w600">3.1&times;</text>
+
+          <text x="110" y="322" class="mono-sm sv-faint">
+            Below a 2 MB span the two runs are identical, because a transparent huge page cannot back a region smaller than itself &mdash; the &ldquo;2 MB&rdquo; run is still on 4 KB pages there.
+          </text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>The step from 96 to 112 pages is the whole measurement.</b> 0.778 ns becomes 2.141 ns
+        with no change in the amount of data touched &mdash; six kilobytes, comfortably L1-resident,
+        in both cases. The only thing that overflowed was the translation cache.
+      </figcaption>
+    </figure>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Pages</th><th scope="col">Address span</th><th scope="col">Data touched</th>
+            <th scope="col">4 KB pages</th><th scope="col">2 MB pages</th><th scope="col">Tax</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>80</td><td>320 KB</td><td>5 KB</td><td>0.779 ns</td><td>0.779 ns</td><td>1.00&times;</td></tr>
+          <tr class="good"><td>96</td><td>384 KB</td><td>6 KB</td><td>0.778 ns</td><td>0.779 ns</td><td>1.00&times;</td></tr>
+          <tr class="bad"><td>112</td><td>448 KB</td><td>7 KB</td><td>2.141 ns</td><td>2.142 ns</td><td>1.00&times;</td></tr>
+          <tr><td>512</td><td>2 MB</td><td>32 KB</td><td>2.140 ns</td><td>0.779 ns</td><td>2.75&times;</td></tr>
+          <tr><td>4096</td><td>16 MB</td><td>256 KB</td><td>6.564 ns</td><td>2.761 ns</td><td>2.38&times;</td></tr>
+          <tr class="bad"><td>8192</td><td>32 MB</td><td>512 KB</td><td>8.814 ns</td><td>2.849 ns</td><td>3.09&times;</td></tr>
+          <tr><td>65536</td><td>256 MB</td><td>4 MB</td><td>21.697 ns</td><td>12.573 ns</td><td>1.73&times;</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lede" style="font-size:13.5px">
+      Note that the 112-page row shows <em>no</em> huge-page benefit: at a 448 KB span there is no
+      huge page to be had. The tax column only becomes meaningful from 512 pages on.
+    </p>
+  </section>
+
+  <!-- ============ 04 ============ -->
+  <section>
+    <h2><span class="num">04</span>The overflow, worked through</h2>
+    <p class="lede">
+      Back to the array from the top of this page: 12 MB of doubles, accessed in random order. Every
+      cache number says this should be fast. It is not, and the arithmetic says why.
+    </p>
+
+    <ol class="steps">
+      <li>
+        <span class="n">1</span>
+        <div class="body">
+          <h3>It fits in cache with room to spare</h3>
+          <p>12 MB against this complex&rsquo;s 16 MB L3. Nothing about the data is too big; an L3 hit here costs about 11.9 ns.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">2</span>
+        <div class="body">
+          <h3>But it spans 3,072 pages</h3>
+          <p><code>12 MB / 4 KB = 3,072</code> distinct translations, touched in random order so no two consecutive accesses share a page.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">3</span>
+        <div class="body">
+          <h3>The TLB holds 96</h3>
+          <p><strong>32&times; oversubscribed.</strong> By the time an entry would be reused it was evicted long ago, so nearly every access takes a page walk on top of its cache access.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">4</span>
+        <div class="body">
+          <h3>Measured: 31.9 ns instead of 13.5 ns</h3>
+          <p>The same 12 MB on 2 MB pages needs only <strong>6 translations</strong> &mdash; they never leave the TLB, and the access costs what an L3 hit should cost. <strong>2.4&times;, entirely in address translation.</strong></p>
+        </div>
+      </li>
+    </ol>
+
+    <div class="note warn">
+      <h3>Why this one is so easy to misdiagnose</h3>
+      <p>
+        Every instinct says &ldquo;12 MB fits in 16 MB of L3, so this is a cache hit, so it is
+        fast.&rdquo; A cache profiler will agree with you &mdash; the cache hit rate really is high.
+        The time is going somewhere that most people never think to measure, and it does not show up
+        as a cache miss because it is not one.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 05 ============ -->
+  <section>
+    <h2><span class="num">05</span>Making the pages bigger</h2>
+    <p class="lede">
+      The fix is not to touch less memory. It is to cover the same memory with fewer translations.
+    </p>
+
+    <ol class="steps">
+      <li>
+        <span class="n">1</span>
+        <div class="body">
+          <h3>Ask for huge pages on the allocation</h3>
+          <p>Align to 2 MB and advise the kernel. This is the whole change &mdash; the access pattern, the data structure, and the loop stay exactly as they were.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">2</span>
+        <div class="body">
+          <h3>Then verify you actually got them</h3>
+          <p><code>MADV_HUGEPAGE</code> is a request, not a promise: under memory fragmentation the kernel will quietly hand back 4 KB pages. Check <code>AnonHugePages</code> in <code>/proc/self/smaps</code> rather than assuming.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">3</span>
+        <div class="body">
+          <h3>Do not bother below 2 MB</h3>
+          <p>A huge page cannot back a region smaller than a huge page. Under that size the call is a no-op, which is exactly what the flat left half of the chart above shows.</p>
+        </div>
+      </li>
+    </ol>
+
+    <pre>double *a;
+posix_memalign((void **)&amp;a, <b>2 &lt;&lt; 20</b>, bytes);   <span class="hot">/* 2 MB alignment is required */</span>
+madvise(a, bytes, <b>MADV_HUGEPAGE</b>);
+
+<span class="hot">/* then confirm -- the kernel is allowed to say no */</span>
+grep -A20 $(printf %x $a) /proc/self/smaps | grep AnonHugePages</pre>
+
+    <div class="note">
+      <h3>Who already does this</h3>
+      <p>
+        Database buffer pools, JVM heaps, and HPC runtimes all request huge pages at startup, and it
+        is one of the few tuning knobs that reliably pays. The reason is exactly the arithmetic
+        above: their working sets are measured in gigabytes, and 4 KB pages would put a page walk in
+        front of a large fraction of their accesses.
+      </p>
+    </div>
+  </section>
+
+  <footer class="colophon">
+    <h2>How this was measured</h2>
+    <p>
+      The sweep is <code>tlb_walk.c</code> in this directory: one 64-byte line chased per page in
+      random page order, pinned to <code>cpu0</code>, best of three, with the core clock re-measured
+      before the run. The line offset within each page is rotated so that consecutive accesses do
+      not all land in the same L1 set &mdash; without that, the experiment measures set conflicts
+      instead of translation. The 12 MB figures come from the main pointer-chase benchmark,
+      <code>cache_latency.c</code>.
+    </p>
+    <p>
+      The L1 DTLB step at 96 entries is clean. The second-level TLB boundary is not, because past
+      1,024 pages the data footprint leaves L1 and cache cost grows alongside translation cost; the
+      tax column is the honest reading there.
+    </p>
+    <p>
+      Also in this series: <a href="cache_map.html">Strix Point Cache Map</a> for the full hierarchy, and
+      <a href="why_1024_is_slow.html">Why 1024 Is Slow</a> for what happens when addresses collide instead.
+      Sources and raw results are in this directory; the full write-up is
+      <a href="cache_hierarchy.ipynb">cache_hierarchy.ipynb</a>.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>

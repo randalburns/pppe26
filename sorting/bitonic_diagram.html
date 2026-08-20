@@ -1,8 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Bitonic Sort -- generated for the pppe26 repo; opens standalone in any browser,
+     no server and no external assets beyond the web fonts, which fall back
+     to system faces offline. -->
 <title>Bitonic Sort</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
+  /* the hosted version of this page got a reset from its runtime; standalone,
+     it brings its own */
+  body { margin: 0; }
+  img { max-width: 100%; }
+
   :root{
     --ground:#F6F8F9; --surface:#FFFFFF; --panel:#FBFCFD;
     --ink:#16202B; --muted:#5D6D7B; --rule:#DAE1E7; --rule-soft:#E9EEF2;
@@ -108,7 +121,8 @@
   a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--asc); outline-offset:3px; border-radius:2px}
   @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
 </style>
-
+</head>
+<body>
 <div class="wrap">
 
   <header>
@@ -426,3 +440,5 @@
   <footer>Sorting network figures follow the standard Knuth diagram convention: wires run left to right, comparators join two wires, and the trace above is a complete run of the 8-element network.</footer>
 
 </div>
+</body>
+</html>

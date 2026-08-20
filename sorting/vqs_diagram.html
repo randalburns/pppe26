@@ -1,8 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Vectorized Quicksort -- generated for the pppe26 repo; opens standalone in any browser,
+     no server and no external assets beyond the web fonts, which fall back
+     to system faces offline. -->
 <title>Vectorized Quicksort</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=JetBrains+Mono:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <style>
+  /* the hosted version of this page got a reset from its runtime; standalone,
+     it brings its own */
+  body { margin: 0; }
+  img { max-width: 100%; }
+
   :root{
     --ground:#FAF9FC; --surface:#FFFFFF; --panel:#F4F2F8;
     --ink:#1B1823; --muted:#655E73; --rule:#E3DFEA; --rule-soft:#EDEAF2;
@@ -81,7 +94,8 @@
   a:focus-visible{outline:2px solid var(--lt); outline-offset:3px; border-radius:2px}
   @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
 </style>
-
+</head>
+<body>
 <div class="wrap">
 
   <header>
@@ -463,3 +477,5 @@
   <footer>Diagrams follow <code>vqs_highway_x86.cpp</code>; the partition trace is a complete run of one <code>simd_partition</code> call at 8 lanes, the AVX2 vector width for int32, and was checked against the implementation. Timings are pinned to one core with <code>taskset</code>.</footer>
 
 </div>
+</body>
+</html>

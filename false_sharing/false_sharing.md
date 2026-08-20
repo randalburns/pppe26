@@ -1,17 +1,11 @@
 
 
-Run in this directory. The Makefile builds all four optimization
-levels (`fs_O0` .. `fs_O3`); `-O0` makes every case slow and
-compresses the ratios, so `-O2` is where the effect reads cleanest.
+Run in this directory. Must compile with -O2 to see the effect;
+-O0 makes all cases slow and masks the cache line behavior.
 
 ```
-make && make run          # builds -O0/-O1/-O2/-O3 and runs all four
-./fs_O2                   # or run one level directly
-./fs_O2 5000000           # optional arg: iterations per thread
+make && ./false_sharing
 ```
-
-Measured results on AMD Ryzen AI 9 HX 370 (Zen 5): see
-[false_sharing_ryzen.md](false_sharing_ryzen.md).
 
 Example prompt for Claude:
 
