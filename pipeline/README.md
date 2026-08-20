@@ -54,38 +54,6 @@ of leaving it idle. That's the single idea behind every example below:
 breaking or hiding a dependency chain so the pipeline has something to do
 while a slow result is still in flight.
 
-## The pipeline on this machine
-
-The examples here were built and measured on Apple silicon (M-series),
-clocked at a measured/assumed **4.0 GHz** — the constant these benchmarks
-use to convert wall-clock time into cycles. Some relevant, independently
-measured characteristics of this specific pipeline, drawn from the more
-detailed cycle-level analysis in [../ILP/](../ILP/):
-
-- **10-wide superscalar, out-of-order.** The core can have many
-  instructions in flight at once and issue several per cycle when they're
-  independent — [speculative_execution.md](../ILP/speculative_execution.md)
-  measures a sustained CPI of 0.14 (about 7 instructions retiring per
-  cycle) on a loop with no stalls, well below the "1 instruction per cycle"
-  a purely sequential model would predict.
-- **Floating-point add latency: 3 cycles**, across **4 independent FP
-  execution units** — [out_of_order.md](../ILP/out_of_order.md) derives the
-  minimum accumulator count needed to keep one FP unit fully busy
-  (`K_min = latency / throughput = 3`), then shows the four independent
-  accumulators in `pipeline.cpp` engaging more than one of those units at
-  once.
-- **Branch misprediction flush cost: ~15 cycles nominal, ~18 measured.**
-  [speculative_execution.md](../ILP/speculative_execution.md) assumes 15
-  cycles per wrong guess; cross-checking the arithmetic against measured
-  timings (and against a Zen 5 machine benchmarked the same way) puts the
-  real number closer to 18 on this chip.
-
-None of the examples below need those exact numbers to make sense, but
-they're what "the pipeline stalls" cashes out to concretely on this
-hardware: a wrong guess or an unready operand costs a specific, measurable
-number of cycles, and the point of every technique here is to avoid paying
-that cost more than once.
-
 Each example is a single source file; build and run it directly — no
 shared Makefile.
 
