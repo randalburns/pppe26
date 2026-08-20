@@ -209,6 +209,8 @@ code{
 .c-z5c .more a{color:var(--zen5c);text-decoration-color:var(--zen5c)}
 .c-cost .figure{color:var(--cost)}
 .c-ink .figure{color:var(--ink)}
+.c-ink .more a{color:var(--ink-2);text-decoration-color:var(--ink-3)}
+section[id]{scroll-margin-top:20px}
 
 /* ---------- callout ---------- */
 .note{
@@ -220,6 +222,7 @@ code{
   font-family:"IBM Plex Sans",sans-serif;font-size:.95rem;font-weight:600;margin:0;
 }
 .note p{font-size:14px;color:var(--ink-2)}
+.note.warn{border-left-color:var(--cost)}
 
 /* ---------- decomposition list ---------- */
 .puzzles{display:flex;flex-direction:column;gap:18px;margin:0;padding:0}
@@ -598,9 +601,140 @@ a:focus-visible{outline:2px solid var(--zen5);outline-offset:3px;border-radius:2
     </figure>
   </section>
 
+  <!-- ============ BANDWIDTH SCALING ============ -->
+  <section id="bandwidth">
+    <h2><span class="num">03</span>One core already saturates DRAM</h2>
+    <p class="lede">
+      Latency is how long <em>one dependent</em> access takes. Bandwidth is how much
+      <em>independent</em> traffic the memory system will sustain, and it is the number that decides
+      whether parallelism helps you. Here it decides that it does not: each thread streams its own
+      slice of a 1 GB array, no sharing, no false sharing, only capacity.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 360" role="img"
+             aria-label="Aggregate DRAM read bandwidth against thread count. One thread reads 38.5 gigabytes per second. Twelve threads read at best 38.8, and by twelve the curve has drifted down to 34.4. Perfect scaling would reach 462 gigabytes per second and leaves the top of the chart before four threads.">
+          <defs>
+            <marker id="b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5"
+                    orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" class="sv-faint"/></marker>
+          </defs>
+
+          <!-- axes -->
+          <line x1="120" y1="280" x2="930" y2="280" class="st-rule" stroke-width="1.25"/>
+          <line x1="120" y1="40" x2="120" y2="280" class="st-rule" stroke-width="1.25"/>
+          <g class="st-grid" stroke-width="1">
+            <line x1="120" y1="220" x2="930" y2="220"/>
+            <line x1="120" y1="160" x2="930" y2="160"/>
+            <line x1="120" y1="100" x2="930" y2="100"/>
+            <line x1="120" y1="40"  x2="930" y2="40"/>
+          </g>
+          <g class="mono-sm sv-faint">
+            <text x="112" y="283" text-anchor="end">0</text>
+            <text x="112" y="223" text-anchor="end">40</text>
+            <text x="112" y="163" text-anchor="end">80</text>
+            <text x="112" y="103" text-anchor="end">120</text>
+            <text x="112" y="43"  text-anchor="end">160 GB/s</text>
+          </g>
+
+          <!-- perfect scaling, which leaves the chart before 5 threads -->
+          <line x1="120" y1="222.3" x2="343.8" y2="40" class="st-dim" stroke-width="1.5"
+                stroke-dasharray="6 4"/>
+          <text x="352" y="52" class="mono-sm sv-dim w500">perfect scaling</text>
+          <text x="352" y="66" class="lbl-sm sv-faint">would reach 462 GB/s at 12 threads</text>
+
+          <!-- one-thread reference -->
+          <line x1="120" y1="222.3" x2="930" y2="222.3" class="st-z5" stroke-width="1"
+                stroke-dasharray="3 4"/>
+          <text x="936" y="215" class="mono-sm sv-z5">one thread</text>
+          <text x="936" y="227" class="mono-sm sv-z5">38.5 GB/s</text>
+
+          <!-- Zen 5c boundary -->
+          <line x1="368" y1="240" x2="368" y2="280" class="st-grid" stroke-width="1.25"/>
+          <text x="374" y="252" class="mono-sm sv-faint">Zen 5c cores</text>
+          <text x="374" y="264" class="mono-sm sv-faint">start here</text>
+
+          <!-- measured -->
+          <polyline class="st-cost fill-none" stroke-width="2.5"
+                    points="120,222.3 190.9,222.1 261.8,223.7 332.7,224.8 403.6,223.3 474.5,223.2 545.5,222.4 616.4,221.8 687.3,223.3 758.2,224.5 829.1,227.6 900,228.4"/>
+          <g class="sv-cost">
+            <circle cx="120" cy="222.3" r="3.5"/><circle cx="190.9" cy="222.1" r="3.5"/>
+            <circle cx="261.8" cy="223.7" r="3.5"/><circle cx="332.7" cy="224.8" r="3.5"/>
+            <circle cx="403.6" cy="223.3" r="3.5"/><circle cx="474.5" cy="223.2" r="3.5"/>
+            <circle cx="545.5" cy="222.4" r="3.5"/><circle cx="616.4" cy="221.8" r="3.5"/>
+            <circle cx="687.3" cy="223.3" r="3.5"/><circle cx="758.2" cy="224.5" r="3.5"/>
+            <circle cx="829.1" cy="227.6" r="3.5"/><circle cx="900" cy="228.4" r="3.5"/>
+          </g>
+          <text x="640" y="248" class="mono sv-cost w600">measured</text>
+
+          <!-- the 1.01x callout -->
+          <line x1="616.4" y1="221.8" x2="700" y2="150" class="st-ink" stroke-width="1"
+                marker-start="url(#b1)"/>
+          <rect x="700" y="112" width="228" height="44" rx="2" class="fill-cost"/>
+          <rect x="700" y="112" width="228" height="44" rx="2" class="st-cost" stroke-width="1.25"/>
+          <text x="814" y="131" text-anchor="middle" class="lbl sv-ink w600">best of all thread counts:</text>
+          <text x="814" y="147" text-anchor="middle" class="mono sv-cost w600">38.8 GB/s &mdash; 1.01&times; one thread</text>
+
+          <!-- x labels -->
+          <g class="mono-sm sv-faint">
+            <text x="120" y="298" text-anchor="middle">1</text>
+            <text x="190.9" y="298" text-anchor="middle">2</text>
+            <text x="261.8" y="298" text-anchor="middle">3</text>
+            <text x="332.7" y="298" text-anchor="middle">4</text>
+            <text x="403.6" y="298" text-anchor="middle">5</text>
+            <text x="474.5" y="298" text-anchor="middle">6</text>
+            <text x="545.5" y="298" text-anchor="middle">7</text>
+            <text x="616.4" y="298" text-anchor="middle">8</text>
+            <text x="687.3" y="298" text-anchor="middle">9</text>
+            <text x="758.2" y="298" text-anchor="middle">10</text>
+            <text x="829.1" y="298" text-anchor="middle">11</text>
+            <text x="900" y="298" text-anchor="middle">12</text>
+          </g>
+          <text x="525" y="318" text-anchor="middle" class="lbl sv-dim">threads, one per physical core</text>
+
+          <text x="120" y="344" class="mono-sm sv-faint">
+            Each thread streams its own contiguous slice, so there is no sharing to pay for. Aggregate
+            is total bytes over the slowest thread's time, not the sum of per-thread rates.
+          </text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>Twelve times the cores, 1.01&times; the bandwidth.</b> The curve is not merely
+        sublinear &mdash; it is flat, and past ten threads it bends <em>down</em>, because the extra
+        threads are Zen 5c cores contending for a memory controller that was already saturated by
+        the first one.
+      </figcaption>
+    </figure>
+
+    <p>
+      This is the single most consequential number on this page for anyone about to parallelize
+      something. A memory-bound loop gets <strong>no speedup at all</strong> from more cores here.
+      Not a disappointing speedup &mdash; none. Amdahl&rsquo;s law is not what is binding; the memory
+      controller is.
+    </p>
+    <p>
+      Parallelism still pays when the extra threads bring extra <em>cache</em> with them, since every
+      core has its own L1 and L2, or when the work is genuinely compute-bound. The dividing line is
+      the machine&rsquo;s balance: a Zen 5 core retires two 512-bit FMAs per cycle, so
+      <code>2 &times; 8 doubles &times; 2 flops = 32 flops/cycle</code>, or 162 GFLOP/s at 5.07 GHz,
+      against 38.5 GB/s of DRAM &mdash; 4.8 billion doubles per second.
+    </p>
+    <div class="note warn">
+      <h3>About 34 flops per double</h3>
+      <p>
+        <code>162 GFLOP/s &divide; 4.8 Gdouble/s &asymp; 34</code>. If your loop does fewer than
+        roughly 34 floating-point operations per element it reads from DRAM, it is not a computation
+        &mdash; it is a memory system with some arithmetic attached, and this flat line is your
+        ceiling. Dot products, <code>saxpy</code>, most elementwise array work and every graph
+        traversal sit far below that line. Dense matrix multiply is one of the few common kernels
+        above it, which is exactly why it is the example everyone tiles.
+      </p>
+    </div>
+  </section>
+
   <!-- ============ FIGURE 3: SHARING ============ -->
   <section>
-    <h2><span class="num">03</span>What it costs two threads to share a line</h2>
+    <h2><span class="num">04</span>What it costs two threads to share a line</h2>
     <p class="lede">
       A cache line is owned by one core at a time. When a second core writes it, the line has to
       travel &mdash; and how far it travels depends entirely on where the scheduler put the two
@@ -703,14 +837,14 @@ a:focus-visible{outline:2px solid var(--zen5);outline-offset:3px;border-radius:2
         <b>Placement is an 8&times; decision you never wrote down.</b> The same two-thread program
         pays 20&nbsp;ns or 167&nbsp;ns per handoff depending on which cores the scheduler picked.
         Worse, the expensive case is also the unstable one, and a barrier waits for the tail.
-        None of these match the latency scale above &mdash; &sect;04 takes them apart.
+        None of these match the latency scale above &mdash; &sect;05 takes them apart.
       </figcaption>
     </figure>
   </section>
 
   <!-- ============ DECOMPOSITION ============ -->
   <section>
-    <h2><span class="num">04</span>Why a handoff costs more than a cache hit</h2>
+    <h2><span class="num">05</span>Why a handoff costs more than a cache hit</h2>
     <p class="lede">
       Those four numbers do not line up with the latency scale, and the mismatch is worth chasing.
       Two threads sharing an L1 &mdash; a cache with a <strong>0.78 ns</strong> hit time &mdash;
@@ -883,7 +1017,7 @@ a:focus-visible{outline:2px solid var(--zen5);outline-offset:3px;border-radius:2
 
   <!-- ============ CONSEQUENCES ============ -->
   <section>
-    <h2><span class="num">05</span>Four numbers the map cannot draw</h2>
+    <h2><span class="num">06</span>Four numbers the map cannot draw</h2>
     <p class="lede">
       Capacity and latency are only half of it. These came out of the same benchmark runs and each
       one changes how you write the loop. The second has its own page, because it is the one nobody
@@ -925,13 +1059,14 @@ a:focus-visible{outline:2px solid var(--zen5);outline-offset:3px;border-radius:2
           One thread reads 38.5&nbsp;GB/s; twelve threads read 38.8&nbsp;GB/s. A memory-bound loop
           gets no speedup from more cores on this machine &mdash; not a poor one, none.
         </p>
+        <p class="more"><a href="#bandwidth">See the scaling curve &rarr;</a></p>
       </div>
     </div>
   </section>
 
   <!-- ============ TABLE ============ -->
   <section>
-    <h2><span class="num">06</span>Every number on this page</h2>
+    <h2><span class="num">07</span>Every number on this page</h2>
     <div class="tablewrap">
       <table>
         <thead>
@@ -974,7 +1109,7 @@ a:focus-visible{outline:2px solid var(--zen5);outline-offset:3px;border-radius:2
       and 5.16 GHz and a clock sampled once at startup silently corrupts every cycle count.
       Capacities and associativity are read from <code>/sys/devices/system/cpu/cpu*/cache/</code>,
       not from a datasheet. Handoff costs come from a 200,000-exchange ping-pong of one line
-      between pinned threads; the PAUSE and polling figures in &sect;04 come from <code>spin_cost.c</code>,
+      between pinned threads; the PAUSE and polling figures in &sect;05 come from <code>spin_cost.c</code>,
       run on each core type.
     </p>
     <p>
