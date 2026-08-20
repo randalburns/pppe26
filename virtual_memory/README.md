@@ -15,7 +15,7 @@ pagemap}` and take fault counts from `getrusage`.
 
 ## Start here
 
-[virtual_memory.html](virtual_memory.html) — the write-up, with diagrams. Standalone; double-click
+[vm_reality.html](vm_reality.html) — the write-up, with diagrams. Standalone; double-click
 it. Or run the programs yourself:
 
 ```
