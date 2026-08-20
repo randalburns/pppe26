@@ -840,6 +840,452 @@ a:focus-visible{outline:2px solid var(--zen5);outline-offset:3px;border-radius:2
         None of these match the latency scale above &mdash; &sect;05 takes them apart.
       </figcaption>
     </figure>
+
+    <p>
+      The four cases above are representatives. Every one of the 66 core pairs was measured, and
+      laid out as a matrix the chip&rsquo;s floorplan draws itself &mdash; two blocks on the
+      diagonal, one expensive field everywhere else.
+    </p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 566" role="img"
+             aria-label="Matrix of coherence latency between every pair of the twelve physical cores. The four Zen 5 cores of CCX 0 exchange a line in about 20 nanoseconds and the eight Zen 5c cores of CCX 1 in about 30. Every pair that crosses between the two complexes costs about 167 nanoseconds, except pairs involving core 4, which cost 76 to 155.">
+          <text x="96" y="40" class="cap sv-z5">CCX 0 &middot; Zen 5</text>
+          <line x1="96" y1="48" x2="232" y2="48" class="st-z5" stroke-width="1.25"/>
+          <text x="232" y="40" class="cap sv-z5c">CCX 1 &middot; Zen 5c</text>
+          <line x1="232" y1="48" x2="504" y2="48" class="st-z5c" stroke-width="1.25"/>
+          <text x="113" y="68" text-anchor="middle" class="mono-sm sv-z5">0</text>
+          <text x="86" y="96" text-anchor="end" class="mono-sm sv-z5">0</text>
+          <text x="147" y="68" text-anchor="middle" class="mono-sm sv-z5">1</text>
+          <text x="86" y="130" text-anchor="end" class="mono-sm sv-z5">1</text>
+          <text x="181" y="68" text-anchor="middle" class="mono-sm sv-z5">2</text>
+          <text x="86" y="164" text-anchor="end" class="mono-sm sv-z5">2</text>
+          <text x="215" y="68" text-anchor="middle" class="mono-sm sv-z5">3</text>
+          <text x="86" y="198" text-anchor="end" class="mono-sm sv-z5">3</text>
+          <text x="249" y="68" text-anchor="middle" class="mono-sm sv-z5c">4</text>
+          <text x="86" y="232" text-anchor="end" class="mono-sm sv-z5c">4</text>
+          <text x="283" y="68" text-anchor="middle" class="mono-sm sv-z5c">5</text>
+          <text x="86" y="266" text-anchor="end" class="mono-sm sv-z5c">5</text>
+          <text x="317" y="68" text-anchor="middle" class="mono-sm sv-z5c">6</text>
+          <text x="86" y="300" text-anchor="end" class="mono-sm sv-z5c">6</text>
+          <text x="351" y="68" text-anchor="middle" class="mono-sm sv-z5c">7</text>
+          <text x="86" y="334" text-anchor="end" class="mono-sm sv-z5c">7</text>
+          <text x="385" y="68" text-anchor="middle" class="mono-sm sv-z5c">8</text>
+          <text x="86" y="368" text-anchor="end" class="mono-sm sv-z5c">8</text>
+          <text x="419" y="68" text-anchor="middle" class="mono-sm sv-z5c">9</text>
+          <text x="86" y="402" text-anchor="end" class="mono-sm sv-z5c">9</text>
+          <text x="453" y="68" text-anchor="middle" class="mono-sm sv-z5c">10</text>
+          <text x="86" y="436" text-anchor="end" class="mono-sm sv-z5c">10</text>
+          <text x="487" y="68" text-anchor="middle" class="mono-sm sv-z5c">11</text>
+          <text x="86" y="470" text-anchor="end" class="mono-sm sv-z5c">11</text>
+          <text x="86" y="60" text-anchor="end" class="mono-sm sv-faint">core</text>
+          <rect x="96" y="76" width="34" height="34" class="fill-sunken"/>
+          <text x="113" y="92" text-anchor="middle" class="mono-sm sv-dim">18</text>
+          <text x="113" y="103" text-anchor="middle" class="mono-sm sv-faint" font-size="7.5">SMT</text>
+          <rect x="130" y="76" width="34" height="34" class="fill-cost" opacity="0.147"/>
+          <text x="147" y="96" text-anchor="middle" class="mono-sm sv-ink">19</text>
+          <rect x="164" y="76" width="34" height="34" class="fill-cost" opacity="0.182"/>
+          <text x="181" y="96" text-anchor="middle" class="mono-sm sv-ink">21</text>
+          <rect x="198" y="76" width="34" height="34" class="fill-cost" opacity="0.183"/>
+          <text x="215" y="96" text-anchor="middle" class="mono-sm sv-ink">21</text>
+          <rect x="232" y="76" width="34" height="34" class="fill-cost" opacity="0.638"/>
+          <text x="249" y="96" text-anchor="middle" class="mono-sm fill-surface">83</text>
+          <rect x="266" y="76" width="34" height="34" class="fill-cost" opacity="0.988"/>
+          <text x="283" y="96" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="300" y="76" width="34" height="34" class="fill-cost" opacity="0.988"/>
+          <text x="317" y="96" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="334" y="76" width="34" height="34" class="fill-cost" opacity="0.986"/>
+          <text x="351" y="96" text-anchor="middle" class="mono-sm fill-surface">167</text>
+          <rect x="368" y="76" width="34" height="34" class="fill-cost" opacity="0.993"/>
+          <text x="385" y="96" text-anchor="middle" class="mono-sm fill-surface">169</text>
+          <rect x="402" y="76" width="34" height="34" class="fill-cost" opacity="0.989"/>
+          <text x="419" y="96" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="436" y="76" width="34" height="34" class="fill-cost" opacity="0.996"/>
+          <text x="453" y="96" text-anchor="middle" class="mono-sm fill-surface">170</text>
+          <rect x="470" y="76" width="34" height="34" class="fill-cost" opacity="0.992"/>
+          <text x="487" y="96" text-anchor="middle" class="mono-sm fill-surface">169</text>
+          <rect x="96" y="110" width="34" height="34" class="fill-cost" opacity="0.147"/>
+          <text x="113" y="130" text-anchor="middle" class="mono-sm sv-ink">19</text>
+          <rect x="130" y="110" width="34" height="34" class="fill-sunken"/>
+          <text x="147" y="130" text-anchor="middle" class="mono-sm sv-faint">&middot;</text>
+          <rect x="164" y="110" width="34" height="34" class="fill-cost" opacity="0.163"/>
+          <text x="181" y="130" text-anchor="middle" class="mono-sm sv-ink">20</text>
+          <rect x="198" y="110" width="34" height="34" class="fill-cost" opacity="0.224"/>
+          <text x="215" y="130" text-anchor="middle" class="mono-sm sv-ink">24</text>
+          <rect x="232" y="110" width="34" height="34" class="fill-cost" opacity="0.667"/>
+          <text x="249" y="130" text-anchor="middle" class="mono-sm fill-surface">89</text>
+          <rect x="266" y="110" width="34" height="34" class="fill-cost" opacity="0.986"/>
+          <text x="283" y="130" text-anchor="middle" class="mono-sm fill-surface">167</text>
+          <rect x="300" y="110" width="34" height="34" class="fill-cost" opacity="0.985"/>
+          <text x="317" y="130" text-anchor="middle" class="mono-sm fill-surface">167</text>
+          <rect x="334" y="110" width="34" height="34" class="fill-cost" opacity="0.983"/>
+          <text x="351" y="130" text-anchor="middle" class="mono-sm fill-surface">166</text>
+          <rect x="368" y="110" width="34" height="34" class="fill-cost" opacity="0.99"/>
+          <text x="385" y="130" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="402" y="110" width="34" height="34" class="fill-cost" opacity="0.986"/>
+          <text x="419" y="130" text-anchor="middle" class="mono-sm fill-surface">167</text>
+          <rect x="436" y="110" width="34" height="34" class="fill-cost" opacity="0.993"/>
+          <text x="453" y="130" text-anchor="middle" class="mono-sm fill-surface">169</text>
+          <rect x="470" y="110" width="34" height="34" class="fill-cost" opacity="0.989"/>
+          <text x="487" y="130" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="96" y="144" width="34" height="34" class="fill-cost" opacity="0.182"/>
+          <text x="113" y="164" text-anchor="middle" class="mono-sm sv-ink">21</text>
+          <rect x="130" y="144" width="34" height="34" class="fill-cost" opacity="0.163"/>
+          <text x="147" y="164" text-anchor="middle" class="mono-sm sv-ink">20</text>
+          <rect x="164" y="144" width="34" height="34" class="fill-sunken"/>
+          <text x="181" y="164" text-anchor="middle" class="mono-sm sv-faint">&middot;</text>
+          <rect x="198" y="144" width="34" height="34" class="fill-cost" opacity="0.192"/>
+          <text x="215" y="164" text-anchor="middle" class="mono-sm sv-ink">21</text>
+          <rect x="232" y="144" width="34" height="34" class="fill-cost" opacity="0.942"/>
+          <text x="249" y="164" text-anchor="middle" class="mono-sm fill-surface">155</text>
+          <rect x="266" y="144" width="34" height="34" class="fill-cost" opacity="0.99"/>
+          <text x="283" y="164" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="300" y="144" width="34" height="34" class="fill-cost" opacity="0.966"/>
+          <text x="317" y="164" text-anchor="middle" class="mono-sm fill-surface">161</text>
+          <rect x="334" y="144" width="34" height="34" class="fill-cost" opacity="0.988"/>
+          <text x="351" y="164" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="368" y="144" width="34" height="34" class="fill-cost" opacity="0.993"/>
+          <text x="385" y="164" text-anchor="middle" class="mono-sm fill-surface">169</text>
+          <rect x="402" y="144" width="34" height="34" class="fill-cost" opacity="0.989"/>
+          <text x="419" y="164" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="436" y="144" width="34" height="34" class="fill-cost" opacity="0.996"/>
+          <text x="453" y="164" text-anchor="middle" class="mono-sm fill-surface">170</text>
+          <rect x="470" y="144" width="34" height="34" class="fill-cost" opacity="0.993"/>
+          <text x="487" y="164" text-anchor="middle" class="mono-sm fill-surface">169</text>
+          <rect x="96" y="178" width="34" height="34" class="fill-cost" opacity="0.183"/>
+          <text x="113" y="198" text-anchor="middle" class="mono-sm sv-ink">21</text>
+          <rect x="130" y="178" width="34" height="34" class="fill-cost" opacity="0.224"/>
+          <text x="147" y="198" text-anchor="middle" class="mono-sm sv-ink">24</text>
+          <rect x="164" y="178" width="34" height="34" class="fill-cost" opacity="0.192"/>
+          <text x="181" y="198" text-anchor="middle" class="mono-sm sv-ink">21</text>
+          <rect x="198" y="178" width="34" height="34" class="fill-sunken"/>
+          <text x="215" y="198" text-anchor="middle" class="mono-sm sv-faint">&middot;</text>
+          <rect x="232" y="178" width="34" height="34" class="fill-cost" opacity="0.605"/>
+          <text x="249" y="198" text-anchor="middle" class="mono-sm fill-surface">76</text>
+          <rect x="266" y="178" width="34" height="34" class="fill-cost" opacity="0.99"/>
+          <text x="283" y="198" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="300" y="178" width="34" height="34" class="fill-cost" opacity="0.991"/>
+          <text x="317" y="198" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="334" y="178" width="34" height="34" class="fill-cost" opacity="0.99"/>
+          <text x="351" y="198" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="368" y="178" width="34" height="34" class="fill-cost" opacity="0.995"/>
+          <text x="385" y="198" text-anchor="middle" class="mono-sm fill-surface">170</text>
+          <rect x="402" y="178" width="34" height="34" class="fill-cost" opacity="0.989"/>
+          <text x="419" y="198" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="436" y="178" width="34" height="34" class="fill-cost" opacity="0.999"/>
+          <text x="453" y="198" text-anchor="middle" class="mono-sm fill-surface">171</text>
+          <rect x="470" y="178" width="34" height="34" class="fill-cost" opacity="0.996"/>
+          <text x="487" y="198" text-anchor="middle" class="mono-sm fill-surface">170</text>
+          <rect x="96" y="212" width="34" height="34" class="fill-cost" opacity="0.638"/>
+          <text x="113" y="232" text-anchor="middle" class="mono-sm fill-surface">83</text>
+          <rect x="130" y="212" width="34" height="34" class="fill-cost" opacity="0.667"/>
+          <text x="147" y="232" text-anchor="middle" class="mono-sm fill-surface">89</text>
+          <rect x="164" y="212" width="34" height="34" class="fill-cost" opacity="0.942"/>
+          <text x="181" y="232" text-anchor="middle" class="mono-sm fill-surface">155</text>
+          <rect x="198" y="212" width="34" height="34" class="fill-cost" opacity="0.605"/>
+          <text x="215" y="232" text-anchor="middle" class="mono-sm fill-surface">76</text>
+          <rect x="232" y="212" width="34" height="34" class="fill-sunken"/>
+          <text x="249" y="228" text-anchor="middle" class="mono-sm sv-dim">29</text>
+          <text x="249" y="239" text-anchor="middle" class="mono-sm sv-faint" font-size="7.5">SMT</text>
+          <rect x="266" y="212" width="34" height="34" class="fill-cost" opacity="0.304"/>
+          <text x="283" y="232" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="300" y="212" width="34" height="34" class="fill-cost" opacity="0.303"/>
+          <text x="317" y="232" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="334" y="212" width="34" height="34" class="fill-cost" opacity="0.306"/>
+          <text x="351" y="232" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="368" y="212" width="34" height="34" class="fill-cost" opacity="0.312"/>
+          <text x="385" y="232" text-anchor="middle" class="mono-sm sv-ink">32</text>
+          <rect x="402" y="212" width="34" height="34" class="fill-cost" opacity="0.312"/>
+          <text x="419" y="232" text-anchor="middle" class="mono-sm sv-ink">32</text>
+          <rect x="436" y="212" width="34" height="34" class="fill-cost" opacity="0.3"/>
+          <text x="453" y="232" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="470" y="212" width="34" height="34" class="fill-cost" opacity="0.32"/>
+          <text x="487" y="232" text-anchor="middle" class="mono-sm sv-ink">33</text>
+          <rect x="96" y="246" width="34" height="34" class="fill-cost" opacity="0.988"/>
+          <text x="113" y="266" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="130" y="246" width="34" height="34" class="fill-cost" opacity="0.986"/>
+          <text x="147" y="266" text-anchor="middle" class="mono-sm fill-surface">167</text>
+          <rect x="164" y="246" width="34" height="34" class="fill-cost" opacity="0.99"/>
+          <text x="181" y="266" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="198" y="246" width="34" height="34" class="fill-cost" opacity="0.99"/>
+          <text x="215" y="266" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="232" y="246" width="34" height="34" class="fill-cost" opacity="0.304"/>
+          <text x="249" y="266" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="266" y="246" width="34" height="34" class="fill-sunken"/>
+          <text x="283" y="266" text-anchor="middle" class="mono-sm sv-faint">&middot;</text>
+          <rect x="300" y="246" width="34" height="34" class="fill-cost" opacity="0.291"/>
+          <text x="317" y="266" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="334" y="246" width="34" height="34" class="fill-cost" opacity="0.283"/>
+          <text x="351" y="266" text-anchor="middle" class="mono-sm sv-ink">29</text>
+          <rect x="368" y="246" width="34" height="34" class="fill-cost" opacity="0.304"/>
+          <text x="385" y="266" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="402" y="246" width="34" height="34" class="fill-cost" opacity="0.291"/>
+          <text x="419" y="266" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="436" y="246" width="34" height="34" class="fill-cost" opacity="0.312"/>
+          <text x="453" y="266" text-anchor="middle" class="mono-sm sv-ink">32</text>
+          <rect x="470" y="246" width="34" height="34" class="fill-cost" opacity="0.303"/>
+          <text x="487" y="266" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="96" y="280" width="34" height="34" class="fill-cost" opacity="0.988"/>
+          <text x="113" y="300" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="130" y="280" width="34" height="34" class="fill-cost" opacity="0.985"/>
+          <text x="147" y="300" text-anchor="middle" class="mono-sm fill-surface">167</text>
+          <rect x="164" y="280" width="34" height="34" class="fill-cost" opacity="0.966"/>
+          <text x="181" y="300" text-anchor="middle" class="mono-sm fill-surface">161</text>
+          <rect x="198" y="280" width="34" height="34" class="fill-cost" opacity="0.991"/>
+          <text x="215" y="300" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="232" y="280" width="34" height="34" class="fill-cost" opacity="0.303"/>
+          <text x="249" y="300" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="266" y="280" width="34" height="34" class="fill-cost" opacity="0.291"/>
+          <text x="283" y="300" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="300" y="280" width="34" height="34" class="fill-sunken"/>
+          <text x="317" y="300" text-anchor="middle" class="mono-sm sv-faint">&middot;</text>
+          <rect x="334" y="280" width="34" height="34" class="fill-cost" opacity="0.283"/>
+          <text x="351" y="300" text-anchor="middle" class="mono-sm sv-ink">29</text>
+          <rect x="368" y="280" width="34" height="34" class="fill-cost" opacity="0.293"/>
+          <text x="385" y="300" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="402" y="280" width="34" height="34" class="fill-cost" opacity="0.293"/>
+          <text x="419" y="300" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="436" y="280" width="34" height="34" class="fill-cost" opacity="0.304"/>
+          <text x="453" y="300" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="470" y="280" width="34" height="34" class="fill-cost" opacity="0.301"/>
+          <text x="487" y="300" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="96" y="314" width="34" height="34" class="fill-cost" opacity="0.986"/>
+          <text x="113" y="334" text-anchor="middle" class="mono-sm fill-surface">167</text>
+          <rect x="130" y="314" width="34" height="34" class="fill-cost" opacity="0.983"/>
+          <text x="147" y="334" text-anchor="middle" class="mono-sm fill-surface">166</text>
+          <rect x="164" y="314" width="34" height="34" class="fill-cost" opacity="0.988"/>
+          <text x="181" y="334" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="198" y="314" width="34" height="34" class="fill-cost" opacity="0.99"/>
+          <text x="215" y="334" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="232" y="314" width="34" height="34" class="fill-cost" opacity="0.306"/>
+          <text x="249" y="334" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="266" y="314" width="34" height="34" class="fill-cost" opacity="0.283"/>
+          <text x="283" y="334" text-anchor="middle" class="mono-sm sv-ink">29</text>
+          <rect x="300" y="314" width="34" height="34" class="fill-cost" opacity="0.283"/>
+          <text x="317" y="334" text-anchor="middle" class="mono-sm sv-ink">29</text>
+          <rect x="334" y="314" width="34" height="34" class="fill-sunken"/>
+          <text x="351" y="334" text-anchor="middle" class="mono-sm sv-faint">&middot;</text>
+          <rect x="368" y="314" width="34" height="34" class="fill-cost" opacity="0.295"/>
+          <text x="385" y="334" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="402" y="314" width="34" height="34" class="fill-cost" opacity="0.283"/>
+          <text x="419" y="334" text-anchor="middle" class="mono-sm sv-ink">29</text>
+          <rect x="436" y="314" width="34" height="34" class="fill-cost" opacity="0.303"/>
+          <text x="453" y="334" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="470" y="314" width="34" height="34" class="fill-cost" opacity="0.29"/>
+          <text x="487" y="334" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="96" y="348" width="34" height="34" class="fill-cost" opacity="0.993"/>
+          <text x="113" y="368" text-anchor="middle" class="mono-sm fill-surface">169</text>
+          <rect x="130" y="348" width="34" height="34" class="fill-cost" opacity="0.99"/>
+          <text x="147" y="368" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="164" y="348" width="34" height="34" class="fill-cost" opacity="0.993"/>
+          <text x="181" y="368" text-anchor="middle" class="mono-sm fill-surface">169</text>
+          <rect x="198" y="348" width="34" height="34" class="fill-cost" opacity="0.995"/>
+          <text x="215" y="368" text-anchor="middle" class="mono-sm fill-surface">170</text>
+          <rect x="232" y="348" width="34" height="34" class="fill-cost" opacity="0.312"/>
+          <text x="249" y="368" text-anchor="middle" class="mono-sm sv-ink">32</text>
+          <rect x="266" y="348" width="34" height="34" class="fill-cost" opacity="0.304"/>
+          <text x="283" y="368" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="300" y="348" width="34" height="34" class="fill-cost" opacity="0.293"/>
+          <text x="317" y="368" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="334" y="348" width="34" height="34" class="fill-cost" opacity="0.295"/>
+          <text x="351" y="368" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="368" y="348" width="34" height="34" class="fill-sunken"/>
+          <text x="385" y="364" text-anchor="middle" class="mono-sm sv-dim">28</text>
+          <text x="385" y="375" text-anchor="middle" class="mono-sm sv-faint" font-size="7.5">SMT</text>
+          <rect x="402" y="348" width="34" height="34" class="fill-cost" opacity="0.308"/>
+          <text x="419" y="368" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="436" y="348" width="34" height="34" class="fill-cost" opacity="0.33"/>
+          <text x="453" y="368" text-anchor="middle" class="mono-sm sv-ink">34</text>
+          <rect x="470" y="348" width="34" height="34" class="fill-cost" opacity="0.314"/>
+          <text x="487" y="368" text-anchor="middle" class="mono-sm sv-ink">32</text>
+          <rect x="96" y="382" width="34" height="34" class="fill-cost" opacity="0.989"/>
+          <text x="113" y="402" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="130" y="382" width="34" height="34" class="fill-cost" opacity="0.986"/>
+          <text x="147" y="402" text-anchor="middle" class="mono-sm fill-surface">167</text>
+          <rect x="164" y="382" width="34" height="34" class="fill-cost" opacity="0.989"/>
+          <text x="181" y="402" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="198" y="382" width="34" height="34" class="fill-cost" opacity="0.989"/>
+          <text x="215" y="402" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="232" y="382" width="34" height="34" class="fill-cost" opacity="0.312"/>
+          <text x="249" y="402" text-anchor="middle" class="mono-sm sv-ink">32</text>
+          <rect x="266" y="382" width="34" height="34" class="fill-cost" opacity="0.291"/>
+          <text x="283" y="402" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="300" y="382" width="34" height="34" class="fill-cost" opacity="0.293"/>
+          <text x="317" y="402" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="334" y="382" width="34" height="34" class="fill-cost" opacity="0.283"/>
+          <text x="351" y="402" text-anchor="middle" class="mono-sm sv-ink">29</text>
+          <rect x="368" y="382" width="34" height="34" class="fill-cost" opacity="0.308"/>
+          <text x="385" y="402" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="402" y="382" width="34" height="34" class="fill-sunken"/>
+          <text x="419" y="402" text-anchor="middle" class="mono-sm sv-faint">&middot;</text>
+          <rect x="436" y="382" width="34" height="34" class="fill-cost" opacity="0.307"/>
+          <text x="453" y="402" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="470" y="382" width="34" height="34" class="fill-cost" opacity="0.293"/>
+          <text x="487" y="402" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="96" y="416" width="34" height="34" class="fill-cost" opacity="0.996"/>
+          <text x="113" y="436" text-anchor="middle" class="mono-sm fill-surface">170</text>
+          <rect x="130" y="416" width="34" height="34" class="fill-cost" opacity="0.993"/>
+          <text x="147" y="436" text-anchor="middle" class="mono-sm fill-surface">169</text>
+          <rect x="164" y="416" width="34" height="34" class="fill-cost" opacity="0.996"/>
+          <text x="181" y="436" text-anchor="middle" class="mono-sm fill-surface">170</text>
+          <rect x="198" y="416" width="34" height="34" class="fill-cost" opacity="0.999"/>
+          <text x="215" y="436" text-anchor="middle" class="mono-sm fill-surface">171</text>
+          <rect x="232" y="416" width="34" height="34" class="fill-cost" opacity="0.3"/>
+          <text x="249" y="436" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="266" y="416" width="34" height="34" class="fill-cost" opacity="0.312"/>
+          <text x="283" y="436" text-anchor="middle" class="mono-sm sv-ink">32</text>
+          <rect x="300" y="416" width="34" height="34" class="fill-cost" opacity="0.304"/>
+          <text x="317" y="436" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="334" y="416" width="34" height="34" class="fill-cost" opacity="0.303"/>
+          <text x="351" y="436" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="368" y="416" width="34" height="34" class="fill-cost" opacity="0.33"/>
+          <text x="385" y="436" text-anchor="middle" class="mono-sm sv-ink">34</text>
+          <rect x="402" y="416" width="34" height="34" class="fill-cost" opacity="0.307"/>
+          <text x="419" y="436" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="436" y="416" width="34" height="34" class="fill-sunken"/>
+          <text x="453" y="436" text-anchor="middle" class="mono-sm sv-faint">&middot;</text>
+          <rect x="470" y="416" width="34" height="34" class="fill-cost" opacity="0.3"/>
+          <text x="487" y="436" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="96" y="450" width="34" height="34" class="fill-cost" opacity="0.992"/>
+          <text x="113" y="470" text-anchor="middle" class="mono-sm fill-surface">169</text>
+          <rect x="130" y="450" width="34" height="34" class="fill-cost" opacity="0.989"/>
+          <text x="147" y="470" text-anchor="middle" class="mono-sm fill-surface">168</text>
+          <rect x="164" y="450" width="34" height="34" class="fill-cost" opacity="0.993"/>
+          <text x="181" y="470" text-anchor="middle" class="mono-sm fill-surface">169</text>
+          <rect x="198" y="450" width="34" height="34" class="fill-cost" opacity="0.996"/>
+          <text x="215" y="470" text-anchor="middle" class="mono-sm fill-surface">170</text>
+          <rect x="232" y="450" width="34" height="34" class="fill-cost" opacity="0.32"/>
+          <text x="249" y="470" text-anchor="middle" class="mono-sm sv-ink">33</text>
+          <rect x="266" y="450" width="34" height="34" class="fill-cost" opacity="0.303"/>
+          <text x="283" y="470" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="300" y="450" width="34" height="34" class="fill-cost" opacity="0.301"/>
+          <text x="317" y="470" text-anchor="middle" class="mono-sm sv-ink">31</text>
+          <rect x="334" y="450" width="34" height="34" class="fill-cost" opacity="0.29"/>
+          <text x="351" y="470" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="368" y="450" width="34" height="34" class="fill-cost" opacity="0.314"/>
+          <text x="385" y="470" text-anchor="middle" class="mono-sm sv-ink">32</text>
+          <rect x="402" y="450" width="34" height="34" class="fill-cost" opacity="0.293"/>
+          <text x="419" y="470" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="436" y="450" width="34" height="34" class="fill-cost" opacity="0.3"/>
+          <text x="453" y="470" text-anchor="middle" class="mono-sm sv-ink">30</text>
+          <rect x="470" y="450" width="34" height="34" class="fill-sunken"/>
+          <text x="487" y="470" text-anchor="middle" class="mono-sm sv-faint">&middot;</text>
+          <g class="st-grid" stroke-width="1">
+            <line x1="96" y1="76" x2="96" y2="484"/>
+            <line x1="96" y1="76" x2="504" y2="76"/>
+            <line x1="130" y1="76" x2="130" y2="484"/>
+            <line x1="96" y1="110" x2="504" y2="110"/>
+            <line x1="164" y1="76" x2="164" y2="484"/>
+            <line x1="96" y1="144" x2="504" y2="144"/>
+            <line x1="198" y1="76" x2="198" y2="484"/>
+            <line x1="96" y1="178" x2="504" y2="178"/>
+            <line x1="232" y1="76" x2="232" y2="484"/>
+            <line x1="96" y1="212" x2="504" y2="212"/>
+            <line x1="266" y1="76" x2="266" y2="484"/>
+            <line x1="96" y1="246" x2="504" y2="246"/>
+            <line x1="300" y1="76" x2="300" y2="484"/>
+            <line x1="96" y1="280" x2="504" y2="280"/>
+            <line x1="334" y1="76" x2="334" y2="484"/>
+            <line x1="96" y1="314" x2="504" y2="314"/>
+            <line x1="368" y1="76" x2="368" y2="484"/>
+            <line x1="96" y1="348" x2="504" y2="348"/>
+            <line x1="402" y1="76" x2="402" y2="484"/>
+            <line x1="96" y1="382" x2="504" y2="382"/>
+            <line x1="436" y1="76" x2="436" y2="484"/>
+            <line x1="96" y1="416" x2="504" y2="416"/>
+            <line x1="470" y1="76" x2="470" y2="484"/>
+            <line x1="96" y1="450" x2="504" y2="450"/>
+            <line x1="504" y1="76" x2="504" y2="484"/>
+            <line x1="96" y1="484" x2="504" y2="484"/>
+          </g>
+          <g class="st-cost" stroke-width="2">
+            <line x1="232" y1="76" x2="232" y2="484"/>
+            <line x1="96" y1="212" x2="504" y2="212"/>
+          </g>
+          <text x="96" y="506" class="mono-sm sv-faint">nanoseconds per handoff &mdash; median of five runs</text>
+          <rect x="96.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.1"/>
+          <rect x="108.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.21"/>
+          <rect x="120.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.267"/>
+          <rect x="132.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.314"/>
+          <rect x="144.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.354"/>
+          <rect x="156.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.39"/>
+          <rect x="168.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.424"/>
+          <rect x="180.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.455"/>
+          <rect x="192.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.485"/>
+          <rect x="204.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.513"/>
+          <rect x="216.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.54"/>
+          <rect x="228.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.566"/>
+          <rect x="240.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.591"/>
+          <rect x="252.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.615"/>
+          <rect x="264.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.638"/>
+          <rect x="276.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.661"/>
+          <rect x="288.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.683"/>
+          <rect x="300.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.705"/>
+          <rect x="312.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.726"/>
+          <rect x="324.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.746"/>
+          <rect x="336.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.766"/>
+          <rect x="348.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.786"/>
+          <rect x="360.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.806"/>
+          <rect x="372.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.825"/>
+          <rect x="384.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.843"/>
+          <rect x="396.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.862"/>
+          <rect x="408.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.88"/>
+          <rect x="420.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.898"/>
+          <rect x="432.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.916"/>
+          <rect x="444.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.933"/>
+          <rect x="456.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.95"/>
+          <rect x="468.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.967"/>
+          <rect x="480.0" y="514" width="12.6" height="13" class="fill-cost" opacity="0.984"/>
+          <rect x="492.0" y="514" width="12.6" height="13" class="fill-cost" opacity="1.0"/>
+          <rect x="96" y="514" width="408" height="13" class="st-grid" stroke-width="1"/>
+          <line x1="96.0" y1="527" x2="96.0" y2="532" class="st-grid" stroke-width="1"/>
+          <text x="96.0" y="544" text-anchor="middle" class="mono-sm sv-faint">18</text>
+          <line x1="128.0" y1="527" x2="128.0" y2="532" class="st-grid" stroke-width="1"/>
+          <text x="128.0" y="544" text-anchor="middle" class="mono-sm sv-faint">30</text>
+          <line x1="208.0" y1="527" x2="208.0" y2="532" class="st-grid" stroke-width="1"/>
+          <text x="208.0" y="544" text-anchor="middle" class="mono-sm sv-faint">60</text>
+          <line x1="314.7" y1="527" x2="314.7" y2="532" class="st-grid" stroke-width="1"/>
+          <text x="314.7" y="544" text-anchor="middle" class="mono-sm sv-faint">100</text>
+          <line x1="501.3" y1="527" x2="501.3" y2="532" class="st-grid" stroke-width="1"/>
+          <text x="501.3" y="544" text-anchor="middle" class="mono-sm sv-faint">170</text>
+          <rect x="588" y="85" width="13" height="13" class="fill-sunken"/>
+          <text x="612" y="96" class="cap sv-dim">Same core &middot; SMT</text>
+          <text x="612" y="126" class="mono-lg sv-ink">18&ndash;29 ns</text>
+          <text x="612" y="148" class="lbl-sm sv-dim">The line never leaves L1. Measured for cores 0, 4 and 8;</text>
+          <text x="612" y="163" class="lbl-sm sv-dim">the rest of the diagonal was not sampled.</text>
+          <rect x="588" y="185" width="13" height="13" class="fill-cost" opacity="0.185"/>
+          <text x="612" y="196" class="cap sv-dim">Inside CCX 0</text>
+          <text x="612" y="226" class="mono-lg sv-ink">19&ndash;24 ns</text>
+          <text x="612" y="248" class="lbl-sm sv-dim">Four Zen 5 cores resolving through one 16 MB L3.</text>
+          <text x="612" y="263" class="lbl-sm sv-dim">The cheapest place to put two talking threads.</text>
+          <rect x="588" y="285" width="13" height="13" class="fill-cost" opacity="0.305"/>
+          <text x="612" y="296" class="cap sv-dim">Inside CCX 1</text>
+          <text x="612" y="326" class="mono-lg sv-ink">29&ndash;34 ns</text>
+          <text x="612" y="348" class="lbl-sm sv-dim">Same mechanism across eight Zen 5c cores, 8 MB of L3</text>
+          <text x="612" y="363" class="lbl-sm sv-dim">and a 3.29 GHz clock instead of 5.16.</text>
+          <rect x="588" y="385" width="13" height="13" class="fill-cost" opacity="0.986"/>
+          <text x="612" y="396" class="cap sv-dim">Across the fabric</text>
+          <text x="612" y="426" class="mono-lg sv-ink">161&ndash;171 ns</text>
+          <text x="612" y="448" class="lbl-sm sv-dim">8&times; the intra-complex cost, and more than a DRAM</text>
+          <text x="612" y="463" class="lbl-sm sv-dim">miss. This is the block the boundary lines enclose.</text>
+          <line x1="588" y1="470" x2="1000" y2="470" class="st-grid" stroke-width="1"/>
+          <text x="588" y="494" class="cap sv-cost">Except core 4</text>
+          <text x="588" y="520" class="lbl-sm sv-dim">Row and column 4 cross the boundary for 76&ndash;155 ns, roughly half</text>
+          <text x="588" y="535" class="lbl-sm sv-dim">what its seven CCX 1 neighbours charge. The effect is in the medians,</text>
+          <text x="588" y="550" class="lbl-sm sv-dim">not the noise &mdash; and this page does not explain it.</text>
+        </svg>
+      </div>
+      <figcaption>
+        <b>The boundary is visible in the data before you are told where it is.</b> Two cheap blocks
+        sit on the diagonal &mdash; the four Zen 5 cores at ~20&nbsp;ns, the eight Zen 5c cores at
+        ~30&nbsp;ns &mdash; and everything off them costs about 167&nbsp;ns. Cell values are medians
+        in nanoseconds, rounded; the diagonal holds SMT-sibling handoffs, sampled on cores 0, 4 and 8
+        only. The one thing the schematic above cannot show is row&nbsp;4: core&nbsp;4 answers the
+        Zen&nbsp;5 complex in 76&ndash;155&nbsp;ns while its seven neighbours all charge ~167&nbsp;ns.
+        That asymmetry is reproducible across runs and is not explained here.
+      </figcaption>
+    </figure>
   </section>
 
   <!-- ============ DECOMPOSITION ============ -->
