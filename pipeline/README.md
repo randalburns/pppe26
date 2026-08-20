@@ -10,16 +10,38 @@ assembly line has a different car under each station simultaneously. When
 every instruction is independent of its neighbors, a new one can enter the
 pipeline every cycle, and the pipeline retires one instruction per cycle
 even though each individual instruction takes several cycles start to
-finish.
+finish:
+
+| | Cy 1 | Cy 2 | Cy 3 | Cy 4 | Cy 5 | Cy 6 | Cy 7 | Cy 8 |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| Instr 1 | IF | ID | EX | MEM | WB | | | |
+| Instr 2 | | IF | ID | EX | MEM | WB | | |
+| Instr 3 | | | IF | ID | EX | MEM | WB | |
+| Instr 4 | | | | IF | ID | EX | MEM | WB |
+
+Four independent instructions, each individually taking 5 cycles
+(**I**nstruction **F**etch → **I**nstruction **D**ecode → **EX**ecute →
+**Mem**ory access → **W**rite **B**ack), but one finishes every single
+cycle from cycle 5 onward — the pipeline is full, and throughput is one
+instruction per cycle even though *latency* per instruction is still five.
 
 That throughput depends on independence. If instruction B needs a value
 that instruction A hasn't finished computing — a **RAW (Read-After-Write)
 hazard** — B can't enter its execute stage until A's result exists. The
 pipeline **stalls**: it inserts bubble cycles instead of useful work,
-waiting for the value B needs. A loop whose accumulator is read and written
-every iteration hits this hazard once per element, and the loop runs no
-faster than the latency of that one dependency, no matter how many
-execution units the chip has sitting idle.
+waiting for the value B needs:
+
+| | Cy 1 | Cy 2 | Cy 3 | Cy 4 | Cy 5 | Cy 6 | Cy 7 |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| Instr A | IF | ID | EX | MEM | WB | | |
+| Instr B *(needs A's result)* | | IF | ID | *stall* | *stall* | EX | MEM |
+
+B is decoded and ready by cycle 3, but can't execute until A's result is
+available — two bubble cycles where nothing retires, before B can finally
+proceed. A loop whose accumulator is read and written every iteration hits
+this hazard once per element, and the loop runs no faster than the latency
+of that one dependency, no matter how many execution units the chip has
+sitting idle.
 
 Not all instructions stall the same amount, because not all operations take
 the same number of cycles to produce a result. A simple integer add is
