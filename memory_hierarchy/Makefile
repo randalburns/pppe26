@@ -13,7 +13,7 @@ FAST    = -O3 -march=native -Wall
 SCRATCH = /tmp/cache_hierarchy_scratch.bin
 
 BINS = cache_latency stride_bandwidth core_to_core row_column bandwidth_scaling \
-       storage_latency spin_cost set_conflict
+       storage_latency spin_cost set_conflict tlb_walk
 
 all: $(BINS)
 
@@ -35,6 +35,9 @@ spin_cost: spin_cost.c
 set_conflict: set_conflict.c
 	$(CC) $(CFLAGS) -fno-tree-vectorize -o $@ $<
 
+tlb_walk: tlb_walk.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 stride_bandwidth: stride_bandwidth.c
 	$(CC) $(FAST) -o $@ $<
 
@@ -54,6 +57,7 @@ data: all
 	./core_to_core 12     > core_to_core.csv
 	./storage_latency $(SCRATCH) 2048 > storage.csv
 	{ ./spin_cost 0; echo; ./spin_cost 5 | head -6; echo; ./set_conflict; } > spin_and_sets.txt
+	./tlb_walk 0          > tlb_walk.csv
 
 clean:
 	rm -f $(BINS)

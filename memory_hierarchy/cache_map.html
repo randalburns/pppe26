@@ -206,6 +206,7 @@ code{
 }
 .c-z5 .figure{color:var(--zen5)}
 .c-z5c .figure{color:var(--zen5c)}
+.c-z5c .more a{color:var(--zen5c);text-decoration-color:var(--zen5c)}
 .c-cost .figure{color:var(--cost)}
 .c-ink .figure{color:var(--ink)}
 
@@ -911,10 +912,11 @@ a:focus-visible{outline:2px solid var(--zen5);outline-offset:3px;border-radius:2
         <div class="figure">2.4&times;</div>
         <h3>Address translation, on 4 KB pages</h3>
         <p>
-          A 96-entry L1 DTLB covers 384&nbsp;KB. On a 12&nbsp;MB working set that fits in L3, page
-          walks cost more than the cache misses. One <code>madvise</code> for 2&nbsp;MB pages
-          removes it.
+          The L1 DTLB holds 96 translations &mdash; 384&nbsp;KB of reach, less than this core&rsquo;s
+          L2. A 12&nbsp;MB working set that fits in L3 spans 3,072 pages, so it pays a page walk
+          almost every access.
         </p>
+        <p class="more"><a href="tlb_cliff.html">Read the full explanation &rarr;</a></p>
       </div>
       <div class="card c-ink">
         <div class="figure">1.01&times;</div>

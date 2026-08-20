@@ -58,3 +58,4 @@ memory_hierarchy/bandwidth_scaling
 memory_hierarchy/storage_latency
 memory_hierarchy/spin_cost
 memory_hierarchy/set_conflict
+memory_hierarchy/tlb_walk
