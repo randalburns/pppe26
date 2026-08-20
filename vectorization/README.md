@@ -1,4 +1,3 @@
-**RB**
 
 Standalone, one file, no Makefile needed. Both a hand-written path and
 Highway build on either chip — AVX2 on x86, NEON on arm64 — picked at compile
@@ -255,3 +254,22 @@ highway target: AVX2, 4 lanes per vector
 The program prints the selected target for this reason. If you benchmark
 Highway against hand-written AVX2 without checking this line, Highway looks
 about twice as slow as it is.
+
+The simpler fix is to stop listing individual `-m` flags and name a concrete
+CPU instead — `-march=<cpu>` sets every flag Highway checks for in one shot:
+
+```
+$ clang++ -O3 -march=znver5 ... && ./find_first    # this machine
+highway target: AVX2, 4 lanes per vector
+
+$ clang++ -O3 -march=native ... && ./find_first    # any machine
+highway target: AVX2, 4 lanes per vector
+```
+
+Two flags that look like they should work do not. `-march=x86-64-v3` — the
+generic "AVX2-generation" portability level — omits AES and PCLMUL, so it
+still falls back to SSSE3. So, surprisingly, does `-march=haswell`: real
+Haswell silicon has AES-NI, but clang's target definition for it does not
+set `__AES__`. Verified by dumping predefined macros for each target
+(`clang++ -march=<x> -dM -E -x c++ /dev/null`) rather than trusting the
+flag's name — only a concrete, current CPU model reliably sets all six.
