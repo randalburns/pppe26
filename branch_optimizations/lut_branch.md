@@ -29,6 +29,24 @@ The table fits in a single 16-byte L1 cache line.  After the first access
 it stays in L1 and each subsequent lookup costs 1–4 cycles with no
 misprediction risk.
 
+```
+HEX[] = "0123456789abcdef"        16 bytes — one L1 cache line
+
+        0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
+       ┌────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┐
+ value │ 0  │ 1  │ 2  │ 3  │ 4  │ 5  │ 6  │ 7  │ 8  │ 9  │ a  │ b  │ c  │ d  │ e  │ f  │
+       └────┴────┴────┴────┴────┴────┴────┴────┴────┴────┴────┴────┴────┴────┴────┴────┘
+                                                                 ▲
+                                                   nibble = 11 ──┘
+
+        out = HEX[nibble]  →  'b'   (one load, no branch)
+```
+
+No condition is ever evaluated: the nibble *is* the address offset. Compare
+that to the branchy version, which has to test `nibble < 10` and take one of
+two paths before it knows what to store — a decision the predictor can get
+wrong.
+
 ---
 
 ## This example: hex encoding
