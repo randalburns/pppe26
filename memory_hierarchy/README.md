@@ -1,4 +1,4 @@
-# The memory hierarchy — a guided tour
+# The memory hierarchy
 
 A measured description of one machine's memory system: an **AMD Ryzen AI 9 HX 370**
 (Zen 5, "Strix Point"), 12 cores / 24 threads, LPDDR5X, one NVMe SSD, Linux, gcc 13.3.
