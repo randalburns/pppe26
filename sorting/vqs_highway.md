@@ -9,6 +9,11 @@ clang++ -O2 -std=c++17 -I/opt/homebrew/include -L/opt/homebrew/lib -lhwy \
   -o vqs_highway vqs_highway.cpp
 ```
 
+[vqs_diagram.html](vqs_diagram.html) walks the CompressStore partition step by
+step — one NEON block, one full pass, the write-pattern comparison against
+Hoare, and the results below — open it in a browser before reading the rest
+of this file.
+
 ---
 
 ## Structure

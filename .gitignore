@@ -66,3 +66,16 @@ virtual_memory/lazy_alloc
 virtual_memory/fault_cost
 virtual_memory/cow_fork
 virtual_memory/same_address
+
+# sorting build artifacts
+sorting/bitonic_sort
+sorting/bitonic_sort_highway
+sorting/bitonic_sort_simd
+sorting/insertion_sort
+sorting/newintrosort
+sorting/newintrosort_heapsortfallback
+sorting/quicksort
+sorting/sort_compare_large
+sorting/sort_compare_n16
+sorting/std_sort
+sorting/vqs_highway

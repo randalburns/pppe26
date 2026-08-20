@@ -54,6 +54,10 @@ sorts pull ahead.
 
 ### Bitonic scalar — 80 CAS, branchless (56 ns, 1.30× slower)
 
+[bitonic_diagram.html](bitonic_diagram.html) builds the network up step by
+step, from a single comparator to a full traced run — open it in a browser
+before reading the rest of this section.
+
 The bitonic sorting network executes a predetermined sequence of 80
 compare-and-swap (CAS) operations with no branches, no recursion, and no
 data-dependent control flow.  Despite being branchless, it is the *slowest*

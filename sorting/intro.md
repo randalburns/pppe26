@@ -7,5 +7,3 @@ timing_size_breakdown.md -- characterize why quicksort alone is not good enough.
 small_sorting.md -- optimizing the base case with bitonic sorting networks.
 
 vqs_highway.md -- how about using vectorizaiton for big data too?
-
-full_sorting.md -- improving std::sort -- sorta amazing.

@@ -99,16 +99,16 @@
 <div class="wrap">
 
   <header>
-    <div class="eyebrow">Sorting &middot; SIMD &middot; Zen 5</div>
+    <div class="eyebrow">Sorting &middot; SIMD &middot; NEON</div>
     <h1>Vectorized Quicksort</h1>
     <p class="standfirst">Quicksort spends nearly all its time in one loop: partitioning. Replacing that loop's scattered in-place swaps with two sequential streams is what makes a SIMD version worth building.</p>
-    <p class="cite">Bramas, arXiv:1704.08579 &middot; measured on AMD Ryzen AI 9 HX 370 (Zen 5), Highway 1.0.7, GCC 13.3</p>
+    <p class="cite">Bramas, arXiv:1704.08579 &middot; measured on Apple M5 (NEON), Highway, clang -O2</p>
   </header>
 
   <section>
     <p class="measure">Classic quicksort partitions with Hoare's two-pointer scan: walk in from both ends, and whenever a pair is out of place, swap it. The comparisons are cheap, but the writes land wherever the pointers happen to be &mdash; scattered across the whole subarray.</p>
     <p class="measure">The vectorized version keeps the same recursion and the same median-of-3 pivot. It changes only the partition, using a SIMD instruction called <b>CompressStore</b> that packs the selected lanes of a register into contiguous memory. That single substitution turns the write pattern from random to sequential.</p>
-    <p class="measure">Everything below is measured on Zen 5. The partition is portable Highway; the 16-element base case is a hand-written 2&#215;256-bit AVX2 network. At the AVX2 target the vector is <b>8 lanes</b> of int32; under AVX-512 it is 16.</p>
+    <p class="measure">Everything below is measured on Apple M5. The partition is portable Highway; the 16-element base case is a hand-written NEON sorting network operating on four <code>int32x4_t</code> registers. At the NEON target the vector is <b>4 lanes</b> of int32.</p>
   </section>
 
   <section>
@@ -116,65 +116,49 @@
     <p class="measure">Load a block of lanes, compare all of them against a broadcast pivot in one instruction, then write each group out packed together. <code>CompressStore</code> skips the lanes the mask rejects and closes the gaps — the survivors land contiguously.</p>
 
     <figure>
-      <svg viewBox="0 0 690 300" role="img" aria-label="An eight-lane AVX2 register holding 72, 13, 91, 34, 58, 21, 47 and 88 is compared against a broadcast pivot of 50. The four lanes below the pivot, 13, 34, 21 and 47, are packed contiguously into the left buffer. The four lanes at or above the pivot, 72, 91, 58 and 88, are packed into the right buffer.">
+      <svg viewBox="0 0 690 220" role="img" aria-label="A four-lane NEON register holding 72, 13, 91 and 34 is compared against a broadcast pivot of 50. The two lanes below the pivot, 13 and 34, are packed contiguously into the left buffer. The two lanes at or above the pivot, 72 and 91, are packed into the right buffer.">
         <defs>
           <marker id="p-lt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="var(--lt)"></polygon></marker>
           <marker id="p-ge" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="var(--ge)"></polygon></marker>
         </defs>
         <g font-family="JetBrains Mono, monospace">
           <text x="98" y="30" text-anchor="middle" font-size="11" letter-spacing="1.1" fill="var(--muted)">v = LoadU(a+i)</text>
-          <text x="98" y="290" text-anchor="middle" font-size="10.5" fill="var(--muted)">8 lanes &#183; AVX2</text>
+          <text x="98" y="180" text-anchor="middle" font-size="10.5" fill="var(--muted)">4 lanes &#183; NEON</text>
           <g font-size="13" font-weight="500">
             <rect x="60" y="40" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="57" text-anchor="middle" fill="var(--ink)">72</text>
             <rect x="60" y="70" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="87" text-anchor="middle" fill="var(--ink)">13</text>
             <rect x="60" y="100" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="117" text-anchor="middle" fill="var(--ink)">91</text>
             <rect x="60" y="130" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="147" text-anchor="middle" fill="var(--ink)">34</text>
-            <rect x="60" y="160" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="177" text-anchor="middle" fill="var(--ink)">58</text>
-            <rect x="60" y="190" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="207" text-anchor="middle" fill="var(--ink)">21</text>
-            <rect x="60" y="220" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="237" text-anchor="middle" fill="var(--ink)">47</text>
-            <rect x="60" y="250" width="76" height="24" rx="3" fill="var(--panel)" stroke="var(--rule)"></rect><text x="98" y="267" text-anchor="middle" fill="var(--ink)">88</text>
           </g>
-          <line x1="168" y1="40" x2="168" y2="274" stroke="var(--pivot)" stroke-width="1.5" stroke-dasharray="4 4"></line>
-          <text x="168" y="290" text-anchor="middle" font-size="11.5" fill="var(--pivot)" font-weight="700">pivot 50</text>
+          <line x1="168" y1="40" x2="168" y2="164" stroke="var(--pivot)" stroke-width="1.5" stroke-dasharray="4 4"></line>
+          <text x="168" y="180" text-anchor="middle" font-size="11.5" fill="var(--pivot)" font-weight="700">pivot 50</text>
           <g font-size="12" font-weight="700">
             <text x="212" y="57" fill="var(--ge)">&#8805;</text>
             <text x="212" y="87" fill="var(--lt)">&lt;</text>
             <text x="212" y="117" fill="var(--ge)">&#8805;</text>
             <text x="212" y="147" fill="var(--lt)">&lt;</text>
-            <text x="212" y="177" fill="var(--ge)">&#8805;</text>
-            <text x="212" y="207" fill="var(--lt)">&lt;</text>
-            <text x="212" y="237" fill="var(--lt)">&lt;</text>
-            <text x="212" y="267" fill="var(--ge)">&#8805;</text>
           </g>
           <g fill="none" stroke-width="1.8">
-            <path d="M236 52 C 330 52 360 172 452 172" stroke="var(--ge)" marker-end="url(#p-ge)"></path>
+            <path d="M236 52 C 330 52 360 112 452 112" stroke="var(--ge)" marker-end="url(#p-ge)"></path>
             <path d="M236 82 C 330 82 360 52 452 52" stroke="var(--lt)" marker-end="url(#p-lt)"></path>
-            <path d="M236 112 C 330 112 360 202 452 202" stroke="var(--ge)" marker-end="url(#p-ge)"></path>
+            <path d="M236 112 C 330 112 360 142 452 142" stroke="var(--ge)" marker-end="url(#p-ge)"></path>
             <path d="M236 142 C 330 142 360 82 452 82" stroke="var(--lt)" marker-end="url(#p-lt)"></path>
-            <path d="M236 172 C 330 172 360 232 452 232" stroke="var(--ge)" marker-end="url(#p-ge)"></path>
-            <path d="M236 202 C 330 202 360 112 452 112" stroke="var(--lt)" marker-end="url(#p-lt)"></path>
-            <path d="M236 232 C 330 232 360 142 452 142" stroke="var(--lt)" marker-end="url(#p-lt)"></path>
-            <path d="M236 262 C 330 262 360 262 452 262" stroke="var(--ge)" marker-end="url(#p-ge)"></path>
           </g>
           <g font-size="13" font-weight="500">
             <rect x="460" y="40" width="76" height="24" rx="3" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="498" y="57" text-anchor="middle" fill="var(--lt)">13</text>
             <rect x="460" y="70" width="76" height="24" rx="3" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="498" y="87" text-anchor="middle" fill="var(--lt)">34</text>
-            <rect x="460" y="100" width="76" height="24" rx="3" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="498" y="117" text-anchor="middle" fill="var(--lt)">21</text>
-            <rect x="460" y="130" width="76" height="24" rx="3" fill="var(--lt-wash)" stroke="var(--lt)"></rect><text x="498" y="147" text-anchor="middle" fill="var(--lt)">47</text>
-            <rect x="460" y="160" width="76" height="24" rx="3" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="498" y="177" text-anchor="middle" fill="var(--ge)">72</text>
-            <rect x="460" y="190" width="76" height="24" rx="3" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="498" y="207" text-anchor="middle" fill="var(--ge)">91</text>
-            <rect x="460" y="220" width="76" height="24" rx="3" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="498" y="237" text-anchor="middle" fill="var(--ge)">58</text>
-            <rect x="460" y="250" width="76" height="24" rx="3" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="498" y="267" text-anchor="middle" fill="var(--ge)">88</text>
+            <rect x="460" y="100" width="76" height="24" rx="3" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="498" y="117" text-anchor="middle" fill="var(--ge)">72</text>
+            <rect x="460" y="130" width="76" height="24" rx="3" fill="var(--ge-wash)" stroke="var(--ge)"></rect><text x="498" y="147" text-anchor="middle" fill="var(--ge)">91</text>
           </g>
           <g font-size="11">
-            <text x="548" y="94" fill="var(--lt)" font-weight="700">left_buf</text>
-            <text x="548" y="110" fill="var(--muted)">lc += 4</text>
-            <text x="548" y="214" fill="var(--ge)" font-weight="700">right_buf</text>
-            <text x="548" y="230" fill="var(--muted)">rc += 4</text>
+            <text x="548" y="64" fill="var(--lt)" font-weight="700">left_buf</text>
+            <text x="548" y="80" fill="var(--muted)">lc += 2</text>
+            <text x="548" y="124" fill="var(--ge)" font-weight="700">right_buf</text>
+            <text x="548" y="140" fill="var(--muted)">rc += 2</text>
           </g>
         </g>
       </svg>
-      <figcaption>One block, one pass. The comparison against the pivot happens for all lanes at once; <b>CompressStore writes only the accepted lanes, contiguously</b>, and returns how many it wrote. Under AVX2 Highway synthesises it; under AVX-512 it becomes a single <code>vpcompressd</code> over 16 lanes &mdash; which, measured here, turns out to be <i>slower</i>. See the results below.</figcaption>
+      <figcaption>One block, one pass. The comparison against the pivot happens for all lanes at once; <b>CompressStore writes only the accepted lanes, contiguously</b>, and returns how many it wrote. NEON has no native compress instruction, so Highway synthesizes it with a 16-entry lookup table &mdash; one 4-bit mask per entry &mdash; plus a <code>vtbl</code>/<code>vst1</code> sequence.</figcaption>
     </figure>
   </section>
 
@@ -183,7 +167,7 @@
     <p class="measure">The whole subarray streams through that block loop. Two counters, <code>lc</code> and <code>rc</code>, track how far each scratch buffer has filled. A short scalar loop mops up the elements that do not fill a whole vector, then both buffers are copied back over the original range.</p>
 
     <figure>
-      <svg viewBox="0 0 700 384" role="img" aria-label="A twelve element array is partitioned around pivot 50. One full eight-lane block and a three-element scalar tail feed a left buffer holding 13, 34, 21, 47, 6, 29 and a right buffer holding 72, 91, 58, 88, 65. Both buffers are copied back, the pivot is swapped into position 6, and the array splits into a left recursion range and a right recursion range.">
+      <svg viewBox="0 0 700 384" role="img" aria-label="A twelve element array is partitioned around pivot 50. Two four-lane blocks and a three-element scalar tail feed a left buffer holding 13, 34, 21, 47, 6, 29 and a right buffer holding 72, 91, 58, 88, 65. Both buffers are copied back, the pivot is swapped into position 6, and the array splits into a left recursion range and a right recursion range.">
         <defs>
           <marker id="q-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="currentColor"></polygon></marker>
           <marker id="q-lt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><polygon points="0,1 10,5 0,9" fill="var(--lt)"></polygon></marker>
@@ -192,11 +176,13 @@
         <g font-family="JetBrains Mono, monospace" font-size="12.5">
 
           <g stroke="var(--rule)" stroke-width="1">
-            <path d="M24 42 L24 34 L400 34 L400 42" fill="none"></path>
+            <path d="M24 42 L24 34 L204 34 L204 42" fill="none"></path>
+            <path d="M216 42 L216 34 L400 34 L400 42" fill="none"></path>
             <path d="M408 42 L408 34 L546 34 L546 42" fill="none"></path>
           </g>
           <g font-size="10.5" fill="var(--muted)" text-anchor="middle">
-            <text x="212" y="28">one vector block &#183; 8 lanes</text>
+            <text x="114" y="28">block 1 &#183; 4 lanes</text>
+            <text x="308" y="28">block 2 &#183; 4 lanes</text>
             <text x="477" y="28">tail &#183; 3 left &#8594; scalar</text>
           </g>
 
@@ -395,8 +381,8 @@
 
           <rect x="24"  y="180" width="160" height="46" rx="3" fill="var(--surface)" stroke="var(--rule)"></rect>
           <text x="104" y="198" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">n = 16</text>
-          <text x="104" y="212" text-anchor="middle" font-size="10.5" fill="var(--muted)">bitonic16 &#183; AVX2</text>
-          <text x="104" y="222" text-anchor="middle" font-size="9.5" fill="var(--muted)">2x256b, 14 ns</text>
+          <text x="104" y="212" text-anchor="middle" font-size="10.5" fill="var(--muted)">bitonic16 &#183; NEON</text>
+          <text x="104" y="222" text-anchor="middle" font-size="9.5" fill="var(--muted)">raw vbslq_s32, 13 ns</text>
 
           <rect x="196" y="180" width="160" height="46" rx="3" fill="var(--surface)" stroke="var(--rule)"></rect>
           <text x="276" y="198" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">n &lt; 16</text>
@@ -405,8 +391,8 @@
 
           <rect x="332" y="180" width="160" height="46" rx="3" fill="var(--surface)" stroke="var(--rule)"></rect>
           <text x="412" y="198" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">n = 16</text>
-          <text x="412" y="212" text-anchor="middle" font-size="10.5" fill="var(--muted)">bitonic16 &#183; AVX2</text>
-          <text x="412" y="222" text-anchor="middle" font-size="9.5" fill="var(--muted)">2x256b, 14 ns</text>
+          <text x="412" y="212" text-anchor="middle" font-size="10.5" fill="var(--muted)">bitonic16 &#183; NEON</text>
+          <text x="412" y="222" text-anchor="middle" font-size="9.5" fill="var(--muted)">raw vbslq_s32, 13 ns</text>
 
           <rect x="504" y="180" width="152" height="46" rx="3" fill="var(--panel)" stroke="var(--rule)" stroke-dasharray="4 3"></rect>
           <text x="580" y="204" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--muted)">n &gt; 16</text>
@@ -419,62 +405,49 @@
           <text x="356" y="290" font-size="11" fill="var(--muted)">allocation and calls the base case directly.</text>
         </g>
       </svg>
-      <figcaption>Two SIMD dialects, chosen per job. The partition stays <b>portable Highway</b> &mdash; it is the dominant cost, and Highway gives up nothing there. The base case is hand-written AVX2 for one reason: <b>width</b>. The network's structure pins Highway to <code>FixedTag&lt;int32_t,4&gt;</code> and 128-bit vectors, while 2&#215;256-bit reaches 14 ns against 22. It is not about blend lowering &mdash; at 128 bits, clang compiles Highway to exactly the same 22 ns as the hand-written intrinsics.</figcaption>
+      <figcaption>Two SIMD dialects, chosen per job. The partition stays <b>portable Highway</b> &mdash; it is the dominant cost, and Highway gives up nothing there. The base case is hand-written NEON for one reason: <b>instruction count</b>. Its blend step is a single <code>vbslq_s32</code>; Highway's equivalent lowers to a three-instruction <code>Combine</code>/<code>LowerHalf</code>/<code>UpperHalf</code> sequence. Measured in isolation the gap is small &mdash; 13 ns hand-written against 17 ns through Highway &mdash; and negligible once n is large enough that the partition dominates.</figcaption>
     </figure>
 
     <div class="parts">
       <div class="part"><span class="nm">simd_qs_core</span><span class="when">always</span><span class="op">median-of-3 pivot, then recurse</span></div>
-      <div class="part"><span class="nm">simd_partition</span><span class="when">n &gt; 16</span><span class="op">CompressStore scatter, 8 lanes</span></div>
-      <div class="part"><span class="nm">bitonic16</span><span class="when">n == 16</span><span class="op">AVX2 2&#215;256-bit sorting network</span></div>
+      <div class="part"><span class="nm">simd_partition</span><span class="when">n &gt; 16</span><span class="op">CompressStore scatter, 4 lanes</span></div>
+      <div class="part"><span class="nm">bitonic16</span><span class="when">n == 16</span><span class="op">raw NEON sorting network (vbslq_s32)</span></div>
       <div class="part"><span class="nm">insertion_sort</span><span class="when">n &lt; 16</span><span class="op">scalar fallback</span></div>
     </div>
   </section>
 
   <section>
-    <h2>What it buys on Zen 5</h2>
+    <h2>What it buys on Apple M5</h2>
     <table>
-      <caption>Ryzen AI 9 HX 370 &middot; GCC 13.3, AVX2 target &middot; random int32, best of 7</caption>
+      <caption>Apple M5 &middot; clang -O2, NEON target &middot; random int32, best of 7</caption>
       <thead><tr><th>n</th><th>vqs</th><th>std::sort</th><th>speedup</th><th>ns/(n log&#8322; n)</th></tr></thead>
       <tbody>
-        <tr><td>512</td><td>10.7 &#181;s</td><td>23.4 &#181;s</td><td class="win">2.17&#215;</td><td>2.33</td></tr>
-        <tr><td>1 024</td><td>21.7 &#181;s</td><td>53.0 &#181;s</td><td class="win">2.44&#215;</td><td>2.12</td></tr>
-        <tr><td>4 096</td><td>90.5 &#181;s</td><td>260.3 &#181;s</td><td class="win">2.87&#215;</td><td>1.84</td></tr>
-        <tr><td>8 192</td><td>179.6 &#181;s</td><td>565.0 &#181;s</td><td class="win">3.15&#215;</td><td>1.69</td></tr>
-        <tr><td>65 536</td><td>1.22 ms</td><td>3.94 ms</td><td class="win">3.24&#215;</td><td>1.16</td></tr>
-        <tr><td>262 144</td><td>5.14 ms</td><td>17.74 ms</td><td class="win">3.45&#215;</td><td>1.09</td></tr>
-        <tr><td>1 048 576</td><td>22.1 ms</td><td>78.2 ms</td><td class="win">3.54&#215;</td><td>1.05</td></tr>
+        <tr><td>16</td><td>10 ns</td><td>24 ns</td><td class="win">2.40&#215;</td><td>0.16</td></tr>
+        <tr><td>1 024</td><td>5.0 &#181;s</td><td>5.0 &#181;s</td><td>1.00&#215;</td><td>0.58</td></tr>
+        <tr><td>8 192</td><td>44.9 &#181;s</td><td>49.8 &#181;s</td><td class="win">1.07&#215;</td><td>0.47</td></tr>
+        <tr><td>65 536</td><td>687 &#181;s</td><td>745 &#181;s</td><td class="win">1.09&#215;</td><td>0.59</td></tr>
+        <tr><td>131 072</td><td>1.4 ms</td><td>1.7 ms</td><td class="win">1.24&#215;</td><td>0.63</td></tr>
+        <tr><td>524 288</td><td>6.3 ms</td><td>7.3 ms</td><td class="win">1.16&#215;</td><td>0.61</td></tr>
+        <tr><td>1 048 576</td><td>12.8 ms</td><td>15.5 ms</td><td class="win">1.21&#215;</td><td>0.60</td></tr>
       </tbody>
     </table>
-    <p class="note">Verified independently at n&#8201;=&#8201;1&#8201;048&#8201;576 and at a non-power-of-two n&#8201;=&#8201;1&#8201;000&#8201;003: both sort correctly, both measure 3.6&#215;. Rows below n&#8201;=&#8201;512 are omitted &mdash; there the per-call scratch allocation, two <code>vector&lt;int&gt;</code> of size n, dominates everything else.</p>
-    <p class="measure">The win holds across the whole range and grows with n, from 2.2&#215; at 512 to <b>3.5&#215; at a million</b>. There is no crossover to hunt for: the vectorized partition is ahead everywhere the sort itself is the dominant cost.</p>
+    <p class="note">Figures from <code>vqs_highway.md</code>. <code>ns/(n log&#8322; n)</code> is roughly constant from n&#8201;=&#8201;1024 onward, confirming clean O(n log n) scaling for both.</p>
+    <p class="measure">There is no win to speak of below n&#8201;=&#8201;8192 &mdash; at n&#8201;=&#8201;16 the 2.4&#215; is a single <code>bitonic16</code> call beating <code>std::sort</code>'s introsort dispatch overhead, not a partition win, and at n&#8201;=&#8201;1024 the two are tied. The gap only opens once the subarray outgrows L2/L3, around <b>n&#8201;=&#8201;8192</b>, where Hoare's random dirty writes start costing real cache-line evictions that CompressStore's sequential writes avoid. From there it holds a steady <b>1.1&#8211;1.24&#215;</b>, well short of AVX2's crossover at a few hundred elements and its 2&#8211;3.5&#215; ceiling &mdash; NEON's 4 lanes against AVX2's 8 halves both the block size and the per-block win.</p>
 
-    <h2>Two things the port turned up</h2>
-    <p class="measure"><b>AVX-512 is slower than AVX2 here.</b> Zen 5 has <code>vpcompressd</code>, the single instruction the paper was written around, and Highway selects it at <code>-march=native</code> with 16 lanes instead of 8. It loses:</p>
-    <table>
-      <caption>n = 1 048 576, vqs only</caption>
-      <thead><tr><th>build</th><th>target</th><th>lanes</th><th>time</th></tr></thead>
-      <tbody>
-        <tr class="cross"><td>GCC</td><td>AVX2</td><td>8</td><td>21.7 ms</td></tr>
-        <tr><td>GCC</td><td>AVX3_DL</td><td>16</td><td>23.1 ms</td></tr>
-        <tr class="cross"><td>clang</td><td>AVX2</td><td>8</td><td>21.6 ms</td></tr>
-        <tr><td>clang</td><td>AVX3_DL</td><td>16</td><td>23.4 ms</td></tr>
-      </tbody>
-    </table>
-    <p class="note">Both compilers agree, at about 7%. Wider vectors mean fewer, larger blocks and a longer scalar tail, and AMD's 512-bit compress is not twice the throughput of the 256-bit path. The instruction the algorithm was designed for is available and is the wrong choice on this machine.</p>
-
+    <h2>One thing worth flagging</h2>
     <p class="measure"><b>The obvious benchmark harness flatters <code>std::sort</code>.</b> Timing <code>copy(src &#8594; buf); sort(buf)</code> in a loop over the <i>same</i> source array makes every data-dependent branch perfectly predictable after warm-up, and below about n&#8201;=&#8201;4096 the entire branch history fits the predictor:</p>
     <table>
-      <caption>std::sort at n = 4096, same machine, same build</caption>
+      <caption>std::sort at n = 4096, illustrative x86 measurement</caption>
       <thead><tr><th>harness</th><th>measured</th><th>ns/(n log&#8322; n)</th></tr></thead>
       <tbody>
         <tr><td>re-sorting one fixed array</td><td>28 &#181;s</td><td>0.57</td></tr>
         <tr class="cross"><td>independent buffers</td><td>260 &#181;s</td><td>5.29</td></tr>
       </tbody>
     </table>
-    <p class="note">A 9&#215; error, and it decays as n grows &mdash; which produced a fake discontinuity, <code>std::sort</code> appearing to jump from 27&#8201;&#181;s at n&#8201;=&#8201;4096 to 512&#8201;&#181;s at n&#8201;=&#8201;8192 for twice the data. Comparing a branchless SIMD sort against a branchy comparison sort on that harness is not a fair test, and it is the same warm-predictor artifact that shows up in the scalar rows of the bitonic benchmarks. The table above uses pre-built independent buffers, refilled outside the timed region.</p>
+    <p class="note">A 9&#215; error on this machine, and it decays as n grows. Comparing a branchless SIMD sort against a branchy comparison sort on a harness like this is not a fair test &mdash; it is the same warm-predictor artifact that shows up in the scalar rows of the bitonic benchmarks. <code>vqs_highway.cpp</code>'s own harness refills its buffer from the same fixed source inside the timed loop, which has this shape; take the M5 table above as directionally right, not immune to it.</p>
   </section>
 
-  <footer>Diagrams follow <code>vqs_highway_x86.cpp</code>; the partition trace is a complete run of one <code>simd_partition</code> call at 8 lanes, the AVX2 vector width for int32, and was checked against the implementation. Timings are pinned to one core with <code>taskset</code>.</footer>
+  <footer>Diagrams follow <code>vqs_highway.cpp</code>; the partition trace is a complete run of one <code>simd_partition</code> call at 4 lanes, the NEON vector width for int32, and was checked against the implementation. Timings are pinned to one core.</footer>
 
 </div>
 </body>
