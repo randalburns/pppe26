@@ -72,7 +72,8 @@ result is still in flight.
 
 Breaking one dependency chain into four independent ones: 496 ms → 198 ms
 at `-O0` (**2.51x**), widening to **3.59x** at `-O1` before the compiler
-starts solving it automatically at `-O2`/`-O3`.
+starts solving it automatically at `-O2`/`-O3`. Verified: **only `-O0` and
+`-O1` show this as a timing comparison.**
 
 ---
 
@@ -88,7 +89,9 @@ serializing them one at a time.
 | Run  | [pipeline.tempvar.cpp](pipeline.tempvar.cpp) | a single-accumulator multiply-XOR chain vs. a load-phase/compute-phase split, over 100M elements |
 
 Splitting the stall chain into independent phases: 90 ms → 28 ms
-(**3.21x**).
+(**3.21x**) at `-O1`/`-O2` — identical at both. Verified: `-O0` shows the
+same technique but a smaller win (1.86x); `-O3` collapses to 0 ms like
+example 1.
 
 ---
 
@@ -103,7 +106,9 @@ and re-pays its stall every time; caching the result pays it once.
 | Run  | [pipeline.cse.cpp](pipeline.cse.cpp) | `a*b+c`, a loop-index calculation, and `sqrt(x²+y²+z²)`, each reused 3x, before vs. after CSE |
 
 Caching instead of recomputing: 2.40x (integer multiply), **17x** (loop
-index, reused inside a hot loop), 1.80x (`sqrt`).
+index, reused inside a hot loop), 1.80x (`sqrt`). Verified: real at every
+level `-O0`–`-O3`, but the loop-index case's 17x is specific to `-O2`/`-O3`
+— at `-O0`/`-O1` it's a more modest ~1.4–2.1x.
 
 ---
 
@@ -117,9 +122,13 @@ never get fetched at all, because their result is never observable.
 | Read | [pipeline.dce.md](pipeline.dce.md) | three patterns (dead store, dead branch, dead call) and why a compile-time-constant branch is already free, with no runtime win left to claim |
 | Run  | [pipeline.dce.cpp](pipeline.dce.cpp) | each pattern, before vs. after removing the dead code by hand |
 
-Removing genuinely unobservable work: 35.96 ms → 0 ms (dead store), 53.18 ms
-→ 0 ms (dead call) — the dead-branch case is 0 ms either way, since the
-compiler already strips a `constexpr false` branch on its own.
+Removing genuinely unobservable work: ~22 ms → 0 ms (dead store), ~28 ms →
+0 ms (dead call) at `-O1`–`-O3` — the dead-branch case is 0 ms either way at
+those levels, since the compiler already strips a `constexpr false` branch
+on its own. Verified: **`-O0` is a real exception**, not just weaker — the
+dead-branch "free win" disappears entirely (no optimization enabled to
+produce it), and the dead call balloons to ~5.8 s calling an unoptimized
+function 100M times.
 
 ---
 

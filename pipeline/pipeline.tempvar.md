@@ -58,16 +58,31 @@ iteration has to actually execute, keeping the benchmark honest.
 ## Build
 
 ```bash
-clang++ -std=c++17 -O2 -o pipeline.tempvar pipeline.tempvar.cpp && ./pipeline.tempvar
+clang++ -std=c++17 -O1 -o pipeline.tempvar pipeline.tempvar.cpp && ./pipeline.tempvar
 ```
 
-## Results (Apple M-series, N=100M ints)
+## Results (Apple M-series, N=100M ints, min of 5 runs, all four levels verified)
 
-```
-Without temporaries (stalled):   90 ms
-With temporaries (pipelined):    28 ms
-Speedup: 3.21x
-```
+| Level | Without temporaries | With temporaries | Speedup |
+|---|---|---|---|
+| `-O0` | 216 ms | 116 ms | 1.86x |
+| `-O1` | 90 ms | 28 ms | **3.21x** |
+| `-O2` | 90 ms | 28 ms | **3.21x** — identical to `-O1` |
+| `-O3` | 0 ms* | 0 ms* | — |
+
+`*` — same failure mode as [pipeline.md](pipeline.md)'s `-O2`/`-O3` rows:
+the compiler either auto-vectorizes `withTempVars` (four independent
+chains is exactly what the auto-vectorizer looks for) or constant-folds
+the whole computation away, and the timed region drops under a
+millisecond either way.
+
+**`-O0` shows the same technique, but a smaller win.** Neither variant
+gets much help from the compiler at `-O0`, so both run slower in absolute
+terms, and the *relative* gap the manual restructuring buys shrinks from
+3.21x to 1.86x — register allocation and instruction scheduling, which
+`-O1` turns on, are part of what makes the independent-phase split pay off
+fully. **`-O1` and `-O2` are identical here** (90/28 ms exactly), so either
+is a safe choice for reproducing this result; `-O3` is not.
 
 ## A diagnostic note: why timers can lie at high `-O`
 
@@ -101,3 +116,8 @@ microseconds is the quick fix if the goal is just to see a nonzero number.
 3. **A 0 ms (or suspiciously fast) result needs a second look** before
    being read as "no effect" — check the generated assembly before drawing
    conclusions from wall-clock time alone.
+4. **The technique is real at `-O0`, but its full payoff needs `-O1`.**
+   Without register allocation and instruction scheduling turned on, both
+   variants pay overhead the manual restructuring can't route around, so
+   the measured win shrinks from 3.21x to 1.86x — `-O0` isn't a clean
+   baseline for this specific effect the way it is for `pipeline.md`'s.

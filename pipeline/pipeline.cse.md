@@ -83,6 +83,31 @@ clang++ -O2 -o pipeline.cse pipeline.cse.cpp -lm && ./pipeline.cse
 | Loop index: `stride*i` reused 3x | 0.17 ms | 0.01 ms | 17x |
 | FP: `sqrt(x²+y²+z²)` reused 3x | 20.93 ms | 11.62 ms | 1.80x |
 
+## Verified optimization levels
+
+Rebuilt and re-run at every level (`clang++`, best of 3 runs per cell —
+`main()` here doesn't loop internally, so single runs are noisier than
+[pipeline.cpp](pipeline.cpp)'s):
+
+| Level | Integer speedup | Loop-index speedup | `sqrt` speedup |
+|---|---|---|---|
+| `-O0` | 2.4x | 1.4x | 1.2x |
+| `-O1` | 2.0x | 2.1x | 1.8x |
+| `-O2` | 2.0x | **17x** | 1.8x |
+| `-O3` | 2.1x | **17x** | 1.8x |
+
+**All four levels show a real before/after gap** — confirming the source
+comment's claim that the `NOINLINE`/`doNotOptimize()` fences work "at any
+optimisation level." But the loop-index case is *not* level-invariant: its
+dramatic 17x only appears at `-O2`/`-O3`. At `-O0`/`-O1` the manual CSE
+alone is worth roughly 1.4–2.1x, the same ballpark as the other two
+sections; the extra 8x only shows up once the compiler's own optimizations
+(loop-invariant code motion, stronger address-calculation folding) start
+compounding with the hand-written fix on top of it. The integer and `sqrt`
+cases don't show this — they're consistently ~2x and ~1.2–1.8x at every
+level, since there's no comparable second optimization for the compiler to
+add on top of the manual fix there.
+
 ## Analysis
 
 Same underlying mechanism throughout: each repeated recomputation re-issues
@@ -109,3 +134,9 @@ time the redundant `sqrt` calls actually account for.
    `doNotOptimize()` exist here specifically to defeat the optimizer so the
    "before" cost is even observable. Ordinary code rarely needs to force
    this by hand.
+4. **A speedup number can itself be level-dependent, even when the effect
+   is real at every level.** The loop-index case's headline 17x needs
+   `-O2`/`-O3` — at `-O0`/`-O1` the same fix is genuinely present but worth
+   only ~1.4–2.1x, because the rest of that speedup comes from a second
+   compiler optimization compounding with the manual one, not from CSE
+   alone.

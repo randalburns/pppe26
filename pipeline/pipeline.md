@@ -77,6 +77,22 @@ independent accumulators is exactly the shape the auto-vectorizer wants),
 so the timed region finishes in well under a millisecond and
 `duration_cast<milliseconds>` rounds it to 0.
 
+## Verified optimization levels
+
+Re-built and re-run at each level to confirm the table above (`clang++
+-std=c++17`, same source, same machine):
+
+| Level | Shows the effect? |
+|---|---|
+| `-O0` | **Yes** — 2.51x / 1.50x |
+| `-O1` | **Yes** — 3.59x / 3.83x, the cleanest run |
+| `-O2` | No — the dependent-chain side already reports 0 ms |
+| `-O3` | No — both sides report 0 ms |
+
+**Only `-O0` and `-O1` demonstrate this example as a timing comparison.**
+From `-O2` on, the compiler has already applied an equivalent fix on its
+own, so there's no gap left for the benchmark to show.
+
 ## Analysis
 
 The 2.5–3.8x speedups from breaking the dependency chain are real and
