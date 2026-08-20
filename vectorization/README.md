@@ -155,48 +155,6 @@ It also writes the fiddly parts for you: the remainder handling, and turning a
 comparison mask into a lane index. Those are the two places the hand-written
 version is easiest to get wrong.
 
-## Same source, two chips: Zen vs M5
-
-`find_simd` is hand-written AVX2, so it only exists on the Ryzen build — there is
-no `<immintrin.h>` on arm64. `find_first.cpp` now guards it behind
-`#if defined(__x86_64__) || defined(__i386__)`, so the same file builds on both
-machines: the Ryzen gets scalar, hand-written AVX2, and Highway; the M5 gets
-scalar and Highway only, with the hand-written column simply absent from its
-output. Highway itself needed no changes — this is exactly what
-`ScalableTag<int64_t>` is for:
-
-```
-$ clang++ -O3 -std=c++17 find_first.cpp -o find_first -lhwy   # on the M5
-highway target: NEON, 2 lanes per vector
-```
-
-Two int64 lanes instead of four, because NEON registers are 128 bits, half the
-width of AVX2's 256. Median of 7 pinned runs on each machine, same source, same
-`n = 8192`, `clang -O3`:
-
-| first match at | Zen scalar | Zen highway (AVX2) | Zen speedup | M5 scalar | M5 highway (NEON) | M5 speedup |
-|---|---:|---:|---:|---:|---:|---:|
-| 0 | 0.5 ns | 1.0 ns | 0.50x | 0.2 ns | 0.5 ns | 0.40x |
-| 16 | 6.8 ns | 1.8 ns | 3.78x | 4.5 ns | 2.4 ns | 1.88x |
-| 256 | 60.6 ns | 26.6 ns | 2.28x | 65.7 ns | 42.0 ns | 1.56x |
-| 4096 | 909.1 ns | 312.6 ns | 2.91x | 933.2 ns | 549.4 ns | 1.70x |
-| 8191 | 1596.1 ns | 698.5 ns | 2.29x | 1856.8 ns | 1062.6 ns | 1.75x |
-| no match | 1318.8 ns | 651.1 ns | 2.03x | 1855.5 ns | 1079.7 ns | 1.72x |
-
-Two things stand out. First, the scalar columns are close — same algorithm, same
-`n`, and neither chip is starved for single-element compares, so per-element
-scalar cost is in the same ballpark on both. Second, the speedup ratio is
-consistently lower on the M5, because it is bounded by lane count: doubling the
-work per instruction buys less than quadrupling it does. AVX2's 4 lanes pull
-2.0-3.8x out of this loop; NEON's 2 lanes pull 1.6-1.9x. Same portable source,
-same algorithm, the ceiling set by the width of the register.
-
-The index-0 row is the exception on both chips, and for the same reason: a
-matched first element makes the scalar loop return on the very first compare,
-while the vector path always pays for one load-and-test of a full register
-before it can check anything. Narrower or wider, that setup cost does not go
-away.
-
 ## One trap
 
 Highway picks its instruction set from the `-m` flags, not from the CPU it is
