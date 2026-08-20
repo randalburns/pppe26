@@ -12,7 +12,8 @@ CFLAGS  = -O2 -Wall
 FAST    = -O3 -march=native -Wall
 SCRATCH = /tmp/cache_hierarchy_scratch.bin
 
-BINS = cache_latency stride_bandwidth core_to_core row_column bandwidth_scaling storage_latency
+BINS = cache_latency stride_bandwidth core_to_core row_column bandwidth_scaling \
+       storage_latency spin_cost set_conflict
 
 all: $(BINS)
 
@@ -26,6 +27,13 @@ row_column: row_column.c
 
 storage_latency: storage_latency.c
 	$(CC) $(CFLAGS) -o $@ $<
+
+# Supporting measurements for the two HTML pages rather than the notebook.
+spin_cost: spin_cost.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+set_conflict: set_conflict.c
+	$(CC) $(CFLAGS) -fno-tree-vectorize -o $@ $<
 
 stride_bandwidth: stride_bandwidth.c
 	$(CC) $(FAST) -o $@ $<
@@ -45,6 +53,7 @@ data: all
 	./bandwidth_scaling   > bandwidth_scaling.csv
 	./core_to_core 12     > core_to_core.csv
 	./storage_latency $(SCRATCH) 2048 > storage.csv
+	{ ./spin_cost 0; echo; ./spin_cost 5 | head -6; echo; ./set_conflict; } > spin_and_sets.txt
 
 clean:
 	rm -f $(BINS)
