@@ -1,4 +1,4 @@
-# Strength reduction — a guided tour
+# Strength reduction
 
 Strength reduction replaces an expensive operation with a cheaper one that
 computes the same result — a shift instead of a divide, an accumulate
@@ -121,7 +121,7 @@ gives a genuine 1.29x; M5's UDIV throughput (~4 cycles) is already fast
 enough that shifting buys nothing. This is the single clearest
 architecture-dependent result in the set.
 
-**Test 4 shows the same failure mode with different severity.** Under
+**Test 4 is the one that inverts expectation, and only on M5.** Under
 `optnone`, the precomputed reciprocal `r` can't be kept in a register — it
 spills to the stack and reloads every iteration. On M5 that reload cost
 exceeds the FDIV saving, so the "optimized" version is *slower*. On Zen 5
