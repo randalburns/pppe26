@@ -103,3 +103,25 @@ sorting/n16_*
 sorting/sort_compare_n16_x86
 sorting/sort_survey_x86*
 sorting/vqs_x86_*
+
+# roofline_example build artifacts (roofline*.png plots ARE tracked)
+roofline/roofline_example/stream
+roofline/roofline_example/peak_flops
+roofline/roofline_example/sort_bench
+roofline/roofline_example/dot_bench
+roofline/roofline_example/saxpy_bench
+roofline/roofline_example/stencil_bench
+roofline/roofline_example/spmv_bench
+roofline/roofline_example/nbody_bench
+roofline/roofline_example/matmul_naive_bench
+roofline/roofline_example/matmul_bench
+roofline/roofline_example/openblas_bench
+roofline/roofline_example/stream_mt
+roofline/roofline_example/peak_flops_mt
+roofline/roofline_example/sort_bench_mt
+roofline/roofline_example/dot_bench_mt
+roofline/roofline_example/saxpy_bench_mt
+roofline/roofline_example/stencil_bench_mt
+roofline/roofline_example/spmv_bench_mt
+roofline/roofline_example/nbody_bench_mt
+roofline/roofline_example/matmul_naive_bench_mt
